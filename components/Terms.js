@@ -476,11 +476,8 @@ function Terms() {
                 <h3>17. CONTACT INFORMATION</h3>
                 <p>For questions about these Terms or the Service, contact us at:</p>
 
-                <p><strong>[COMPANY NAME]</strong><br/>
-                <strong>[ADDRESS]</strong><br/>
-                <strong>[CITY], California [ZIP CODE]</strong><br/>
-                <strong>Email: [EMAIL ADDRESS]</strong><br/>
-                <strong>Phone: [PHONE NUMBER]</strong></p>
+
+                <strong>Email: punkhunt@proton.me</strong><br/>
 
                 <h3>ACKNOWLEDGMENT</h3>
                 <p><strong>By using the Punk HUNT NFT Game Service, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. You further acknowledge that you understand this is a high-risk elimination game where loss of your NFTs is the expected outcome, and you accept full financial responsibility for your participation.</strong></p>
