@@ -7,6 +7,15 @@ body {
   font-family: 'Press Start 2P', monospace;
   background-color: #000;
   color: #fff;
+  padding-top: 120px; /* 80px main nav + 40px subnav */
+}
+
+
+nav {
+  width: 100%;
+  max-width: 424px;
+  margin: 0 auto;
+  overflow-x: hidden;
 }
 
 /* Mini-app specific overrides */
