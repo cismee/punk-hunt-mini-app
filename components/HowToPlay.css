@@ -1,0 +1,40 @@
+/* Lime background band */
+.howto-section {
+  background: #e5e5e5; /* tweak to match your exact green */
+}
+
+/* Keep pixel art crispy */
+.img-pixel {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Big pixel heading */
+.howto-title {
+  color: #000;
+  text-transform: uppercase;
+  line-height: 0.95;
+  font-weight: 900;
+  /* Size similar to the mock, scales down on mobile */
+  font-size: clamp(32px, 6vw, 108px);
+}
+
+/* Body copy – uppercase, roomy, limited measure for neat blocks */
+.howto-copy {
+  max-width: 64ch; /* keeps paragraphs readable */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.howto-copy p {
+  color: #000;
+  text-transform: uppercase;
+  line-height: 1.5;
+  /* Comfortable sizing that scales with viewport */
+  font-size: clamp(14px, 1.8vw, 28px);
+}
+
+/* Optional: tighten spacing a bit on very large screens */
+@media (min-width: 1400px) {
+  .howto-section { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+}

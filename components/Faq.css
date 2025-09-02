@@ -1,0 +1,21 @@
+.faq {
+  background-color: #97e500 !important;
+  color: #000;
+}
+
+a {
+   font-size: 1.25em; 
+   color: #ea6126;
+   text-decoration: none;
+}
+.stats {
+  font-size: 1.5em!important;
+}
+
+
+@media only screen and (max-width: 1152px) {
+    /* Style adjustments for viewports that meet the condition */
+.stats {
+  font-size: .75em!important;
+}
+}

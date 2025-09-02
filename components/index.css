@@ -1,0 +1,270 @@
+@font-face {
+  font-family: "NES";   /*Can be any text*/
+  src: local("Pixel_NES"),
+    url("./fonts/Pixel_NES.otf") format("opentype");
+}
+
+* {
+  font-family: NES;
+  image-rendering: pixelated;        /* Chrome/Edge/Safari */
+  image-rendering: crisp-edges;      /* Spec/partial fallback */
+  image-rendering: -moz-crisp-edges; /* Older Firefox */
+  /* legacy IE: */ 
+  -ms-interpolation-mode: nearest-neighbor;
+    --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+}
+
+
+section {
+    overflow-x: hidden;
+}
+
+a {
+  display: inline-block;
+     font-size: 1.25em; 
+   color: #ea6126;
+   text-decoration: none;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+}
+
+.splash {
+  background-color: #000;
+  color: #fff;
+}
+
+hr {
+  border: 2px solid;
+  border-radius: 0px;
+  opacity: 100%;
+  margin-top: -2px;
+  width: 80vw!important;
+}
+
+p {
+  font-size: 1em!important;
+}
+
+b {
+  font-size: 1.25em!important;
+}
+
+a.underlinelink {
+  text-decoration: underline!important;
+}
+
+.covering-image {
+  pointer-events: none;
+}
+
+.nav {
+  background-color: #000;
+}
+
+.stats {
+  font-size: 1.5em!important;
+}
+
+.zap {
+  background-color: #97e500;
+}
+
+.terms {
+  background-color: #aa32d2;
+}
+
+.pixel-btn{
+  --btn:#3bc3fd;          /* base blue */
+  --hi:#3bc3fd;           /* light edge (top/left) */
+  --lo:#176AA0;           /* dark edge (right/bottom) */
+  --shadow:#000;       /* drop shadow */
+
+  background: var(--btn);
+  color:#fff;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  padding:8px 16px;
+  border:4px solid;
+  border-top-color:var(--hi);
+  border-left-color:var(--hi);
+  border-right-color:var(--lo);
+  border-bottom-color:var(--lo);
+  box-shadow: 4px 4px 0 var(--shadow);   /* hard pixel shadow */
+  border-radius:0;                        /* square corners */
+  display:inline-block;
+  cursor:pointer;
+}
+
+.pixel-btn:active{
+  transform: translate(2px,2px);
+  box-shadow: 2px 2px 0 var(--shadow);
+  /* flip the bevel so it looks pressed */
+  border-top-color:var(--lo);
+  border-left-color:var(--lo);
+  border-right-color:var(--hi);
+  border-bottom-color:var(--hi);
+}
+
+.pixel-btn:focus{
+  outline:2px solid #000;
+  outline-offset:2px;
+}
+
+
+/* Drop this after Bootstrap (or anywhere in your CSS) */
+.btn-nes{
+  --frame: #000;   /* outer frame */
+  --shadow:#000;   /* hard drop shadow */
+  --face:  #fff;   /* button face */
+  --barR:  #fff;   /* inner right strip */
+  --barB:  #fff;   /* inner bottom bevel */
+
+
+  padding: 10px 28px;      /* was 8px 18px */
+  background: var(--face);
+  color: #000;
+  text-transform: none;
+  font-weight: 800;
+  letter-spacing: .5px;
+  font-size: 1.25em!important;
+
+  border-radius: 0;
+  border: 4px solid var(--frame);
+  box-shadow: 4px 4px 0 var(--shadow);      /* pixel shadow */
+  padding: 8px 18px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* inner bottom bevel */
+.btn-nes::before{
+
+  content:"";
+  position:absolute;
+  left:4px; right:12px; bottom:4px;
+  height:8px;
+  background: var(--barB);
+}
+
+/* inner right light strip */
+.btn-nes::after{
+  z-index: -1;             /* keep bevel/strip behind the text */  
+  content:"";
+  position:absolute;
+  top:4px; bottom:4px; right:4px;
+  width:8px;
+  background: var(--barR);
+}
+
+.btn-nes:active{
+  transform: translate(2px,2px);
+  box-shadow: 4px 4px 0 var(--shadow);
+  /* subtle “pressed” feel */
+}
+
+/* ---- Splash menu alignment ---- */
+.menu-list{
+  display:inline-block;
+  text-align:left;
+  margin:0;
+  padding:0;
+  list-style:none;
+  text-transform:uppercase;
+  font-weight:800;
+  line-height:1.6;
+}
+.menu-item{
+  display:flex;
+  align-items:baseline;   /* baseline alignment */
+  gap:10px;
+}
+
+/* bullet column */
+.menu-bullet{
+  width:1ch;                           /* fixed column width */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transform: translateY(0.06em);       /* tiny vertical nudge */
+  color:#fff;                       /* <- bullet color */
+}
+
+/* Blink only for the active row’s bullet */
+.menu-item.is-active .menu-bullet svg{
+  width:0.9em;
+  height:0.9em;
+  shape-rendering:crispEdges;
+  image-rendering:pixelated;
+  animation: pixel-blink 0.8s steps(2, start) infinite;
+}
+
+/* Hide bullets on non-active rows but keep spacing for alignment */
+.menu-item:not(.is-active) .menu-bullet{ visibility: hidden; }
+
+@keyframes pixel-blink{
+  0%, 49% { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+
+/* Links */
+.menu-link{
+  color:#ff650b;
+  text-decoration:none;
+  letter-spacing:.5px;
+}
+
+.menu-link:hover{
+  color:#ff650b;
+  text-decoration:underline;
+}
+
+/* “Stats // Leaderboard” inline row */
+.menu-inline{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+}
+.menu-sep{ color:#ff650b; }
+
+
+:root { --top-nav-h: 80px; }         /* match your top nav’s height */
+.nav.sticky-top { z-index: 1030; }   /* keep main nav above subnav */
+.subnav {
+  background: #0a0a0a;
+  z-index: 1020;                     /* below top nav, above content */
+}
+
+/* ensure top nav height is set somewhere */
+:root { --top-nav-h: 80px; }
+
+/* marquee */
+.mq { white-space: nowrap; }
+.mq-track{
+  display: inline-flex;
+  gap: 0;                           /* no visual gaps between copies */
+  padding: 0 0;
+  will-change: transform;
+  animation: mq var(--mq-dur, 8s) linear infinite;
+}
+.mq:hover .mq-track{ animation-play-state: paused; }
+
+@keyframes mq{
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-1 * var(--mq-shift, 600px))); }
+}
+
+
+
+
+@media only screen and (max-width: 1152px) {
+    /* Style adjustments for viewports that meet the condition */
+.stats {
+  font-size: 1em!important;
+}
+}

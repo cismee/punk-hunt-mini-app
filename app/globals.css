@@ -1,0 +1,369 @@
+/* app/globals.css */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import 'nes.css/css/nes.min.css';
+
+body {
+  font-family: 'Press Start 2P', monospace;
+  background-color: #000;
+  color: #fff;
+}
+
+/* Mini-app specific overrides */
+.mini-app-container {
+  width: 100%;
+  max-width: 424px;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+.nes-btn {
+  min-height: 44px !important;
+  font-family: 'Press Start 2P', monospace !important;
+}
+
+.nes-input {
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 16px !important;
+}
+
+* {
+  font-family: 'Press Start 2P', monospace !important;
+  image-rendering: pixelated;        /* Chrome/Edge/Safari */
+  image-rendering: crisp-edges;      /* Spec/partial fallback */
+  image-rendering: -moz-crisp-edges; /* Older Firefox */
+  /* legacy IE: */ 
+  -ms-interpolation-mode: nearest-neighbor;
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+
+
+
+section {
+    overflow-x: hidden;
+}
+
+a {
+  display: inline-block;
+     font-size: 1.25em; 
+   color: #ea6126;
+   text-decoration: none;
+}
+
+a:hover {
+  color: #3a3afc;
+}
+
+
+.splash {
+  background-color: #000;
+  color: #fff;
+}
+
+hr {
+  border: 4px solid;
+  border-radius: 0px;
+  opacity: 100%;
+  margin-top: -2px;
+  width: 80vw!important;
+}
+
+p {
+  font-size: 1em!important;
+  line-height: 1.25em !important;
+}
+
+
+p.faq {
+  line-height: 2em !important;
+}
+
+
+.nes-container {
+  line-height: 2em !important;
+}
+
+
+b {
+  font-size: 1.25em!important;
+}
+
+a.underlinelink {
+  text-decoration: underline!important;
+}
+
+.covering-image {
+  pointer-events: none;
+}
+
+.nav {
+  background-color: #000;
+}
+
+.stats {
+  font-size: 1.5em!important;
+}
+
+.zap {
+  background-color: #97e500;
+}
+
+.terms {
+  background-color: #aa32d2;
+}
+
+.pixel-btn{
+  --btn:#3bc3fd;          /* base blue */
+  --hi:#3bc3fd;           /* light edge (top/left) */
+  --lo:#176AA0;           /* dark edge (right/bottom) */
+  --shadow:#000;       /* drop shadow */
+
+  background: var(--btn);
+  color:#fff;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  padding:8px 16px;
+  border:4px solid;
+  border-top-color:var(--hi);
+  border-left-color:var(--hi);
+  border-right-color:var(--lo);
+  border-bottom-color:var(--lo);
+  box-shadow: 4px 4px 0 var(--shadow);   /* hard pixel shadow */
+  border-radius:0;                        /* square corners */
+  display:inline-block;
+  cursor:pointer;
+}
+
+.pixel-btn:active{
+  transform: translate(2px,2px);
+  box-shadow: 2px 2px 0 var(--shadow);
+  /* flip the bevel so it looks pressed */
+  border-top-color:var(--lo);
+  border-left-color:var(--lo);
+  border-right-color:var(--hi);
+  border-bottom-color:var(--hi);
+}
+
+.pixel-btn:focus{
+  outline:2px solid #000;
+  outline-offset:2px;
+}
+
+
+/* Drop this after Bootstrap (or anywhere in your CSS) */
+.btn-nes{
+  --frame: #000;   /* outer frame */
+  --shadow:#000;   /* hard drop shadow */
+  --face:  #fff;   /* button face */
+  --barR:  #fff;   /* inner right strip */
+  --barB:  #fff;   /* inner bottom bevel */
+
+
+  padding: 10px 28px;      /* was 8px 18px */
+  background: var(--face);
+  color: #000;
+  text-transform: none;
+  font-weight: 800;
+  letter-spacing: .5px;
+  font-size: 1.25em!important;
+
+  border-radius: 0;
+  border: 4px solid var(--frame);
+  box-shadow: 4px 4px 0 var(--shadow);      /* pixel shadow */
+  padding: 8px 18px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* inner bottom bevel */
+.btn-nes::before{
+
+  content:"";
+  position:absolute;
+  left:4px; right:12px; bottom:4px;
+  height:8px;
+  background: var(--barB);
+}
+
+/* inner right light strip */
+.btn-nes::after{
+  z-index: -1;             /* keep bevel/strip behind the text */  
+  content:"";
+  position:absolute;
+  top:4px; bottom:4px; right:4px;
+  width:8px;
+  background: var(--barR);
+}
+
+.btn-nes:active{
+  transform: translate(2px,2px);
+  box-shadow: 4px 4px 0 var(--shadow);
+  /* subtle “pressed” feel */
+}
+
+/* ---- Splash menu alignment ---- */
+.menu-list{
+  display:inline-block;
+  text-align:left;
+  margin:0;
+  padding:0;
+  list-style:none;
+  text-transform:uppercase;
+  font-weight:800;
+  line-height:1.6;
+}
+.menu-item{
+  display:flex;
+  align-items:baseline;   /* baseline alignment */
+  gap:10px;
+}
+
+/* bullet column */
+.menu-bullet{
+  width:1ch;                           /* fixed column width */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transform: translateY(0.06em);       /* tiny vertical nudge */
+  color:#fff;                       /* <- bullet color */
+}
+
+/* Blink only for the active row’s bullet */
+.menu-item.is-active .menu-bullet svg{
+  width:0.9em;
+  height:0.9em;
+  shape-rendering:crispEdges;
+  image-rendering:pixelated;
+  animation: pixel-blink 0.8s steps(2, start) infinite;
+}
+
+/* Add to app/globals.css */
+.pixel-btn {
+  --btn: #3bc3fd;          /* base blue */
+  --hi: #3bc3fd;           /* light edge (top/left) */
+  --lo: #176AA0;           /* dark edge (right/bottom) */
+  --shadow: #000;          /* drop shadow */
+  background: var(--btn);
+  color: #fff;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  border: 4px solid;
+  border-top-color: var(--hi);
+  border-left-color: var(--hi);
+  border-right-color: var(--lo);
+  border-bottom-color: var(--lo);
+  box-shadow: 4px 4px 0 var(--shadow);   /* hard pixel shadow */
+  border-radius: 0;                       /* square corners */
+  display: inline-block;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+}
+
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--shadow);
+  /* flip the bevel so it looks pressed */
+  border-top-color: var(--lo);
+  border-left-color: var(--lo);
+  border-right-color: var(--hi);
+  border-bottom-color: var(--hi);
+}
+
+
+.container,
+.container-fluid,
+[class*="grid"],
+[class*="flex"] {
+  gap: 0 !important;
+}
+
+/* Also remove default margins on flex and grid children */
+.flex > *,
+.grid > * {
+  margin: 0;
+}
+
+/* Remove default padding from containers */
+.container,
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Override Tailwind's space utilities */
+[class*="space-x"] > * + *,
+[class*="space-y"] > * + * {
+  margin: 0 !important;
+}
+
+/* Force pepe image to break out of mini-app container */
+.pepe-fullwidth {
+  width: 100vw !important;
+  max-width: none !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+  position: relative !important;
+  left: 50% !important;
+  right: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Drop this after Bootstrap (or anywhere in your CSS) */
+.btn-nes{
+  --frame: #000;   /* outer frame */
+  --shadow:#000;   /* hard drop shadow */
+  --face:  #fff;   /* button face */
+  --barR:  #fff;   /* inner right strip */
+  --barB:  #fff;   /* inner bottom bevel */
+
+
+  padding: 10px 28px;      /* was 8px 18px */
+  background: var(--face);
+  color: #000;
+  text-transform: none;
+  font-weight: 800;
+  letter-spacing: .5px;
+  font-size: 1.25em!important;
+
+  border-radius: 0;
+  border: 4px solid var(--frame);
+  box-shadow: 4px 4px 0 var(--shadow);      /* pixel shadow */
+  padding: 8px 18px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* inner bottom bevel */
+.btn-nes::before{
+
+  content:"";
+  position:absolute;
+  left:4px; right:12px; bottom:4px;
+  height:8px;
+  background: var(--barB);
+}
+
+/* inner right light strip */
+.btn-nes::after{
+  z-index: -1;             /* keep bevel/strip behind the text */  
+  content:"";
+  position:absolute;
+  top:4px; bottom:4px; right:4px;
+  width:8px;
+  background: var(--barR);
+}
+
+.btn-nes:active{
+  transform: translate(2px,2px);
+  box-shadow: 4px 4px 0 var(--shadow);
+  /* subtle “pressed” feel */
+}

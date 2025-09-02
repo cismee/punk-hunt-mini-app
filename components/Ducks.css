@@ -1,0 +1,18 @@
+.duck {
+      background-color: #3BC3FD;
+}
+
+
+
+.fence {
+  margin-top: -12em;
+}
+
+
+@media only screen and (max-width: 1152px) {
+    /* Style adjustments for viewports that meet the condition */
+.fence {
+  margin-top: -2em;
+}
+
+}
