@@ -8,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import '../components/Ducks.css'
 import '../components/Splash.css'
 import '../components/Stats.css'
-import { Press_Start_2P } from 'next/font/google'
 
 export const viewport: Viewport = {
   width: "device-width",

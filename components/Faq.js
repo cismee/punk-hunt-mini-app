@@ -19,7 +19,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What is this?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo's Duck Hunt. Players compete to be
+                <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo&apos;s Duck Hunt. Players compete to be
                 the <strong>last duck standing</strong> while hunting for <strong>Top Shot</strong> (most eliminations).
               </p>
               <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to zap Ducks.</p>
@@ -51,7 +51,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What is a PvP NFT Game?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                "PvP" stands for "Player versus Player." Punk HUNT is an elimination NFT game.
+                &quot;PvP&quot; stands for &quot;Player versus Player.&quot; Punk HUNT is an elimination NFT game.
               </p>
               <p className="faq">
                 The objective: mint ducks and receive zappers, shoot Ducks by burning{' '}
@@ -60,7 +60,7 @@ function Faq() {
                 <strong>blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>.
               </p>
               <p className="faq">
-                It's like "<a className="underline text-black" href="https://en.wikipedia.org/wiki/King_of_the_hill_(game)" target="_blank" rel="noopener noreferrer">king-of-the-hill</a>" with a non-fungible twist.
+                It&apos;s like &quot;<a className="underline text-black" href="https://en.wikipedia.org/wiki/King_of_the_hill_(game)" target="_blank" rel="noopener noreferrer">king-of-the-hill</a>&quot; with a non-fungible twist.
               </p>
             </div>
           </div>
@@ -71,10 +71,10 @@ function Faq() {
       <div className="w-full px-2 sm:px-4 pt-4">
         <div className="flex flex-wrap justify-center">
           <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">So it's not a collectible?</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-3">So it&apos;s not a collectible?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Correct. This is an <strong>NFT game</strong>, not a static collectible. It's <strong>anti-collectible</strong> - your NFT will
+                Correct. This is an <strong>NFT game</strong>, not a static collectible. It&apos;s <strong>anti-collectible</strong> - your NFT will
                 likely be burned. When the game completes, only one NFT remains.
               </p>
             </div>
@@ -89,7 +89,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What happens when I get shot?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Your Duck gets <strong>rekt</strong> - the NFT is burned and its image changes to show it's eliminated. No respawns, no second chances.
+                Your Duck gets <strong>rekt</strong> - the NFT is burned and its image changes to show it&apos;s eliminated. No respawns, no second chances.
               </p>
             </div>
           </div>
@@ -117,7 +117,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Can I withdraw if I change my mind?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                No refunds. Once you mint, you're committed to the game.
+                No refunds. Once you mint, you&apos;re committed to the game.
               </p>
             </div>
           </div>
@@ -183,7 +183,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How are targets chosen?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                You don't pick. Each Zap fires at a <strong>random Duck</strong> for fairness. Sometimes you miss, sometimes you hit.
+                You don&apos;t pick. Each Zap fires at a <strong>random Duck</strong> for fairness. Sometimes you miss, sometimes you hit.
                 Your hit rate decreases as fewer Ducks remain alive.
               </p>
             </div>
@@ -212,7 +212,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Can I shoot my own Ducks?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Yes, but eliminating your own ducks doesn't increase your kill count.
+                Yes, but eliminating your own ducks doesn&apos;t increase your kill count.
               </p>
             </div>
           </div>
@@ -240,7 +240,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How do I know if my Duck is eliminated?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                When it's burned. Your Duck's image and traits will flip to <strong>rekt</strong>, and the transaction shows the elimination.
+                When it&apos;s burned. Your Duck&apos;s image and traits will flip to <strong>rekt</strong>, and the transaction shows the elimination.
               </p>
             </div>
           </div>
@@ -269,7 +269,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Where do I get paid?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                You'll be paid at the wallet address corresponding to the winners onchain, and denoted @ the CA.
+                You&apos;ll be paid at the wallet address corresponding to the winners onchain, and denoted @ the CA.
               </p>
             </div>
           </div>

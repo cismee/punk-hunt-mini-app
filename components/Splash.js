@@ -6,34 +6,6 @@ const etherscan = '/img/Pixel_Etherscan_Hunt.png';
 const opensea = '/img/opensea.png';
 const twitter = '/img/x_alt.png';
 
-/**
- * PixelBullet
- * 8×8 crisp, pixelated arrow. Faces LEFT by default.
- * Uses currentColor so you can style via CSS.
- */
-function PixelBullet({ dir = 'left' }) {
-  // Draw a right-facing wedge, then flip for left
-  const flip = dir === 'left' ? 'scale(-1,1) translate(-8,0)' : undefined;
-  return (
-    <svg
-      viewBox="0 0 8 8"
-      width="8"
-      height="8"
-      aria-hidden="true"
-      focusable="false"
-      shapeRendering="crispEdges"
-    >
-      <g transform={flip}>
-        {/* right-pointing wedge built from 1×1 rects; fill inherits currentColor */}
-        <rect x="0" y="3" width="1" height="2" fill="currentColor" />
-        <rect x="1" y="2" width="1" height="4" fill="currentColor" />
-        <rect x="2" y="1" width="1" height="6" fill="currentColor" />
-        <rect x="3" y="0" width="1" height="8" fill="currentColor" />
-      </g>
-    </svg>
-  );
-}
-
 export default function Splash() {
   // Sound effect handlers
   const handleMenuClick = (soundKey, targetId) => {

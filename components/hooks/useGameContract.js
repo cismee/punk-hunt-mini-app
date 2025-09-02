@@ -24,10 +24,10 @@ export function useGameContract() {
         cachedUserData.invalidateCache();
       }, 2000);
     }
-  }, [isConfirmed, address]);
+  }, [isConfirmed, address, cachedUserData]);
 
   // Keep existing transaction functions unchanged
-  const mintDucks = async (amount, userAddress) => {
+  const mintDucks = async (amount) => {
     if (!cachedGameData.duckPrice || !amount) {
       throw new Error('Duck price not loaded or invalid amount');
     }
