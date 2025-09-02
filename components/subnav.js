@@ -33,11 +33,9 @@ export default function SubNav() {
   return (
     <>
       <nav
-        className="sticky w-full overflow-hidden"
+        className="sticky top-20 z-40 w-full overflow-hidden h-10 flex items-center"
         style={{ 
-          background: '#a7df10', 
-          zIndex: 1020,
-          height: '40px'
+          background: '#a7df10'
         }}
         aria-label="Ticker"
       >
