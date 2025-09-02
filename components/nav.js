@@ -64,83 +64,70 @@ const App = () => {
   };
 
   return (
-    <nav className="px-2 nav sticky-top">
-      <div className="container-fluid" style={{ marginTop: '0px !important' }}>
-        <div className="row align-items-center" style={{ maxHeight: '80px' }}>
+    <nav className="fixed top-0 left-0 right-0 z-50 w-full px-2 nav bg-black">
+      <div className="w-full" style={{ marginTop: '0px !important' }}>
+        <div className="flex items-center justify-between" style={{ maxHeight: '80px' }}>
           {/* Left Section */}
-          <div className="col-6 d-flex align-items-center justify-content-start">
-            <img src={logo} alt="Group Image" className="img-fluid m-2" style={{ height: '64px' }} />
+          <div className="flex items-center justify-start">
+            <img src={logo} alt="Group Image" className="w-auto h-16 m-2" />
           </div>
 
           {/* Right Section */}
-          <div className="col-6 d-flex align-items-center justify-content-end">
+          <div className="flex items-center justify-end">
             {!isConnected ? (
               // Not connected - show connect button
               <button
-                className="nes-btn is-primary"
+                className="nes-btn is-primary text-xs px-3 py-2"
                 onClick={handleConnect}
                 type="button"
-                style={{ 
-                  fontSize: '12px',
-                  padding: '8px 12px',
-                  minHeight: 'auto'
-                }}
               >
                 CONNECT
               </button>
             ) : (
               // Connected - show balances and disconnect button
-              <div className="d-flex align-items-center gap-3">
+              <div className="flex items-center gap-3">
                 {/* User Balances */}
-                <div className="d-flex align-items-center gap-2" style={{ color: '#fff', fontSize: '0.9em' }}>
+                <div className="flex items-center gap-2 text-white text-sm">
                   <a 
                     href="#duckmint" 
-                    className="d-flex align-items-center text-decoration-none"
-                    style={{ color: 'inherit' }}
+                    className="flex items-center no-underline text-white hover:text-blue-300"
                     onClick={(e) => {
                       e.preventDefault();
                       handleNavClick('ducks', 'duckmint');
                     }}
                   >
-                    <span style={{ color: '#3BC3FD', fontWeight: 'bold', cursor: 'pointer' }}>🦆</span>
-                    <span className="ms-1">{loading ? '...' : (duckBalance || 0)}</span>
+                    <span className="text-blue-400 font-bold cursor-pointer">🦆</span>
+                    <span className="ml-1">{loading ? '...' : (duckBalance || 0)}</span>
                   </a>
                   <a 
                     href="#zappmint" 
-                    className="d-flex align-items-center text-decoration-none"
-                    style={{ color: 'inherit' }}
+                    className="flex items-center no-underline text-white hover:text-green-300"
                     onClick={(e) => {
                       e.preventDefault();
                       handleNavClick('zappmint', 'zappmint');
                     }}
                   >
-                    <span style={{ color: '#a7df10', fontWeight: 'bold', cursor: 'pointer' }}>⚡</span>
-                    <span className="ms-1">{loading ? '...' : (zapperBalance || 0)}</span>
+                    <span className="text-green-400 font-bold cursor-pointer">⚡</span>
+                    <span className="ml-1">{loading ? '...' : (zapperBalance || 0)}</span>
                   </a>
                   <a 
                     href="#burn" 
-                    className="d-flex align-items-center text-decoration-none"
-                    style={{ color: 'inherit' }}
+                    className="flex items-center no-underline text-white hover:text-red-300"
                     onClick={(e) => {
                       e.preventDefault();
                       handleNavClick('burn', 'burn');
                     }}
                   >
-                    <span style={{ color: '#ff4444', fontWeight: 'bold', cursor: 'pointer' }}>🎯</span>
-                    <span className="ms-1" style={{ cursor: 'pointer' }}>{loading ? '...' : (zapCount || 0)}</span>
+                    <span className="text-red-400 font-bold cursor-pointer">🎯</span>
+                    <span className="ml-1 cursor-pointer">{loading ? '...' : (zapCount || 0)}</span>
                   </a>
                 </div>
 
                 {/* Disconnect Button */}
                 <button
-                  className="nes-btn"
+                  className="nes-btn text-xs px-2 py-1"
                   onClick={() => disconnect()}
                   type="button"
-                  style={{ 
-                    fontSize: '12px',
-                    padding: '4px 8px',
-                    minHeight: 'auto'
-                  }}
                 >
                   X
                 </button>

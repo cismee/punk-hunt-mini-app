@@ -33,7 +33,7 @@ export default function SubNav() {
   return (
     <>
       <nav
-        className="sticky top-20 z-40 w-full overflow-hidden h-10 flex items-center"
+        className="fixed top-20 left-0 right-0 z-40 w-full overflow-hidden h-10 flex items-center"
         style={{ 
           background: '#a7df10'
         }}
