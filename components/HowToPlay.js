@@ -106,7 +106,7 @@ export default function HowToPlay() {
           }}
         >
 
-          <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-8">
+          <div className="items-center justify-center gap-4 lg:gap-8">
             
             {/* Image column: BELOW text on mobile, LEFT on desktop */}
             <div className="w-full lg:w-1/3 text-center mb-2 order-2 lg:order-1">
