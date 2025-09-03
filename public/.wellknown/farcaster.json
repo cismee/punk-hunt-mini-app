@@ -18,6 +18,6 @@
     ],
     "heroImageUrl": "https://punk-hunt-mini-app.vercel.app/hero.png",
     "ogImageUrl": "https://punk-hunt-mini-app.vercel.app/og-image.png",
-    "noindex": true
+    "noindex": false
   }
 }
