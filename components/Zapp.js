@@ -24,7 +24,7 @@ export default function Zapp() {
   const { createMintZappersCall } = useGameContract();
 
   // Handle transaction status from OnchainKit
-  const handleOnStatus = useCallback((status: LifecycleStatus) => {
+  const handleOnStatus = useCallback((status) => {
     console.log('Zapper mint status:', status.statusName, status.statusData);
     
     if (status.statusName === 'success' && status.statusData?.transactionReceipts?.[0]?.transactionHash) {
