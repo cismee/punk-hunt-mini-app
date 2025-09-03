@@ -1,15 +1,8 @@
 // components/Zapp.js
 import { useAccount } from 'wagmi';
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
-import { 
-  Transaction, 
-  TransactionButton, 
-  TransactionStatus,
-  TransactionStatusLabel,
-  TransactionStatusAction 
-} from '@coinbase/onchainkit/transaction';
 
 const zapp = '/img/zapp_animation.gif';
 
@@ -17,45 +10,91 @@ export default function Zapp() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
   const [notifications, setNotifications] = useState([]);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [mintedAmount, setMintedAmount] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
   
   const cachedGameData = useCachedGameData();
-  const { createMintZappersCall } = useGameContract();
+  
+  const {
+    mintZappers,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash
+  } = useGameContract();
 
-  // Handle transaction status from OnchainKit
-  const handleOnStatus = useCallback((status) => {
-    console.log('Zapper mint status:', status.statusName, status.statusData);
-    
-    if (status.statusName === 'success' && status.statusData?.transactionReceipts?.[0]?.transactionHash) {
-      const hash = status.statusData.transactionReceipts[0].transactionHash;
-      
-      // Prevent duplicate notifications
-      if (processedHashes.has(hash)) return;
+  // Show notification when mint is confirmed and hash is available
+  useEffect(() => {
+    if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
       setProcessedHashes(prev => new Set([...prev, hash]));
-      
-      console.log('Zapper mint confirmed! Hash:', hash, 'Amount:', amount);
       
       const notification = {
         id: Date.now() + Math.random(),
-        amount: parseInt(amount),
+        amount: mintedAmount,
         hash: hash
       };
       
       setNotifications(prev => [...prev, notification]);
+      setMintedAmount(null);
       
       setTimeout(() => {
         setNotifications(prev => prev.filter(n => n.id !== notification.id));
       }, 5000);
-      
-      // Refresh cached data after successful transaction
-      setTimeout(() => {
-        cachedGameData.refetch();
-      }, 2000);
     }
-  }, [amount, processedHashes, cachedGameData]);
+  }, [isConfirmed, hash, mintedAmount, processedHashes]);
+
+  // Reset button text after transaction confirms
+  useEffect(() => {
+    if (isConfirmed) {
+      setShowSuccess(true);
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isConfirmed]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
+  };
+
+  const handleMint = async () => {
+    console.log('Mint zappers button clicked', { isConnected, amount, address });
+    
+    if (window.playButtonSound) {
+      window.playButtonSound('zappmint');
+    }
+    
+    if (!isConnected) {
+      console.log('Wallet not connected');
+      return;
+    }
+    
+    if (!amount || amount <= 0) {
+      console.log('Invalid amount:', amount);
+      return;
+    }
+    
+    console.log('Attempting to mint zappers...', { amount: parseInt(amount), address });
+    setMintedAmount(parseInt(amount));
+    
+    try {
+      await mintZappers(parseInt(amount));
+    } catch (err) {
+      console.error('Zapper minting failed:', err);
+      setMintedAmount(null);
+    }
+  };
+
+  const getButtonText = () => {
+    if (!isConnected) return 'CONNECT WALLET';
+    if (isPending) return 'CONFIRM IN WALLET...';
+    if (isConfirming) return 'MINTING...';
+    if (showSuccess) return 'SUCCESS!';
+    return `MINT ${amount} ZAPPERS`;
   };
 
   const calculateZapperPrizePool = () => {
@@ -67,13 +106,8 @@ export default function Zapp() {
     return prizePool.toFixed(3);
   };
 
-  const canMint = () => {
-    return isConnected && amount && parseInt(amount) > 0;
-  };
-
-  const getButtonText = () => {
-    if (!isConnected) return 'Connect Wallet';
-    return `Mint ${amount} Zappers`;
+  const isButtonDisabled = () => {
+    return !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
 
   return (
@@ -100,14 +134,14 @@ export default function Zapp() {
                   rel="noopener noreferrer"
                   className="text-white underline text-xs"
                 >
-                  View TX
+                  TX
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none ml-2"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ✕
+                âœ•
               </button>
             </div>
           </div>
@@ -137,43 +171,31 @@ export default function Zapp() {
                 Zappers!
               </h1>
 
-              {/* OnchainKit Transaction Component */}
-              <Transaction
-                calls={canMint() ? [createMintZappersCall(parseInt(amount), address)] : []}
-                onStatus={handleOnStatus}
-                disabled={!canMint()}
+              <button 
+                className="btn-nes is-success p-2 min-h-[44px] touch-manipulation"
+                onClick={handleMint}
+                disabled={isButtonDisabled()}
               >
-                <TransactionButton 
-                  className="btn-nes is-success p-2 min-h-[44px] touch-manipulation"
-                  disabled={!canMint()}
-                  onClick={() => {
-                    if (window.playButtonSound) {
-                      window.playButtonSound('zappmint');
-                    }
-                  }}
-                  style={{
-                    opacity: !canMint() ? 0.6 : 1
-                  }}
-                >
-                  {getButtonText()}
-                </TransactionButton>
-                <TransactionStatus>
-                  <TransactionStatusLabel />
-                  <TransactionStatusAction />
-                </TransactionStatus>
-              </Transaction>
+                {getButtonText()}
+              </button>
               
               <div className="p-2 space-y-1">
                 <p className="text-black text-base font-bold m-0">
-                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}Ξ` : 'Loading price...'}
+                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}Îž` : 'Loading price...'}
                 </p>
               </div>
 
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs">
+                  Error: {error.shortMessage || error.message}
+                </div>
+              )}
+
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? '…'} Minted!
+                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
               </h2>
 
-              <p className="text-black m-n4">Hunter Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateZapperPrizePool()}Ξ</span></p>
+              <p className="text-black m-n4">Hunter Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateZapperPrizePool()}Îž</span></p>
 
               <h3 className="mx-2 text-white text-sm sm:text-base">
                 Burn Zappers below to shoot ducks!
@@ -198,7 +220,7 @@ export default function Zapp() {
                 className="underline text-[#aa32d2] block mt-2  hover:text-[#97E500]"
               >
                 <h3 className="mx-2 text-[#aa32d2] hover:text-[#aa32d2] underline text-sm sm:text-base font-bold">
-                  Aim carefully, you might miss…
+                  Aim carefully, you might missâ€¦
                 </h3>
               </a>
             </div>
