@@ -7,17 +7,17 @@
   "frame": {
     "version": "1",
     "name": "Punk Hunt [TEST]",
-    "iconUrl": "https://mini.punkhunt.gg/icon.png",
-    "homeUrl": "https://mini.punkhunt.gg",
-    "imageUrl": "https://mini.punkhunt.gg/preview.png",
-    "splashImageUrl": "https://mini.punkhunt.gg/splash.png",
+    "iconUrl": "https://punk-hunt-mini-app.vercel.app/icon.png",
+    "homeUrl": "https://punk-hunt-mini-app.vercel.app",
+    "imageUrl": "https://punk-hunt-mini-app.vercel.app/preview.png",
+    "splashImageUrl": "https://punk-hunt-mini-app.vercel.app/splash.png",
     "splashBackgroundColor": "#1a1a1a",
     "screenshotUrls": [
-      "https://mini.punkhunt.gg/screenshot1.png",
-      "https://mini.punkhunt.gg/screenshot2.png"
+      "https://punk-hunt-mini-app.vercel.app/screenshot1.png",
+      "https://punk-hunt-mini-app.vercel.app/screenshot2.png"
     ],
-    "heroImageUrl": "https://mini.punkhunt.gg/hero.png",
-    "ogImageUrl": "https://mini.punkhunt.gg/og-image.png",
+    "heroImageUrl": "https://punk-hunt-mini-app.vercel.app/hero.png",
+    "ogImageUrl": "https://punk-hunt-mini-app.vercel.app/og-image.png",
     "noindex": true
   }
 }
