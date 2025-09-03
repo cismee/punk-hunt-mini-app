@@ -170,7 +170,7 @@ function Faq() {
           <div className="w-full max-w-4xl px-2">
             <h2 className="text-lg sm:text-xl font-bold mb-3">When can I start shooting?</h2>
             <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">When <strong>Hunting SZN</strong> begins, as denoted on the website and onchain.</p>
+              <p className="faq">When <strong>Hunting SZN</strong> begins, as shown on the website and contract. And announced on X.</p>
             </div>
           </div>
         </div>
@@ -269,7 +269,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Where do I get paid?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                You&apos;ll be paid at the wallet address corresponding to the winners onchain, and denoted @ the CA.
+                You&apos;ll be paid at the wallet address corresponding to the winners onchain, denoted @ the CA.
               </p>
             </div>
           </div>

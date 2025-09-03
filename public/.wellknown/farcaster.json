@@ -1,0 +1,23 @@
+{
+  "accountAssociation": {
+    "header": "YOUR_HEADER",
+    "payload": "YOUR_PAYLOAD",
+    "signature": "YOUR_SIGNATURE"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Punk Hunt [TEST]",
+    "iconUrl": "https://mini.punkhunt.gg/icon.png",
+    "homeUrl": "https://mini.punkhunt.gg",
+    "imageUrl": "https://mini.punkhunt.gg/preview.png",
+    "splashImageUrl": "https://mini.punkhunt.gg/splash.png",
+    "splashBackgroundColor": "#1a1a1a",
+    "screenshotUrls": [
+      "https://mini.punkhunt.gg/screenshot1.png",
+      "https://mini.punkhunt.gg/screenshot2.png"
+    ],
+    "heroImageUrl": "https://mini.punkhunt.gg/hero.png",
+    "ogImageUrl": "https://mini.punkhunt.gg/og-image.png",
+    "noindex": true
+  }
+}
