@@ -203,7 +203,7 @@ function Ducks() {
                 <img src={duck} style={{ height: '6em' }} className="w-auto mx-auto" alt="Duck animation" />
               </div>
               <div className="block lg:hidden w-1/2 ml-auto">
-                <img src={duck} style={{ height: '2em' }} className="w-auto mx-auto" alt="Duck animation" />
+                <img src={duck} style={{ height: '4em' }} className="w-auto mx-auto" alt="Duck animation" />
               </div>
               
               <h1 className="text-lg sm:text-xl lg:text-2xl text-black font-bold">
@@ -252,7 +252,7 @@ function Ducks() {
                 {cachedGameData.ducksMinted ?? '…'} Minted!
               </h2>
               
-              <p className="text-[#00000] m-n4">Duck Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateDuckPrizePool()}</span>Ξ</p>
+              <p className="text-black m-n4">Duck Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateDuckPrizePool()}</span>Ξ</p>
 
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
