@@ -10,7 +10,6 @@ import {
   TransactionStatusLabel,
   TransactionStatusAction 
 } from '@coinbase/onchainkit/transaction';
-import type { LifecycleStatus } from '@coinbase/onchainkit/transaction';
 
 const duck = '/img/duck_animation_002.gif';
 const fence = '/img/fence_alt.png';

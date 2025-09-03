@@ -1,4 +1,4 @@
-// components/Ded.js - Using OnchainKit Transaction components
+// components/Ded.js
 import { useAccount } from 'wagmi';
 import { useState, useEffect, useCallback } from 'react';
 import { useGameContract } from './hooks/useGameContract';
@@ -13,9 +13,55 @@ import {
   TransactionStatusLabel,
   TransactionStatusAction 
 } from '@coinbase/onchainkit/transaction';
-import type { LifecycleStatus } from '@coinbase/onchainkit/transaction';
 
 const pepe = '/img/rekt_animation_002.gif';
+
+// Simple solid-frame progress bar with checker pattern
+function PixelProgress({
+  value,
+  max = 100,
+  height = 16,
+  frame = '#000',
+  track = '#fff',
+  fill  = '#f42a2a',
+  padding = 4
+}) {
+  const pct = Math.max(0, Math.min(100, (value / max) * 100));
+  const checkerSize = 1;
+  
+  return (
+    <div
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      style={{
+        border: `3px solid ${frame}`,
+        padding,
+        background: 'transparent',
+        width: '100%',
+      }}
+    >
+      <div style={{ height, background: track, position: 'relative', overflow: 'hidden' }}>
+        <div 
+          style={{ 
+            height: '100%', 
+            width: `${pct}%`, 
+            background: `
+              repeating-conic-gradient(
+                ${fill} 0% 25%, 
+                ${track} 25% 50%, 
+                ${fill} 50% 75%, 
+                ${track} 75% 100%
+              )
+            `,
+            backgroundSize: `${checkerSize}px ${checkerSize}px`
+          }} 
+        />
+      </div>
+    </div>
+  );
+}
 
 // SentZapper event ABI for decoding
 const SENT_ZAPPER_EVENT_ABI = {
@@ -34,6 +80,7 @@ const SENT_ZAPPER_EVENT_ABI = {
 export default function Ded() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
+  const [huntingStartSupply, setHuntingStartSupply] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [processedHashes, setProcessedHashes] = useState(new Set());
   const publicClient = usePublicClient();
@@ -43,7 +90,7 @@ export default function Ded() {
   const { createSendZappersCall } = useGameContract();
 
   // Handle transaction status changes from OnchainKit
-  const handleOnStatus = useCallback(async (status: LifecycleStatus) => {
+  const handleOnStatus = useCallback(async (status) => {
     console.log('Transaction status:', status.statusName, status.statusData);
     
     if (status.statusName === 'success' && status.statusData?.transactionReceipts?.[0]?.transactionHash) {
@@ -163,6 +210,26 @@ export default function Ded() {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
+  // Track when hunting season first opens and capture duck supply
+  useEffect(() => {
+    if (cachedGameData.huntingSeason && huntingStartSupply === 0 && cachedGameData.ducksMinted > 0) {
+      const currentSupply = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
+      setHuntingStartSupply(currentSupply);
+      console.log('Hunting season opened with supply:', currentSupply);
+    }
+  }, [cachedGameData.huntingSeason, cachedGameData.ducksMinted, cachedGameData.ducksRekt, huntingStartSupply]);
+
+  // Update user's zapper balance periodically
+  useEffect(() => {
+    if (isConnected && address) {
+      const interval = setInterval(() => {
+        cachedUserData.refetch();
+      }, 10000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isConnected, address, cachedUserData]);
+
   const canShoot = () => {
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
     return isConnected && 
@@ -186,9 +253,15 @@ export default function Ded() {
     return `Shoot ${amount} Ducks!`;
   };
 
+  const getProgressValue = () => {
+    if (cachedGameData.ducksMinted === 0) return 0;
+    const progress = (cachedGameData.ducksRekt / cachedGameData.ducksMinted) * 100;
+    return Math.min(100, Math.max(0, progress));
+  };
+
   return (
     <>
-      {/* Notifications */}
+      {/* Multiple Notifications */}
       <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[280px]">
         {notifications.map((notification, index) => (
           <div
@@ -225,7 +298,10 @@ export default function Ded() {
         ))}
       </div>
 
-      <section id="burn" className="relative overflow-hidden bg-[#ba92bb]">
+      <section
+        id="burn"
+        className="relative overflow-hidden bg-[#ba92bb]"
+      >
         <div className="py-2"></div>
 
         <div className="w-full px-2 sm:px-4 pt-4">
@@ -241,13 +317,14 @@ export default function Ded() {
                   max={cachedUserData.zapperBalance || 0}
                   className="nes-input mx-2 mb-2 p-2 w-12 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
+                  id="shoot_field"
                 />
                 Ducks!
               </h1>
 
               {/* OnchainKit Transaction Component */}
               <Transaction
-                calls={[createSendZappersCall(parseInt(amount), address)]}
+                calls={canShoot() ? [createSendZappersCall(parseInt(amount), address)] : []}
                 onStatus={handleOnStatus}
                 disabled={!canShoot()}
               >
@@ -258,6 +335,9 @@ export default function Ded() {
                     if (window.playButtonSound) {
                       window.playButtonSound('burn');
                     }
+                  }}
+                  style={{
+                    opacity: !canShoot() ? 0.6 : 1
                   }}
                 >
                   {getButtonText()}
@@ -281,13 +361,44 @@ export default function Ded() {
                 </h2>
               </div>
 
+              {/* Progress bar showing elimination progress */}
+              <div className="mt-3 mx-auto w-3/4">
+                <PixelProgress value={getProgressValue()} max={100} height={32} />
+              </div>
+
               <h2 className="mt-2 text-black text-base sm:text-lg font-bold">
                 {cachedGameData.ducksRekt}/{cachedGameData.ducksMinted} Ded Ducks!
               </h2>
+              <h3 className="p-2 mx-2 text-black text-sm sm:text-base">
+                The game ends when one duck remains.
+              </h3>
+              <a 
+                href="#faq"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (window.playButtonSound) {
+                    window.playButtonSound('faq');
+                  }
+                  const element = document.getElementById('faq');
+                  if (element) {
+                    element.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                      inline: 'nearest'
+                    });
+                  }
+                }}
+                className="underline text-[#97e500] hover:text-[#97e500] block mt-2"
+              >
+                <h3 className="mb-4 mx-2 text-[#97e500] hover:text-[#97e500] underline text-sm sm:text-base font-bold">
+                  Top Hunter Wins bluechip NFT! 
+                </h3>
+              </a>
             </div>
           </div>
         </div>
         
+        {/* Pepe image in separate container - no gutters */}
         <div className="w-full">
           <img src={pepe} alt="Ded ducks illustration" className="w-full h-auto block" />
         </div>
@@ -307,6 +418,10 @@ export default function Ded() {
         
         .animate-slide-down {
           animation: slide-down 0.3s ease-out;
+        }
+        
+        .touch-manipulation {
+          touch-action: manipulation;
         }
       `}</style>
     </>
