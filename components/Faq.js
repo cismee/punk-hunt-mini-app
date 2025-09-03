@@ -270,9 +270,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What do you mean by bluechip NFTs?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Bluechip NFTs represent the most established and liquid digital assets in the NFT market. 
-            These collections have demonstrated sustained demand, strong community support, and proven 
-            market stability over time.
+                Bluechip NFTs represent the liquid digital assets in the NFT market. Collections have demonstrated sustained demand.
               </p>
 <br />
               <p className="faq">
