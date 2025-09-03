@@ -15,6 +15,7 @@ function Ducks() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [mintedAmount, setMintedAmount] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
   
   // Use cached data instead of direct contract calls
   const cachedGameData = useCachedGameData();
@@ -28,9 +29,21 @@ function Ducks() {
     hash
   } = useGameContract();
 
+  // Handle transaction state changes
+  useEffect(() => {
+    if (isPending || isConfirming) {
+      setIsTransactionPending(true);
+    } else if (isConfirmed || error) {
+      // Reset transaction state after success or error
+      setIsTransactionPending(false);
+    }
+  }, [isPending, isConfirming, isConfirmed, error]);
+
   // Show notification when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
+      console.log('Transaction confirmed! Hash:', hash, 'Amount:', mintedAmount);
+      
       setProcessedHashes(prev => new Set([...prev, hash]));
       
       const notification = {
@@ -41,6 +54,7 @@ function Ducks() {
       
       setNotifications(prev => [...prev, notification]);
       setMintedAmount(null);
+      setIsTransactionPending(false);
       
       setTimeout(() => {
         setNotifications(prev => prev.filter(n => n.id !== notification.id));
@@ -54,11 +68,21 @@ function Ducks() {
       setShowSuccess(true);
       const timer = setTimeout(() => {
         setShowSuccess(false);
-      }, 1000);
+      }, 2000); // Show success for 2 seconds
       
       return () => clearTimeout(timer);
     }
   }, [isConfirmed]);
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (error) {
+      console.log('Transaction error:', error);
+      setMintedAmount(null);
+      setIsTransactionPending(false);
+      setShowSuccess(false);
+    }
+  }, [error]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
@@ -118,20 +142,24 @@ function Ducks() {
     
     console.log('Attempting to mint...', { amount: parseInt(amount), address });
     setMintedAmount(parseInt(amount));
+    setIsTransactionPending(true);
+    setShowSuccess(false);
     
     try {
       await mintDucks(parseInt(amount), address);
     } catch (err) {
       console.error('Minting failed:', err);
       setMintedAmount(null);
+      setIsTransactionPending(false);
     }
   };
 
   const getButtonText = () => {
     if (!isConnected) return 'CONNECT WALLET';
     if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
+    if (error) return 'TRY AGAIN';
     if (isPending) return 'CONFIRM IN WALLET...';
-    if (isConfirming) return 'MINTING...';
+    if (isConfirming || isTransactionPending) return 'MINTING...';
     if (showSuccess) return 'SUCCESS!';
     return `MINT ${amount} DUCKS`;
   };
@@ -149,6 +177,7 @@ function Ducks() {
            timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
            isConfirming || 
+           isTransactionPending ||
            !amount || 
            parseInt(amount) <= 0;
   };
@@ -177,12 +206,12 @@ function Ducks() {
                   rel="noopener noreferrer"
                   className="text-white underline text-xs"
                 >
-                  TX
+                  View TX
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none ml-2"
               >
                 ✕
               </button>
@@ -224,6 +253,9 @@ function Ducks() {
                 className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer touch-manipulation"
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
+                style={{
+                  opacity: isButtonDisabled() ? 0.6 : 1
+                }}
               >
                 {getButtonText()}
               </button>
@@ -253,7 +285,6 @@ function Ducks() {
               </h2>
               
               <p className="text-black m-n4">Duck Prize Pool: <span className="text-[#1a1a89] text-sm sm:text-base">{calculateDuckPrizePool()}Ξ</span></p>
-
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
                 Mint a Duck, Get a Free Zapper.

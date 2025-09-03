@@ -13,6 +13,7 @@ export default function Zapp() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [mintedAmount, setMintedAmount] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
   
   const cachedGameData = useCachedGameData();
   
@@ -25,9 +26,21 @@ export default function Zapp() {
     hash
   } = useGameContract();
 
+  // Handle transaction state changes
+  useEffect(() => {
+    if (isPending || isConfirming) {
+      setIsTransactionPending(true);
+    } else if (isConfirmed || error) {
+      // Reset transaction state after success or error
+      setIsTransactionPending(false);
+    }
+  }, [isPending, isConfirming, isConfirmed, error]);
+
   // Show notification when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
+      console.log('Zapper transaction confirmed! Hash:', hash, 'Amount:', mintedAmount);
+      
       setProcessedHashes(prev => new Set([...prev, hash]));
       
       const notification = {
@@ -38,6 +51,7 @@ export default function Zapp() {
       
       setNotifications(prev => [...prev, notification]);
       setMintedAmount(null);
+      setIsTransactionPending(false);
       
       setTimeout(() => {
         setNotifications(prev => prev.filter(n => n.id !== notification.id));
@@ -51,11 +65,21 @@ export default function Zapp() {
       setShowSuccess(true);
       const timer = setTimeout(() => {
         setShowSuccess(false);
-      }, 1000);
+      }, 2000); // Show success for 2 seconds
       
       return () => clearTimeout(timer);
     }
   }, [isConfirmed]);
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (error) {
+      console.log('Zapper transaction error:', error);
+      setMintedAmount(null);
+      setIsTransactionPending(false);
+      setShowSuccess(false);
+    }
+  }, [error]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
@@ -80,19 +104,23 @@ export default function Zapp() {
     
     console.log('Attempting to mint zappers...', { amount: parseInt(amount), address });
     setMintedAmount(parseInt(amount));
+    setIsTransactionPending(true);
+    setShowSuccess(false);
     
     try {
       await mintZappers(parseInt(amount));
     } catch (err) {
       console.error('Zapper minting failed:', err);
       setMintedAmount(null);
+      setIsTransactionPending(false);
     }
   };
 
   const getButtonText = () => {
     if (!isConnected) return 'CONNECT WALLET';
+    if (error) return 'TRY AGAIN';
     if (isPending) return 'CONFIRM IN WALLET...';
-    if (isConfirming) return 'MINTING...';
+    if (isConfirming || isTransactionPending) return 'MINTING...';
     if (showSuccess) return 'SUCCESS!';
     return `MINT ${amount} ZAPPERS`;
   };
@@ -107,7 +135,12 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
-    return !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
+    return !isConnected || 
+           isPending || 
+           isConfirming || 
+           isTransactionPending ||
+           !amount || 
+           parseInt(amount) <= 0;
   };
 
   return (
@@ -134,12 +167,12 @@ export default function Zapp() {
                   rel="noopener noreferrer"
                   className="text-white underline text-xs"
                 >
-                  TX
+                  View TX
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none ml-2"
               >
                 ✕
               </button>
@@ -175,6 +208,9 @@ export default function Zapp() {
                 className="btn-nes is-success p-2 min-h-[44px] touch-manipulation"
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
+                style={{
+                  opacity: isButtonDisabled() ? 0.6 : 1
+                }}
               >
                 {getButtonText()}
               </button>

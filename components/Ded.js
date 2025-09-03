@@ -78,6 +78,7 @@ export default function Ded() {
   const [showShotsFired, setShowShotsFired] = useState(false);
   const [zappersSent, setZappersSent] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
   const publicClient = usePublicClient();
   
   const cachedGameData = useCachedGameData();
@@ -91,6 +92,16 @@ export default function Ded() {
     error,
     hash
   } = useGameContract();
+
+  // Handle transaction state changes
+  useEffect(() => {
+    if (isPending || isConfirming) {
+      setIsTransactionPending(true);
+    } else if (isConfirmed || error) {
+      // Don't reset here - let the event processing handle it
+      // setIsTransactionPending(false);
+    }
+  }, [isPending, isConfirming, isConfirmed, error]);
 
   // Fetch events when transaction is confirmed
   useEffect(() => {
@@ -110,71 +121,113 @@ export default function Ded() {
           
           console.log('Main contract logs:', mainContractLogs);
           
-          mainContractLogs.forEach((log, index) => {
-            let notification;
+          if (mainContractLogs.length === 0) {
+            // No events found, create generic notification
+            const notification = {
+              id: Date.now() + Math.random(),
+              message: `${zappersSent} shots fired!`,
+              txHash: hash,
+              backgroundColor: '#97E500'
+            };
             
-            try {
-              const decodedLog = decodeEventLog({
-                abi: [SENT_ZAPPER_EVENT_ABI],
-                data: log.data,
-                topics: log.topics
-              });
+            setNotifications(prev => [...prev, notification]);
+            setTimeout(() => {
+              setNotifications(prev => prev.filter(n => n.id !== notification.id));
+            }, 5000);
+          } else {
+            // Process each event
+            mainContractLogs.forEach((log, index) => {
+              let notification;
               
-              const { tokenId, hit, owned } = decodedLog.args;
-              
-              if (!hit) {
+              try {
+                const decodedLog = decodeEventLog({
+                  abi: [SENT_ZAPPER_EVENT_ABI],
+                  data: log.data,
+                  topics: log.topics
+                });
+                
+                const { tokenId, hit, owned } = decodedLog.args;
+                
+                if (!hit) {
+                  notification = {
+                    id: Date.now() + Math.random() + index,
+                    message: "You Missed!",
+                    txHash: hash,
+                    backgroundColor: '#fbb304'
+                  };
+                } else if (owned) {
+                  notification = {
+                    id: Date.now() + Math.random() + index,
+                    message: `You Shot your Own Duck #${tokenId}!`,
+                    txHash: hash,
+                    backgroundColor: '#f42a2a'
+                  };
+                } else {
+                  notification = {
+                    id: Date.now() + Math.random() + index,
+                    message: `You hit Duck #${tokenId}!`,
+                    txHash: hash,
+                    backgroundColor: '#339c1d'
+                  };
+                }
+                
+              } catch (decodeError) {
+                console.error('Failed to decode log:', decodeError);
                 notification = {
-                  id: Date.now() + Math.random(),
-                  message: "You Missed!",
+                  id: Date.now() + Math.random() + index,
+                  message: `Shot fired!`,
                   txHash: hash,
-                  backgroundColor: '#fbb304'
-                };
-              } else if (owned) {
-                notification = {
-                  id: Date.now() + Math.random(),
-                  message: `You Shot your Own Duck #${tokenId}!`,
-                  txHash: hash,
-                  backgroundColor: '#f42a2a'
-                };
-              } else {
-                notification = {
-                  id: Date.now() + Math.random(),
-                  message: `You hit Duck #${tokenId}!`,
-                  txHash: hash,
-                  backgroundColor: '#339c1d'
+                  backgroundColor: '#97E500'
                 };
               }
               
-            } catch (decodeError) {
-              console.error('Failed to decode log:', decodeError);
-              notification = {
-                id: Date.now() + Math.random(),
-                message: `Shot fired!`,
-                txHash: hash,
-                backgroundColor: '#97E500'
-              };
-            }
-            
-            setTimeout(() => {
-              setNotifications(prev => [...prev, notification]);
-              
               setTimeout(() => {
-                setNotifications(prev => prev.filter(n => n.id !== notification.id));
-              }, 5000);
-            }, index * 200);
-          });
+                setNotifications(prev => [...prev, notification]);
+                
+                setTimeout(() => {
+                  setNotifications(prev => prev.filter(n => n.id !== notification.id));
+                }, 5000);
+              }, index * 200);
+            });
+          }
           
+          // Reset transaction state after processing events
           setZappersSent(null);
+          setIsTransactionPending(false);
           
         } catch (error) {
           console.error('Error fetching transaction events:', error);
           setZappersSent(null);
+          setIsTransactionPending(false);
+          
+          // Show generic notification on error
+          const notification = {
+            id: Date.now() + Math.random(),
+            message: `Transaction completed`,
+            txHash: hash,
+            backgroundColor: '#97E500'
+          };
+          
+          setNotifications(prev => [...prev, notification]);
+          setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== notification.id));
+          }, 5000);
         }
       }
     };
     
     fetchTransactionEvents();
   }, [isConfirmed, hash, address, publicClient, zappersSent, processedHashes]);
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (error) {
+      console.log('Shooting transaction error:', error);
+      setZappersSent(null);
+      setIsTransactionPending(false);
+      setShowShotsFired(false);
+    }
+  }, [error]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
@@ -186,7 +239,7 @@ export default function Ded() {
       setShowShotsFired(true);
       const timer = setTimeout(() => {
         setShowShotsFired(false);
-      }, 1000);
+      }, 2000); // Show for 2 seconds
       
       return () => clearTimeout(timer);
     }
@@ -250,6 +303,8 @@ export default function Ded() {
     console.log('Attempting to shoot zappers...', { amount: parseInt(amount), address });
     
     setZappersSent(parseInt(amount));
+    setIsTransactionPending(true);
+    setShowShotsFired(false);
     
     try {
       await sendZappers(parseInt(amount));
@@ -257,6 +312,7 @@ export default function Ded() {
     } catch (err) {
       console.error('Shooting failed:', err);
       setZappersSent(null);
+      setIsTransactionPending(false);
     }
   };
 
@@ -270,8 +326,9 @@ export default function Ded() {
     if (parseInt(amount) > cachedUserData.zapperBalance) {
       return `NEED ${amount - cachedUserData.zapperBalance} MORE ZAPPERS`;
     }
+    if (error) return 'TRY AGAIN';
     if (isPending) return 'CONFIRM IN WALLET...';
-    if (isConfirming) return 'FIRING...';
+    if (isConfirming || isTransactionPending) return 'FIRING...';
     if (showShotsFired) return 'SHOTS FIRED!';
     return `SHOOT ${amount} DUCKS!`;
   };
@@ -283,6 +340,7 @@ export default function Ded() {
            !cachedGameData.huntingSeason || 
            isPending || 
            isConfirming || 
+           isTransactionPending ||
            !amount || 
            parseInt(amount) <= 0 ||
            parseInt(amount) > cachedUserData.zapperBalance;
@@ -319,12 +377,12 @@ export default function Ded() {
                   rel="noopener noreferrer"
                   className="text-white underline text-xs"
                 >
-                  TX
+                  View TX
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none ml-2"
               >
                 ✕
               </button>
@@ -361,6 +419,9 @@ export default function Ded() {
                 className="btn-nes is-warning p-2 min-h-[44px] touch-manipulation"
                 onClick={handleShoot}
                 disabled={isButtonDisabled()}
+                style={{
+                  opacity: isButtonDisabled() ? 0.6 : 1
+                }}
               >
                 {getButtonText()}
               </button>
