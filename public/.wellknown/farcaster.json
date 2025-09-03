@@ -11,7 +11,7 @@
     "homeUrl": "https://punk-hunt-mini-app.vercel.app",
     "imageUrl": "https://punk-hunt-mini-app.vercel.app/preview.png",
     "splashImageUrl": "https://punk-hunt-mini-app.vercel.app/splash.png",
-    "splashBackgroundColor": "#1a1a1a",
+    "splashBackgroundColor": "#000",
     "screenshotUrls": [
       "https://punk-hunt-mini-app.vercel.app/screenshot1.png",
       "https://punk-hunt-mini-app.vercel.app/screenshot2.png"
