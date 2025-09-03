@@ -273,7 +273,7 @@ export default function Ded() {
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'FIRING...';
     if (showShotsFired) return 'SHOTS FIRED!';
-    return `ZAP ${amount} DUCKS!`;
+    return `SHOOT ${amount} DUCKS!`;
   };
 
   const isButtonDisabled = () => {
@@ -343,7 +343,7 @@ export default function Ded() {
           <div className="flex flex-wrap">
             <div className="w-full text-center">
               <h1 className="p-2 text-black text-lg sm:text-xl lg:text-2xl font-bold">
-                Zap
+                Shoot
                 <input
                   type="number"
                   value={amount}

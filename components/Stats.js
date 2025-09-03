@@ -325,7 +325,7 @@ function Stats() {
 
             <div className="flex stats">
               <div className="w-1/2 text-left">
-                <p className="text-[#97E500] text-sm sm:text-base">Live Zapps:</p>
+                <p className="text-[#97E500] text-sm sm:text-base">Live Zaps:</p>
               </div>
               <div className="w-1/2 text-right">
                 <p className="text-[#97E500] text-sm sm:text-base">{cachedGameData.zappersMinted - cachedGameData.zappersBurned}</p>
