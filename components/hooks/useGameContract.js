@@ -1,98 +1,80 @@
 /* global BigInt */
-// src/hooks/useGameContract.js - Keep existing transaction logic, replace reads
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+// src/hooks/useGameContract.js - Simplified hook for MiniKit + OnchainKit
+import { useCallback } from 'react';
 import { parseEther } from 'viem';
-import { useEffect } from 'react';
 import { CONTRACTS, MAIN_ABI } from '../contracts';
 import { useCachedGameData, useCachedUserData } from './useCachedData';
 
 export function useGameContract() {
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
-  const { address } = useAccount();
-
-  // Replace all useReadContract calls with cached data
+  // Get cached data
   const cachedGameData = useCachedGameData();
-  const cachedUserData = useCachedUserData(address);
+  const cachedUserData = useCachedUserData();
 
-  // Invalidate user cache after successful transactions
-  useEffect(() => {
-    if (isConfirmed && address) {
-      console.log('Transaction confirmed, invalidating cache for:', address);
-      // Add delay to allow blockchain to update
-      setTimeout(() => {
-        cachedUserData.invalidateCache();
-      }, 2000);
-    }
-  }, [isConfirmed, address, cachedUserData]);
-
-  // Keep existing transaction functions unchanged
-  const mintDucks = async (amount) => {
+  // Create transaction calls for OnchainKit Transaction components
+  const createMintDucksCall = useCallback((amount, address) => {
     if (!cachedGameData.duckPrice || !amount) {
       throw new Error('Duck price not loaded or invalid amount');
     }
 
     const totalCost = parseEther(cachedGameData.duckPrice) * BigInt(amount);
-    console.log('Minting ducks:', { amount, price: cachedGameData.duckPrice, totalCost: totalCost.toString() });
+    console.log('Mint ducks call:', { amount, totalCost: totalCost.toString() });
     
-    try {
-      await writeContract({
-        address: CONTRACTS.MAIN,
-        abi: MAIN_ABI,
-        functionName: 'mintDucks',
-        args: [amount],
-        value: totalCost,
-      });
-    } catch (err) {
-      console.error('Mint ducks failed:', err);
-      throw err;
-    }
-  };
+    return {
+      to: CONTRACTS.MAIN,
+      abi: MAIN_ABI,
+      functionName: 'mintDucks',
+      args: [amount],
+      value: totalCost,
+    };
+  }, [cachedGameData.duckPrice]);
 
-  const mintZappers = async (amount) => {
+  const createMintZappersCall = useCallback((amount, address) => {
     if (!cachedGameData.zapperPrice || !amount) {
       throw new Error('Zapper price not loaded or invalid amount');
     }
 
     const totalCost = parseEther(cachedGameData.zapperPrice) * BigInt(amount);
-    console.log('Minting zappers:', { amount, price: cachedGameData.zapperPrice, totalCost: totalCost.toString() });
+    console.log('Mint zappers call:', { amount, totalCost: totalCost.toString() });
     
-    try {
-      await writeContract({
-        address: CONTRACTS.MAIN,
-        abi: MAIN_ABI,
-        functionName: 'mintZappers',
-        args: [amount],
-        value: totalCost,
-      });
-    } catch (err) {
-      console.error('Mint zappers failed:', err);
-      throw err;
-    }
-  };
+    return {
+      to: CONTRACTS.MAIN,
+      abi: MAIN_ABI,
+      functionName: 'mintZappers',
+      args: [amount],
+      value: totalCost,
+    };
+  }, [cachedGameData.zapperPrice]);
 
-  const sendZappers = async (amount) => {
+  const createSendZappersCall = useCallback((amount, address) => {
     if (!amount) {
       throw new Error('Invalid amount');
     }
 
-    console.log('Sending zappers:', { amount });
+    console.log('Send zappers call:', { amount });
     
-    try {
-      await writeContract({
-        address: CONTRACTS.MAIN,
-        abi: MAIN_ABI,
-        functionName: 'sendZappers',
-        args: [amount],
-      });
-    } catch (err) {
-      console.error('Send zappers failed:', err);
-      throw err;
-    }
-  };
+    return {
+      to: CONTRACTS.MAIN,
+      abi: MAIN_ABI,
+      functionName: 'sendZappers',
+      args: [amount],
+    };
+  }, []);
+
+  // Legacy wrapper functions (for backward compatibility with existing components)
+  const mintDucks = useCallback(async (amount, address) => {
+    return createMintDucksCall(amount, address);
+  }, [createMintDucksCall]);
+
+  const mintZappers = useCallback(async (amount, address) => {
+    return createMintZappersCall(amount, address);
+  }, [createMintZappersCall]);
+
+  const sendZappers = useCallback(async (amount, address) => {
+    return createSendZappersCall(amount, address);
+  }, [createSendZappersCall]);
 
   return {
-    // Cached data instead of contract reads
+    // Cached data
     duckPrice: cachedGameData.duckPrice,
     zapperPrice: cachedGameData.zapperPrice,
     huntingSeason: cachedGameData.huntingSeason,
@@ -102,22 +84,25 @@ export function useGameContract() {
     userDuckBalance: cachedUserData.duckBalance,
     userZapperBalance: cachedUserData.zapperBalance,
     
-    // Keep existing transaction functions
+    // Transaction call creators (recommended for OnchainKit Transaction components)
+    createMintDucksCall,
+    createMintZappersCall,
+    createSendZappersCall,
+    
+    // Legacy functions (for existing component compatibility)
     mintDucks,
     mintZappers,
     sendZappers,
+    
+    // Cache functions
     refetchZapperBalance: cachedUserData.refetch,
     refetchDuckBalance: cachedUserData.refetch,
-    
-    // Keep existing transaction state
-    isPending,
-    isConfirming,
-    isConfirmed,
-    error,
-    hash,
     
     // Expose cache loading/error states
     cacheLoading: cachedGameData.loading || cachedUserData.loading,
     cacheError: cachedGameData.error || cachedUserData.error,
+    
+    // Note: Transaction state should be managed by OnchainKit Transaction components
+    // Remove isPending, isConfirming, isConfirmed, error, hash from here
   };
 }
