@@ -280,11 +280,6 @@ function Faq() {
               </p>
 <br />
               <p className="faq">
-               All awarded NFTs maintain high liquidity for easy trading and value realization.
-              </p>
-<br />
-
-              <p className="faq">
                Prize quality scales dynamically with community participation and pool size
               </p>
             </div>
