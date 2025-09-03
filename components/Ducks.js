@@ -136,6 +136,14 @@ function Ducks() {
     return `MINT ${amount} DUCKS`;
   };
 
+  // Helper functions for prize pool calculations using server data
+  const calculateDuckPrizePool = () => {
+    if (!cachedGameData.ducksMinted || !cachedGameData.duckPrice) return '0.000';
+    const totalDuckRevenue = parseFloat(cachedGameData.duckPrice) * cachedGameData.ducksMinted;
+    const prizePool = totalDuckRevenue * 0.5;
+    return prizePool.toFixed(3);
+  };
+
   const isButtonDisabled = () => {
     return !isConnected || 
            timeLeft === 'HAPPY HUNTING!' ||
