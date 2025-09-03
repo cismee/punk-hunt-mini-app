@@ -195,7 +195,7 @@ export default function Zapp() {
                 {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
               </h2>
 
-              <p className="text-black m-n4">Hunter Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>
+              <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>
 
               <h3 className="mx-2 text-white text-sm sm:text-base">
                 Burn Zappers below to shoot ducks!
