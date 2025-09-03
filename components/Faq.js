@@ -263,6 +263,42 @@ function Faq() {
         </div>
       </div>
 
+<div className="w-full px-2 sm:px-4 pt-4">
+  <div className="flex flex-wrap justify-center">
+    <div className="w-full max-w-4xl px-2">
+      <h2 className="text-lg sm:text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        What are Bluechip NFTs?
+      </h2>
+      <div className="space-y-4 text-sm sm:text-base">
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            Bluechip NFTs represent the most established and liquid digital assets in the NFT market. 
+            These collections have demonstrated sustained demand, strong community support, and proven 
+            market stability over time.
+          </p>
+        </div>
+        
+        <div className="space-y-3">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">Prize Pool Mechanics:</h3>
+          <ul className="space-y-2 text-gray-700 dark:text-gray-300 ml-4">
+            <li className="flex items-start">
+              <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+              <span>NFT rewards are selected based on the total prize pool generated during gameplay</span>
+            </li>
+            <li className="flex items-start">
+              <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+              <span>All awarded NFTs maintain high liquidity for easy trading and value realization</span>
+            </li>
+            <li className="flex items-start">
+              <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+              <span>Prize quality scales dynamically with community participation and pool size</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
       <div className="w-full px-2 sm:px-4 pt-4">
         <div className="flex flex-wrap justify-center">
           <div className="w-full max-w-4xl px-2">
