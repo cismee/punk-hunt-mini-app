@@ -252,7 +252,7 @@ function Ducks() {
                 {cachedGameData.ducksMinted ?? '…'} Minted!
               </h2>
               
-              <p className="text-black m-n4">Duck Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateDuckPrizePool()}</span>Ξ</p>
+              <p className="text-black m-n4">Duck Prize Pool: <span className="text-[#1a1a89] text-sm sm:text-base">{calculateDuckPrizePool()}Ξ</span></p>
 
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
