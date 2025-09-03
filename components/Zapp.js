@@ -220,7 +220,7 @@ export default function Zapp() {
                 className="underline text-[#aa32d2] block mt-2  hover:text-[#97E500]"
               >
                 <h3 className="mx-2 text-[#aa32d2] hover:text-[#aa32d2] underline text-sm sm:text-base font-bold">
-                  Aim carefully, you might missâ€¦
+                  Aim carefully, you might miss!
                 </h3>
               </a>
             </div>
