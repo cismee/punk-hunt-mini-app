@@ -181,7 +181,7 @@ export default function Zapp() {
               
               <div className="p-2 space-y-1">
                 <p className="text-black text-base font-bold m-0">
-                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}Îž` : 'Loading price...'}
+                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
                 </p>
               </div>
 
@@ -195,7 +195,7 @@ export default function Zapp() {
                 {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
               </h2>
 
-              <p className="text-black m-n4">Hunter Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateZapperPrizePool()}Îž</span></p>
+              <p className="text-black m-n4">Hunter Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>
 
               <h3 className="mx-2 text-white text-sm sm:text-base">
                 Burn Zappers below to shoot ducks!

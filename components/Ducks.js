@@ -230,7 +230,7 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}Îž` : 'Loading price...'}
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
                 </p>
                 {timeLeft && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
@@ -252,7 +252,7 @@ function Ducks() {
                 {cachedGameData.ducksMinted ?? 'â€¦'} Minted!
               </h2>
               
-              <p className="text-black m-n4">Duck Prize Pool: <span className="text-[#1a1a89] text-sm sm:text-base">{calculateDuckPrizePool()}Îž</span></p>
+              <p className="text-black m-n4">Duck Prize Pool: <span className="text-[#ff650b] text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
 
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
@@ -278,11 +278,11 @@ function Ducks() {
                 }}
                 style={{ 
                   textDecoration: 'underline',
-                  color: '#1a1a89'
+                  color: '#ff650b'
                 }}
                 className="block mt-2 mb-6"
               >
-                <h3 style={{ color: '#1a1a89' }} className="text-sm sm:text-base font-bold">
+                <h3 style={{ color: '#ff650b' }} className="text-sm sm:text-base font-bold">
                   Last 3 ducks win bluechip NFTs!
                 </h3>
               </a>
