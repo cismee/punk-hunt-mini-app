@@ -144,15 +144,19 @@ const ChatInterface = () => {
     socket.on('newChatMessage', (messageData) => {
       console.log('💬 Received new message:', messageData);
       
-      // Only add if not duplicate (in case of wallet connected users)
+      // Use a more robust duplicate check
       setMessages(prev => {
-        const isDuplicate = prev.some(msg => 
-          msg.timestamp === messageData.timestamp && 
-          msg.user === messageData.user && 
-          msg.message === messageData.message
-        );
+        const isDuplicate = prev.some(msg => {
+          // Check for exact match on multiple fields
+          const sameTimestamp = Math.abs(msg.timestamp - messageData.timestamp) < 1000; // Within 1 second
+          const sameUser = msg.user === messageData.user;
+          const sameMessage = msg.message === messageData.message;
+          
+          return sameTimestamp && sameUser && sameMessage;
+        });
         
         if (isDuplicate) {
+          console.log('🔄 Duplicate message detected, skipping:', messageData);
           return prev;
         }
         
@@ -212,13 +216,8 @@ const ChatInterface = () => {
     try {
       console.log('📤 Sending message:', messageData);
       
-      // Add message to local state immediately for instant feedback
-      const localMessage = {
-        ...messageData,
-        timestamp: Date.now(),
-        isSystem: false
-      };
-      setMessages(prev => [...prev, localMessage]);
+      // DON'T add message to local state - let server broadcast it back
+      // This prevents duplicates
       
       // Send to backend via Socket.IO - server handles spam prevention (2s cooldown)
       if (socketRef.current) {
@@ -336,7 +335,7 @@ const ChatInterface = () => {
             )}
             
             {messages.map((msg, index) => (
-              <div key={`${msg.timestamp}-${index}`} style={{
+              <div key={`${msg.timestamp}-${index}-${msg.user}`} style={{
                 marginBottom: '5px',
                 wordWrap: 'break-word'
               }}>
