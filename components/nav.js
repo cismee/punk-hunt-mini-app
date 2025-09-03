@@ -63,6 +63,9 @@ const App = () => {
     }
   };
 
+  // Only show loading on initial load when we have no data yet
+  const showLoading = loading && (duckBalance === null || duckBalance === undefined);
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full px-2 nav bg-black">
       <div className="w-full" style={{ marginTop: '0px !important' }}>
@@ -95,9 +98,10 @@ const App = () => {
                       e.preventDefault();
                       handleNavClick('ducks', 'duckmint');
                     }}
+                    style={{ lineHeight: '1' }}
                   >
-                    <span className="text-blue-400 font-bold cursor-pointer">🦆</span>
-                    <span className="ml-1">{loading ? '...' : (duckBalance || 0)}</span>
+                    <span className="text-blue-400 font-bold cursor-pointer" style={{ fontSize: '16px' }}>🦆</span>
+                    <span className="ml-1" style={{ lineHeight: '1' }}>{showLoading ? '...' : (duckBalance || 0)}</span>
                   </a>
                   <a 
                     href="#zappmint" 
@@ -106,9 +110,10 @@ const App = () => {
                       e.preventDefault();
                       handleNavClick('zappmint', 'zappmint');
                     }}
+                    style={{ lineHeight: '1' }}
                   >
-                    <span className="text-green-400 font-bold cursor-pointer">⚡</span>
-                    <span className="ml-1">{loading ? '...' : (zapperBalance || 0)}</span>
+                    <span className="text-green-400 font-bold cursor-pointer" style={{ fontSize: '16px' }}>⚡</span>
+                    <span className="ml-1" style={{ lineHeight: '1' }}>{showLoading ? '...' : (zapperBalance || 0)}</span>
                   </a>
                   <a 
                     href="#burn" 
@@ -117,9 +122,10 @@ const App = () => {
                       e.preventDefault();
                       handleNavClick('burn', 'burn');
                     }}
+                    style={{ lineHeight: '1' }}
                   >
-                    <span className="text-red-400 font-bold cursor-pointer">🎯</span>
-                    <span className="ml-1 cursor-pointer">{loading ? '...' : (zapCount || 0)}</span>
+                    <span className="text-red-400 font-bold cursor-pointer" style={{ fontSize: '16px' }}>🎯</span>
+                    <span className="ml-1 cursor-pointer" style={{ lineHeight: '1' }}>{showLoading ? '...' : (zapCount || 0)}</span>
                   </a>
                 </div>
 
