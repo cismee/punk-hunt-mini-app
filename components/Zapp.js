@@ -10,7 +10,6 @@ import {
   TransactionStatusLabel,
   TransactionStatusAction 
 } from '@coinbase/onchainkit/transaction';
-import type { LifecycleStatus } from '@coinbase/onchainkit/transaction';
 
 const zapp = '/img/zapp_animation.gif';
 
