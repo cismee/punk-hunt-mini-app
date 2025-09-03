@@ -276,12 +276,6 @@ function Faq() {
               </p>
 <br />
               <p className="faq">
-                Bluechip NFTs represent the most established and liquid digital assets in the NFT market. 
-            These collections have demonstrated sustained demand, strong community support, and proven 
-            market stability over time.
-              </p>
-<br />
-              <p className="faq">
                NFT rewards are selected based on the total prize pool generated during gameplay.
               </p>
 <br />
