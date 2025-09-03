@@ -97,6 +97,15 @@ export default function Zapp() {
     return `MINT ${amount} ZAPPERS`;
   };
 
+  const calculateZapperPrizePool = () => {
+    if (!cachedGameData.zappersMinted || !cachedGameData.zapperPrice || !cachedGameData.ducksMinted) return '0.000';
+    // Subtract free zappers (1 per duck minted) to get paid zapper mints
+    const paidZapperMints = Math.max(0, cachedGameData.zappersMinted - cachedGameData.ducksMinted);
+    const totalZapperRevenue = parseFloat(cachedGameData.zapperPrice) * paidZapperMints;
+    const prizePool = totalZapperRevenue * 0.5;
+    return prizePool.toFixed(3);
+  };
+
   const isButtonDisabled = () => {
     return !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
@@ -185,6 +194,9 @@ export default function Zapp() {
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
                 {cachedGameData.zappersMinted ?? '…'} Minted!
               </h2>
+
+              <p className="text-[#00000] m-n4">Hunter Prize Pool: <span className="text-[#aa32d2] text-sm sm:text-base">{calculateZapperPrizePool()}Ξ</span></p>
+
               <h3 className="mx-2 text-white text-sm sm:text-base">
                 Burn Zappers below to shoot ducks!
               </h3>
