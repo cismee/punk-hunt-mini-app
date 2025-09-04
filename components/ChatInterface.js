@@ -12,6 +12,7 @@ const ChatInterface = () => {
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResults, setFinalResults] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('Connecting...');
+  const [showUserMessagesOnly, setShowUserMessagesOnly] = useState(false);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const chatRef = useRef(null);
@@ -26,6 +27,11 @@ const ChatInterface = () => {
   };
 
   const username = address ? formatAddress(address) : null;
+
+  // Filter messages based on toggle state
+  const filteredMessages = showUserMessagesOnly 
+    ? messages.filter(msg => !msg.isSystem && msg.user !== 'SYSTEM')
+    : messages;
 
   // Read final placements from contract when game ends
   useEffect(() => {
@@ -67,7 +73,7 @@ const ChatInterface = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [filteredMessages]);
 
   // Handle mouse events for resizing
   useEffect(() => {
@@ -293,6 +299,33 @@ const ChatInterface = () => {
 
       {!isMinimized && (
         <>
+          {/* Filter Toggle */}
+          <div style={{
+            padding: '6px 12px',
+            backgroundColor: '#f0f0f0',
+            borderBottom: '1px solid #ddd',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '11px'
+          }}>
+            <span>Show only user messages:</span>
+            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={showUserMessagesOnly}
+                onChange={(e) => setShowUserMessagesOnly(e.target.checked)}
+                style={{ marginRight: '4px' }}
+              />
+              <span style={{ 
+                fontSize: '10px',
+                color: showUserMessagesOnly ? '#aa32d2' : '#666'
+              }}>
+                {showUserMessagesOnly ? 'ON' : 'OFF'}
+              </span>
+            </label>
+          </div>
+
           {/* Final Results Display */}
           {gameEnded && finalResults && (
             <div style={{
@@ -321,20 +354,22 @@ const ChatInterface = () => {
             </div>
           )}
 
-          {/* Messages area - always visible, shows server messages */}
+          {/* Messages area - shows filtered messages */}
           <div style={{
-            height: gameEnded && finalResults ? `${dimensions.height - 220}px` : `${dimensions.height - 120}px`,
+            height: gameEnded && finalResults 
+              ? `${dimensions.height - 255}px` 
+              : `${dimensions.height - 155}px`,
             overflowY: 'auto',
             padding: '10px',
             backgroundColor: '#f8f8f8'
           }}>
-            {messages.length === 0 && isConnected && (
+            {filteredMessages.length === 0 && isConnected && (
               <div style={{ color: '#666', fontSize: '11px', textAlign: 'center', padding: '20px' }}>
-                Chat is loading...
+                {showUserMessagesOnly ? 'No user messages yet...' : 'Chat is loading...'}
               </div>
             )}
             
-            {messages.map((msg, index) => (
+            {filteredMessages.map((msg, index) => (
               <div key={`${msg.timestamp}-${index}-${msg.user}`} style={{
                 marginBottom: '5px',
                 wordWrap: 'break-word'
@@ -431,7 +466,7 @@ const ChatInterface = () => {
             color: '#666',
             textAlign: 'center'
           }}>
-            {walletConnected ? username : 'Read-only'} | {messages.length} messages
+            {walletConnected ? username : 'Read-only'} | {filteredMessages.length}/{messages.length} messages
             {isConnected && (
               <span style={{ color: '#00aa00', marginLeft: '5px' }}>● Live</span>
             )}
