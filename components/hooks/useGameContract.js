@@ -1,5 +1,5 @@
 /* global BigInt */
-// src/hooks/useGameContract.js - Enhanced with better state management
+// src/hooks/useGameContract.js - Fixed to prevent button freezing
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 import { useEffect, useState, useCallback } from 'react';
@@ -8,209 +8,139 @@ import { useCachedGameData, useCachedUserData } from './useCachedData';
 
 export function useGameContract() {
   const { writeContract, data: hash, error, isPending, reset } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ 
+  const { isLoading: isConfirming, isSuccess: isConfirmed, error: receiptError } = useWaitForTransactionReceipt({ 
     hash,
-    confirmations: 1, // Wait for 1 confirmation
+    confirmations: 1,
   });
   const { address } = useAccount();
 
-  // Local state to track transaction lifecycle
-  const [transactionState, setTransactionState] = useState({
-    stage: 'idle', // 'idle' | 'preparing' | 'pending' | 'confirming' | 'confirmed' | 'error'
-    lastHash: null,
-    error: null,
-  });
+  // Simple local state for UI feedback only
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [processedHashes, setProcessedHashes] = useState(new Set());
 
   // Replace all useReadContract calls with cached data
   const cachedGameData = useCachedGameData();
   const cachedUserData = useCachedUserData(address);
 
-  // Enhanced state management
+  // Handle successful transactions - show success briefly then reset
   useEffect(() => {
-    if (isPending) {
-      setTransactionState(prev => ({ ...prev, stage: 'pending', error: null }));
-    } else if (isConfirming) {
-      setTransactionState(prev => ({ ...prev, stage: 'confirming', lastHash: hash }));
-    } else if (isConfirmed && hash) {
-      setTransactionState(prev => ({ ...prev, stage: 'confirmed', lastHash: hash }));
+    if (isConfirmed && hash && !processedHashes.has(hash)) {
+      console.log('Transaction confirmed, showing success state:', hash);
+      setProcessedHashes(prev => new Set([...prev, hash]));
       
-      // Auto-reset after successful transaction
-      setTimeout(() => {
-        setTransactionState(prev => ({ ...prev, stage: 'idle', lastHash: null }));
+      setShowSuccess(true);
+      
+      // Emit custom event for notifications
+      window.dispatchEvent(new CustomEvent('transactionConfirmed', { 
+        detail: { hash, address, timestamp: Date.now() } 
+      }));
+      
+      // Reset everything after showing success
+      const resetTimer = setTimeout(() => {
+        setShowSuccess(false);
         reset(); // Reset wagmi state
-      }, 2000);
-      
-    } else if (error) {
-      setTransactionState(prev => ({ 
-        ...prev, 
-        stage: 'error', 
-        error: error.message || 'Transaction failed'
-      }));
-      
-      // Auto-reset after error
-      setTimeout(() => {
-        setTransactionState(prev => ({ ...prev, stage: 'idle', error: null }));
-        reset();
-      }, 5000);
-    }
-  }, [isPending, isConfirming, isConfirmed, hash, error, reset]);
-
-  // Invalidate user cache after successful transactions with retries
-  useEffect(() => {
-    if (isConfirmed && address && hash !== transactionState.lastProcessedHash) {
-      console.log('Transaction confirmed, invalidating cache for:', address);
-      
-      // Mark this hash as processed
-      setTransactionState(prev => ({ ...prev, lastProcessedHash: hash }));
-      
-      // Invalidate cache with retries
-      const invalidateWithRetry = async (attempts = 3) => {
-        for (let i = 0; i < attempts; i++) {
-          try {
-            await cachedUserData.invalidateCache();
-            console.log(`Cache invalidation successful on attempt ${i + 1}`);
-            break;
-          } catch (error) {
-            console.warn(`Cache invalidation attempt ${i + 1} failed:`, error);
-            if (i === attempts - 1) {
-              // Final attempt failed, just refetch
-              setTimeout(() => cachedUserData.refetch(), 3000);
-            } else {
-              // Wait before retry
-              await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-            }
+        
+        // Invalidate cache after a delay to allow blockchain to update
+        setTimeout(() => {
+          if (address) {
+            console.log('Invalidating cache for:', address);
+            cachedUserData.invalidateCache();
           }
-        }
-      };
-
-      // Start invalidation after a delay to allow blockchain to update
-      setTimeout(invalidateWithRetry, 2000);
-    }
-  }, [isConfirmed, address, hash, cachedUserData, transactionState.lastProcessedHash]);
-
-  // Enhanced transaction functions with better error handling
-  const mintDucks = useCallback(async (amount) => {
-    try {
-      setTransactionState(prev => ({ ...prev, stage: 'preparing', error: null }));
-
-      if (!cachedGameData.duckPrice || !amount) {
-        throw new Error('Duck price not loaded or invalid amount');
-      }
-
-      if (!address) {
-        throw new Error('Wallet not connected');
-      }
-
-      const totalCost = parseEther(cachedGameData.duckPrice) * BigInt(amount);
-      console.log('Minting ducks:', { 
-        amount, 
-        price: cachedGameData.duckPrice, 
-        totalCost: totalCost.toString(),
-        address 
-      });
+        }, 2000);
+      }, 2000); // Show success for 2 seconds
       
-      await writeContract({
-        address: CONTRACTS.MAIN,
-        abi: MAIN_ABI,
-        functionName: 'mintDucks',
-        args: [amount],
-        value: totalCost,
-      });
-
-    } catch (err) {
-      console.error('Mint ducks failed:', err);
-      setTransactionState(prev => ({ 
-        ...prev, 
-        stage: 'error', 
-        error: err.message || 'Failed to mint ducks'
-      }));
-      throw err;
+      return () => clearTimeout(resetTimer);
     }
+  }, [isConfirmed, hash, processedHashes, reset, address, cachedUserData]);
+
+  // Reset on error after a delay
+  useEffect(() => {
+    if (error || receiptError) {
+      const errorTimer = setTimeout(() => {
+        reset();
+      }, 3000); // Show error for 3 seconds then reset
+      
+      return () => clearTimeout(errorTimer);
+    }
+  }, [error, receiptError, reset]);
+
+  // Clean up processed hashes periodically to prevent memory issues
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      setProcessedHashes(prev => {
+        if (prev.size > 50) { // Keep only last 50 hashes
+          const array = Array.from(prev);
+          return new Set(array.slice(-25)); // Keep last 25
+        }
+        return prev;
+      });
+    }, 300000); // Clean up every 5 minutes
+
+    return () => clearInterval(cleanup);
+  }, []);
+
+  // Transaction functions with minimal state management
+  const mintDucks = useCallback(async (amount) => {
+    if (!cachedGameData.duckPrice || !amount || !address) {
+      throw new Error('Invalid parameters for minting ducks');
+    }
+
+    const totalCost = parseEther(cachedGameData.duckPrice) * BigInt(amount);
+    console.log('Minting ducks:', { amount, price: cachedGameData.duckPrice, totalCost: totalCost.toString() });
+    
+    await writeContract({
+      address: CONTRACTS.MAIN,
+      abi: MAIN_ABI,
+      functionName: 'mintDucks',
+      args: [amount],
+      value: totalCost,
+    });
   }, [cachedGameData.duckPrice, address, writeContract]);
 
   const mintZappers = useCallback(async (amount) => {
-    try {
-      setTransactionState(prev => ({ ...prev, stage: 'preparing', error: null }));
-
-      if (!cachedGameData.zapperPrice || !amount) {
-        throw new Error('Zapper price not loaded or invalid amount');
-      }
-
-      if (!address) {
-        throw new Error('Wallet not connected');
-      }
-
-      const totalCost = parseEther(cachedGameData.zapperPrice) * BigInt(amount);
-      console.log('Minting zappers:', { 
-        amount, 
-        price: cachedGameData.zapperPrice, 
-        totalCost: totalCost.toString(),
-        address 
-      });
-      
-      await writeContract({
-        address: CONTRACTS.MAIN,
-        abi: MAIN_ABI,
-        functionName: 'mintZappers',
-        args: [amount],
-        value: totalCost,
-      });
-
-    } catch (err) {
-      console.error('Mint zappers failed:', err);
-      setTransactionState(prev => ({ 
-        ...prev, 
-        stage: 'error', 
-        error: err.message || 'Failed to mint zappers'
-      }));
-      throw err;
+    if (!cachedGameData.zapperPrice || !amount || !address) {
+      throw new Error('Invalid parameters for minting zappers');
     }
+
+    const totalCost = parseEther(cachedGameData.zapperPrice) * BigInt(amount);
+    console.log('Minting zappers:', { amount, price: cachedGameData.zapperPrice, totalCost: totalCost.toString() });
+    
+    await writeContract({
+      address: CONTRACTS.MAIN,
+      abi: MAIN_ABI,
+      functionName: 'mintZappers',
+      args: [amount],
+      value: totalCost,
+    });
   }, [cachedGameData.zapperPrice, address, writeContract]);
 
   const sendZappers = useCallback(async (amount) => {
-    try {
-      setTransactionState(prev => ({ ...prev, stage: 'preparing', error: null }));
-
-      if (!amount) {
-        throw new Error('Invalid amount');
-      }
-
-      if (!address) {
-        throw new Error('Wallet not connected');
-      }
-
-      if (amount > cachedUserData.zapperBalance) {
-        throw new Error(`Insufficient zappers. You have ${cachedUserData.zapperBalance}, need ${amount}`);
-      }
-
-      console.log('Sending zappers:', { amount, address, balance: cachedUserData.zapperBalance });
-      
-      await writeContract({
-        address: CONTRACTS.MAIN,
-        abi: MAIN_ABI,
-        functionName: 'sendZappers',
-        args: [amount],
-      });
-
-    } catch (err) {
-      console.error('Send zappers failed:', err);
-      setTransactionState(prev => ({ 
-        ...prev, 
-        stage: 'error', 
-        error: err.message || 'Failed to send zappers'
-      }));
-      throw err;
+    if (!amount || !address) {
+      throw new Error('Invalid parameters for sending zappers');
     }
+
+    if (amount > cachedUserData.zapperBalance) {
+      throw new Error(`Insufficient zappers. You have ${cachedUserData.zapperBalance}, need ${amount}`);
+    }
+
+    console.log('Sending zappers:', { amount, address, balance: cachedUserData.zapperBalance });
+    
+    await writeContract({
+      address: CONTRACTS.MAIN,
+      abi: MAIN_ABI,
+      functionName: 'sendZappers',
+      args: [amount],
+    });
   }, [address, cachedUserData.zapperBalance, writeContract]);
 
-  // Manual reset function for components
+  // Manual reset function
   const resetTransactionState = useCallback(() => {
-    setTransactionState({ stage: 'idle', lastHash: null, error: null });
+    setShowSuccess(false);
     reset();
   }, [reset]);
 
   return {
-    // Cached data instead of contract reads
+    // Cached data
     duckPrice: cachedGameData.duckPrice,
     zapperPrice: cachedGameData.zapperPrice,
     huntingSeason: cachedGameData.huntingSeason,
@@ -220,28 +150,24 @@ export function useGameContract() {
     userDuckBalance: cachedUserData.duckBalance,
     userZapperBalance: cachedUserData.zapperBalance,
     
-    // Enhanced transaction functions
+    // Transaction functions
     mintDucks,
     mintZappers,
     sendZappers,
     
-    // Enhanced transaction state
+    // Basic transaction state (directly from wagmi)
     isPending,
     isConfirming,
-    isConfirmed,
-    error: transactionState.error || error,
+    isConfirmed: showSuccess, // Use local success state for UI
+    error: error || receiptError,
     hash,
-    
-    // Enhanced state information
-    transactionStage: transactionState.stage,
-    isTransacting: ['preparing', 'pending', 'confirming'].includes(transactionState.stage),
     
     // Utility functions
     resetTransactionState,
     refetchZapperBalance: cachedUserData.refetch,
     refetchDuckBalance: cachedUserData.refetch,
     
-    // Expose cache loading/error states
+    // Cache state
     cacheLoading: cachedGameData.loading || cachedUserData.loading,
     cacheError: cachedGameData.error || cachedUserData.error,
   };

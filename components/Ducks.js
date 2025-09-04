@@ -1,4 +1,4 @@
-// components/Ducks.js - Enhanced with better state management
+// components/Ducks.js - Enhanced notification system
 import { useAccount } from 'wagmi';
 import { useState, useEffect, useRef } from 'react';
 import { useGameContract } from './hooks/useGameContract';
@@ -13,7 +13,7 @@ function Ducks() {
   const [timeLeft, setTimeLeft] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [processedHashes, setProcessedHashes] = useState(new Set());
-  const lastNotificationRef = useRef(null);
+  const lastMintAmount = useRef(null);
   
   // Use cached data instead of direct contract calls
   const cachedGameData = useCachedGameData();
@@ -25,70 +25,127 @@ function Ducks() {
     isConfirmed,
     error,
     hash,
-    transactionStage,
-    isTransacting,
     resetTransactionState
   } = useGameContract();
 
-  // Enhanced notification handling with better duplicate prevention
+  // Store amount when starting transaction
   useEffect(() => {
-    if (isConfirmed && hash && amount && !processedHashes.has(hash)) {
-      console.log('Processing confirmed transaction:', { hash, amount });
+    if (isPending && amount) {
+      lastMintAmount.current = parseInt(amount);
+      console.log('Stored mint amount for notification:', lastMintAmount.current);
+    }
+  }, [isPending, amount]);
+
+  // Primary notification trigger - transaction confirmed
+  useEffect(() => {
+    if (isConfirmed && hash && lastMintAmount.current && !processedHashes.has(hash)) {
+      console.log('Primary notification trigger - transaction confirmed:', { hash, amount: lastMintAmount.current });
       
       setProcessedHashes(prev => new Set([...prev, hash]));
       
       const notification = {
-        id: `${hash}-${Date.now()}`, // More unique ID
-        amount: parseInt(amount),
+        id: `duck-${hash}-${Date.now()}`,
+        amount: lastMintAmount.current,
         hash: hash,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        source: 'confirmed'
       };
       
-      // Prevent duplicate notifications by checking recent notifications
-      setNotifications(prev => {
-        const isDuplicateRecent = prev.some(existing => 
-          existing.hash === hash || 
-          (Date.now() - existing.timestamp < 5000 && existing.amount === notification.amount)
-        );
-        
-        if (isDuplicateRecent) {
-          console.log('Preventing duplicate notification for hash:', hash);
-          return prev;
-        }
-        
-        return [...prev, notification];
-      });
+      setNotifications(prev => [...prev, notification]);
       
-      // Auto-remove notification after 6 seconds
+      // Remove notification after 6 seconds
       setTimeout(() => {
         setNotifications(prev => prev.filter(n => n.id !== notification.id));
       }, 6000);
       
-      lastNotificationRef.current = notification;
+      // Clear the stored amount
+      lastMintAmount.current = null;
     }
-  }, [isConfirmed, hash, amount, processedHashes]);
+  }, [isConfirmed, hash, processedHashes]);
 
-  // Reset transaction state when amount changes (new transaction)
+  // Secondary notification trigger - listen for custom events
   useEffect(() => {
-    if (transactionStage === 'idle' && amount !== lastNotificationRef.current?.amount) {
-      // Amount changed, ready for new transaction
-      lastNotificationRef.current = null;
+    const handleTransactionConfirmed = (event) => {
+      const { hash: eventHash } = event.detail;
+      
+      if (eventHash && lastMintAmount.current && !processedHashes.has(eventHash)) {
+        console.log('Secondary notification trigger - custom event:', { hash: eventHash, amount: lastMintAmount.current });
+        
+        setProcessedHashes(prev => new Set([...prev, eventHash]));
+        
+        const notification = {
+          id: `duck-event-${eventHash}-${Date.now()}`,
+          amount: lastMintAmount.current,
+          hash: eventHash,
+          timestamp: Date.now(),
+          source: 'event'
+        };
+        
+        setNotifications(prev => [...prev, notification]);
+        
+        setTimeout(() => {
+          setNotifications(prev => prev.filter(n => n.id !== notification.id));
+        }, 6000);
+        
+        lastMintAmount.current = null;
+      }
+    };
+
+    window.addEventListener('transactionConfirmed', handleTransactionConfirmed);
+    return () => window.removeEventListener('transactionConfirmed', handleTransactionConfirmed);
+  }, [processedHashes]);
+
+  // Fallback notification trigger - detect balance changes
+  const previousDuckBalance = useRef(null);
+  const { duckBalance } = cachedGameData;
+  
+  useEffect(() => {
+    // If we have a stored mint amount and duck balance increased
+    if (lastMintAmount.current && 
+        previousDuckBalance.current !== null && 
+        duckBalance > previousDuckBalance.current) {
+      
+      const balanceIncrease = duckBalance - previousDuckBalance.current;
+      
+      console.log('Fallback notification trigger - balance increase detected:', { 
+        expected: lastMintAmount.current, 
+        actual: balanceIncrease,
+        newBalance: duckBalance 
+      });
+      
+      // Create fallback notification if we haven't already notified for this amount
+      const notification = {
+        id: `duck-fallback-${Date.now()}`,
+        amount: balanceIncrease,
+        hash: hash || 'unknown',
+        timestamp: Date.now(),
+        source: 'fallback'
+      };
+      
+      setNotifications(prev => [...prev, notification]);
+      
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      }, 6000);
+      
+      lastMintAmount.current = null;
     }
-  }, [amount, transactionStage]);
+    
+    previousDuckBalance.current = duckBalance;
+  }, [duckBalance, hash]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
-  // Update countdown timer using cached mint end timestamp with fallback
+  // Update countdown timer
   useEffect(() => {
-    // Use cached timestamp or fallback to 14 days from now
     const mintEndTimestamp = cachedGameData.ducksMintEndTimestamp || 
                             (Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60));
 
     const updateTimer = () => {
       const now = Date.now();
-      const endTime = mintEndTimestamp * 1000; // Convert to milliseconds
+      const endTime = mintEndTimestamp * 1000;
       const difference = endTime - now;
 
       if (difference <= 0) {
@@ -115,65 +172,39 @@ function Ducks() {
   }, [cachedGameData.ducksMintEndTimestamp]);
 
   const handleMint = async () => {
-    console.log('Mint button clicked', { isConnected, amount, address, transactionStage });
+    console.log('Mint button clicked', { isConnected, amount, address });
     
-    // Play duck sound when button is clicked
     if (window.playButtonSound) {
       window.playButtonSound('ducks');
     }
     
-    if (!isConnected) {
-      console.log('Wallet not connected');
-      return;
-    }
-    
-    if (!amount || amount <= 0) {
-      console.log('Invalid amount:', amount);
+    if (!isConnected || !amount || amount <= 0) {
+      console.log('Cannot mint:', { isConnected, amount });
       return;
     }
 
-    // Prevent multiple transactions
-    if (isTransacting) {
+    if (isPending || isConfirming) {
       console.log('Transaction already in progress');
       return;
     }
     
     try {
-      console.log('Attempting to mint ducks...', { 
-        amount: parseInt(amount), 
-        address,
-        stage: transactionStage 
-      });
-      
       await mintDucks(parseInt(amount));
     } catch (err) {
       console.error('Duck minting failed:', err);
-      // Error is handled by the hook, but we can add additional handling here if needed
     }
   };
 
+  // Simplified button text logic
   const getButtonText = () => {
     if (!isConnected) return 'CONNECT WALLET';
     if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
-    
-    // Use enhanced transaction state
-    switch (transactionStage) {
-      case 'preparing':
-        return 'PREPARING...';
-      case 'pending':
-        return 'CONFIRM IN WALLET...';
-      case 'confirming':
-        return 'MINTING...';
-      case 'confirmed':
-        return 'SUCCESS!';
-      case 'error':
-        return 'TRY AGAIN';
-      default:
-        return `MINT ${amount} DUCKS`;
-    }
+    if (isPending) return 'CONFIRM IN WALLET...';
+    if (isConfirming) return 'MINTING...';
+    if (isConfirmed) return 'SUCCESS!';
+    return `MINT ${amount} DUCKS`;
   };
 
-  // Helper functions for prize pool calculations using server data
   const calculateDuckPrizePool = () => {
     if (!cachedGameData.ducksMinted || !cachedGameData.duckPrice) return '0.000';
     const totalDuckRevenue = parseFloat(cachedGameData.duckPrice) * cachedGameData.ducksMinted;
@@ -184,30 +215,15 @@ function Ducks() {
   const isButtonDisabled = () => {
     return !isConnected || 
            timeLeft === 'HAPPY HUNTING!' ||
-           isTransacting || 
+           isPending || 
+           isConfirming || 
            !amount || 
            parseInt(amount) <= 0;
   };
 
-  const getButtonClass = () => {
-    let baseClass = "btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer touch-manipulation";
-    
-    if (isButtonDisabled()) {
-      baseClass += " opacity-60 cursor-not-allowed";
-    }
-    
-    if (transactionStage === 'error') {
-      baseClass += " bg-red-100 border-red-400";
-    } else if (transactionStage === 'confirmed') {
-      baseClass += " bg-green-100 border-green-400";
-    }
-    
-    return baseClass;
-  };
-
   return (
     <>
-      {/* Enhanced Notifications with better styling */}
+      {/* Notifications */}
       <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[320px]">
         {notifications.map((notification, index) => (
           <div
@@ -269,16 +285,19 @@ function Ducks() {
                   className="nes-input p-2 mb-2 sm:w-16 text-center mx-2"
                   style={{ fontSize: '16px' }}
                   id="inline_field"
-                  disabled={isTransacting}
+                  disabled={isPending || isConfirming}
                 />
                 Ducks!
               </h1>
               
               <button 
-                className={getButtonClass()}
+                className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer touch-manipulation"
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
-                title={isButtonDisabled() ? 'Cannot mint right now' : 'Mint ducks'}
+                style={{
+                  opacity: isButtonDisabled() ? 0.6 : 1,
+                  cursor: isButtonDisabled() ? 'not-allowed' : 'pointer'
+                }}
               >
                 {getButtonText()}
               </button>
@@ -297,7 +316,7 @@ function Ducks() {
                 )}
               </div>
 
-              {/* Enhanced Error Display */}
+              {/* Error Display */}
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs max-w-md mx-auto">
                   <div className="font-bold">Transaction Error:</div>
@@ -351,7 +370,6 @@ function Ducks() {
           </div>
         </div>
         
-        {/* Fence image in separate container */}
         <div className="w-full">
           <img src={fence} className="w-full h-auto block" alt="Fence decoration" />
         </div>
@@ -375,17 +393,6 @@ function Ducks() {
         
         .touch-manipulation {
           touch-action: manipulation;
-        }
-
-        /* Enhanced button states */
-        .btn-nes:disabled {
-          cursor: not-allowed !important;
-          opacity: 0.6;
-        }
-        
-        .btn-nes:not(:disabled):hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
       `}</style>
     </>
