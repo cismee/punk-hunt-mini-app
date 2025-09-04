@@ -11,7 +11,8 @@ const ChatInterface = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResults, setFinalResults] = useState(null);
-  const [showOnlyUserMessages, setShowOnlyUserMessages] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('Connecting...');
+  const [showUserMessagesOnly, setShowUserMessagesOnly] = useState(false);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
   const chatRef = useRef(null);
@@ -19,7 +20,7 @@ const ChatInterface = () => {
   // Get wallet connection info
   const { address, isConnected: walletConnected } = useAccount();
 
-  // Format address for display
+  // Format address for display - matches server.js format
   const formatAddress = (addr) => {
     if (!addr) return 'Anonymous';
     return `${addr.slice(0, 4)}...${addr.slice(-4)}`;
@@ -27,25 +28,38 @@ const ChatInterface = () => {
 
   const username = address ? formatAddress(address) : null;
 
-  // Filter messages based on toggle
-  const filteredMessages = showOnlyUserMessages 
+  // Filter messages based on toggle state
+  const filteredMessages = showUserMessagesOnly 
     ? messages.filter(msg => !msg.isSystem && msg.user !== 'SYSTEM')
     : messages;
 
-  // Read final placements from contract
+  // Read final placements from contract when game ends
   useEffect(() => {
     if (!gameEnded) return;
     
     const fetchFinalResults = async () => {
       try {
+        // This would typically fetch from your leaderboard API
+        const response = await fetch('https://punkhunt.gg/api/leaderboard');
+        const data = await response.json();
+        
+        setFinalResults({
+          winner: data.topHolders?.[0]?.address || "0x0000...0000",
+          secondPlace: data.topHolders?.[1]?.address || "0x0000...0000", 
+          thirdPlace: data.topHolders?.[2]?.address || "0x0000...0000",
+          topShooter: { 
+            address: data.topHunters?.[0]?.address || "0x0000...0000", 
+            zaps: data.topHunters?.[0]?.zapCount || 0 
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching final results:', error);
         setFinalResults({
           winner: "0x0000...0000",
           secondPlace: "0x0000...0000", 
           thirdPlace: "0x0000...0000",
           topShooter: { address: "0x0000...0000", zaps: 0 }
         });
-      } catch (error) {
-        console.error('Error fetching final results:', error);
       }
     };
 
@@ -97,69 +111,121 @@ const ChatInterface = () => {
     setIsResizing(true);
   };
 
-  // Socket.IO connection - NOW CONNECTS REGARDLESS OF WALLET STATE
+  // Socket.IO connection - matches server.js configuration
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-    const socket = io(API_URL);
+    console.log('🔌 Initializing WebSocket connection to punkhunt.gg...');
+    
+    // Connect to server with matching CORS origins
+    const socket = io('https://punkhunt.gg', {
+      transports: ['websocket', 'polling'],
+      timeout: 10000,
+      forceNew: true
+    });
 
     socket.on('connect', () => {
       setIsConnected(true);
-      console.log('Connected to backend chat server');
+      setConnectionStatus('Connected');
+      console.log('✅ Connected to backend chat server');
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
       setIsConnected(false);
-      console.log('Disconnected from backend chat server');
+      setConnectionStatus(`Disconnected: ${reason}`);
+      console.log('❌ Disconnected from backend chat server:', reason);
     });
 
-    // Load chat history when connected - ALWAYS RECEIVE MESSAGES
+    socket.on('connect_error', (error) => {
+      setIsConnected(false);
+      setConnectionStatus(`Connection Error: ${error.message}`);
+      console.error('🚫 Connection error:', error);
+    });
+
+    // Load chat history when connected - server sends last 50 messages
     socket.on('chatHistory', (history) => {
-      console.log('Received chat history:', history);
+      console.log('📜 Received chat history:', history);
       setMessages(history || []);
     });
 
-    // Listen for new chat messages - ALWAYS RECEIVE MESSAGES
+    // Listen for new chat messages from server
     socket.on('newChatMessage', (messageData) => {
-      console.log('Received new message:', messageData);
-      // Don't duplicate your own messages (only applies if wallet connected)
-      if (!walletConnected || messageData.user !== username) {
-        setMessages(prev => [...prev, messageData]);
-      }
+      console.log('💬 Received new message:', messageData);
+      
+      // Use a more robust duplicate check
+      setMessages(prev => {
+        const isDuplicate = prev.some(msg => {
+          // Check for exact match on multiple fields
+          const sameTimestamp = Math.abs(msg.timestamp - messageData.timestamp) < 1000; // Within 1 second
+          const sameUser = msg.user === messageData.user;
+          const sameMessage = msg.message === messageData.message;
+          
+          return sameTimestamp && sameUser && sameMessage;
+        });
+        
+        if (isDuplicate) {
+          console.log('🔄 Duplicate message detected, skipping:', messageData);
+          return prev;
+        }
+        
+        return [...prev, messageData];
+      });
     });
 
-    // Listen for contract events (for non-chat purposes only)
+    // Listen for contract events that affect game state
     socket.on('contractEvent', (eventData) => {
-      console.log('Contract event received:', eventData);
+      console.log('📊 Contract event received:', eventData);
       
-      // Only handle game state changes, not chat messages
+      // Check if game ended (only 1 duck remaining)
       if (eventData.type === 'PlayerEliminated' && eventData.remainingSupply === 1) {
         setGameEnded(true);
       }
     });
 
+    // Listen for game state updates from server
+    socket.on('gameStateUpdate', (gameState) => {
+      console.log('🎮 Game state update:', gameState);
+      // Could use this to update UI elements
+    });
+
+    socket.on('leaderboardUpdate', (leaderboard) => {
+      console.log('🏆 Leaderboard update:', leaderboard);
+      // Could use this to update leaderboard display
+    });
+
     socketRef.current = socket;
 
     return () => {
+      console.log('🔌 Cleaning up WebSocket connection...');
       socket.disconnect();
     };
-  }, [username, walletConnected]); // Removed walletConnected from main dependency - only affects duplicate filtering
+  }, []); // Empty dependency array - only connect once
 
   const sendMessage = (e) => {
     e.preventDefault();
     
-    // ONLY CHECK WALLET CONNECTION FOR SENDING MESSAGES
-    if (!message.trim() || !walletConnected || !address || !isConnected || gameEnded) return;
+    // Server-side validation requires wallet connection, valid message, and connection
+    if (!message.trim() || !walletConnected || !address || !isConnected || gameEnded) {
+      console.warn('Cannot send message:', { 
+        hasMessage: !!message.trim(), 
+        walletConnected, 
+        hasAddress: !!address, 
+        isConnected, 
+        gameEnded 
+      });
+      return;
+    }
 
     const messageData = {
       user: username,
-      message: message.trim()
+      message: message.trim().substring(0, 200) // Match server's 200 char limit
     };
 
     try {
-      // Add message to local state immediately
-      setMessages(prev => [...prev, messageData]);
+      console.log('📤 Sending message:', messageData);
       
-      // Send to backend via Socket.IO
+      // DON'T add message to local state - let server broadcast it back
+      // This prevents duplicates
+      
+      // Send to backend via Socket.IO - server handles spam prevention (2s cooldown)
       if (socketRef.current) {
         socketRef.current.emit('chatMessage', messageData);
       }
@@ -208,9 +274,9 @@ const ChatInterface = () => {
         />
       )}
 
-      {/* Header */}
+      {/* Header with connection status */}
       <div style={{
-        backgroundColor: '#f42a2a',
+        backgroundColor: isConnected ? '#f42a2a' : '#666',
         color: '#fff',
         padding: '8px 12px',
         fontWeight: 'bold',
@@ -220,7 +286,14 @@ const ChatInterface = () => {
         alignItems: 'center',
         cursor: 'pointer'
       }} onClick={() => setIsMinimized(!isMinimized)}>
-        <span>TROLLBOX {isConnected ? '🟢' : '🔴'}</span>
+        <span>
+          TROLLBOX {isConnected ? '🟢' : '🔴'} 
+          {!isMinimized && (
+            <span style={{ fontSize: '10px', marginLeft: '5px' }}>
+              {connectionStatus}
+            </span>
+          )}
+        </span>
         <span>{isMinimized ? '▲' : '▼'}</span>
       </div>
 
@@ -228,35 +301,27 @@ const ChatInterface = () => {
         <>
           {/* Filter Toggle */}
           <div style={{
-            padding: '6px 8px',
+            padding: '6px 12px',
             backgroundColor: '#f0f0f0',
-            borderBottom: '1px solid #ccc',
+            borderBottom: '1px solid #ddd',
             display: 'flex',
-            justifyContent: 'space-between',
             alignItems: 'center',
+            justifyContent: 'space-between',
             fontSize: '11px'
           }}>
-            <label style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              cursor: 'pointer',
-              color: '#333'
-            }}>
-              Show Only User Messages:
+            <span>Show only user messages:</span>
+            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
               <input
                 type="checkbox"
-                checked={showOnlyUserMessages}
-                onChange={(e) => setShowOnlyUserMessages(e.target.checked)}
-                style={{ 
-                  margin: '0 5px',
-                  cursor: 'pointer'
-                }}
+                checked={showUserMessagesOnly}
+                onChange={(e) => setShowUserMessagesOnly(e.target.checked)}
+                style={{ marginRight: '4px' }}
               />
               <span style={{ 
-                color: showOnlyUserMessages ? '#aa32d2' : '#333',
-                fontWeight: 'bold'
+                fontSize: '10px',
+                color: showUserMessagesOnly ? '#aa32d2' : '#666'
               }}>
-                {showOnlyUserMessages ? 'ON' : 'OFF'}
+                {showUserMessagesOnly ? 'ON' : 'OFF'}
               </span>
             </label>
           </div>
@@ -289,60 +354,53 @@ const ChatInterface = () => {
             </div>
           )}
 
-          {/* Messages area - NOW ALWAYS VISIBLE */}
+          {/* Messages area - shows filtered messages */}
           <div style={{
             height: gameEnded && finalResults 
-              ? `${dimensions.height - 250}px` 
-              : `${dimensions.height - 150}px`,
+              ? `${dimensions.height - 255}px` 
+              : `${dimensions.height - 155}px`,
             overflowY: 'auto',
             padding: '10px',
             backgroundColor: '#f8f8f8'
           }}>
-            {/* Show empty state message when filter is on but no user messages */}
-            {showOnlyUserMessages && filteredMessages.length === 0 ? (
-              <div style={{
-                textAlign: 'center',
-                color: '#999',
-                fontStyle: 'italic',
-                marginTop: '20px'
-              }}>
-                No User Messages Yet...
+            {filteredMessages.length === 0 && isConnected && (
+              <div style={{ color: '#666', fontSize: '11px', textAlign: 'center', padding: '20px' }}>
+                {showUserMessagesOnly ? 'No user messages yet...' : 'Chat is loading...'}
               </div>
-            ) : (
-              filteredMessages.map((msg, index) => (
-                <div key={`${msg.timestamp}-${index}`} style={{
-                  marginBottom: '5px',
-                  wordWrap: 'break-word'
-                }}>
-                  <span style={{
-                    color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#3a3afc',
-                    fontWeight: 'bold'
-                  }}>
-                    {msg.user === 'SYSTEM' ? '🤖 ' : `${msg.user}: `}
-                  </span>
-                  <span style={{ 
-                    color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#000'
-                  }}>
-                    {msg.message}
-                  </span>
-                  {msg.timestamp && (
-                    <span style={{ 
-                      color: '#999', 
-                      fontSize: '10px', 
-                      marginLeft: '5px' 
-                    }}>
-                      {new Date(msg.timestamp).toLocaleTimeString()}
-                    </span>
-                  )}
-                </div>
-              ))
             )}
+            
+            {filteredMessages.map((msg, index) => (
+              <div key={`${msg.timestamp}-${index}-${msg.user}`} style={{
+                marginBottom: '5px',
+                wordWrap: 'break-word'
+              }}>
+                <span style={{
+                  color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#3a3afc',
+                  fontWeight: 'bold'
+                }}>
+                  {msg.user === 'SYSTEM' ? '🤖 ' : `${msg.user}: `}
+                </span>
+                <span style={{ 
+                  color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#000'
+                }}>
+                  {msg.message}
+                </span>
+                {msg.timestamp && (
+                  <span style={{ 
+                    color: '#999', 
+                    fontSize: '10px', 
+                    marginLeft: '5px' 
+                  }}>
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+            ))}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Message input - CONDITIONAL RENDERING BASED ON WALLET */}
+          {/* Message input - conditional based on wallet connection */}
           {walletConnected ? (
-            // Connected user - show input form
             <form onSubmit={sendMessage} style={{
               display: 'flex',
               padding: '8px',
@@ -352,7 +410,11 @@ const ChatInterface = () => {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder={gameEnded ? "Game ended - chat disabled" : "Type message..."}
+                placeholder={
+                  gameEnded ? "Game ended - chat disabled" : 
+                  !isConnected ? "Connecting..." :
+                  "Type message..."
+                }
                 style={{
                   flex: 1,
                   padding: '5px',
@@ -360,8 +422,8 @@ const ChatInterface = () => {
                   fontSize: '12px',
                   fontFamily: 'monospace',
                   marginRight: '5px',
-                  backgroundColor: gameEnded ? '#f0f0f0' : '#fff',
-                  color: gameEnded ? '#999' : '#000'
+                  backgroundColor: (gameEnded || !isConnected) ? '#f0f0f0' : '#fff',
+                  color: (gameEnded || !isConnected) ? '#999' : '#000'
                 }}
                 maxLength={200}
                 disabled={!isConnected || gameEnded}
@@ -380,11 +442,11 @@ const ChatInterface = () => {
                 }}
                 disabled={!isConnected || !message.trim() || gameEnded}
               >
-                {gameEnded ? 'GAME OVER' : 'SEND'}
+                {gameEnded ? 'GAME OVER' : 
+                 !isConnected ? 'OFFLINE' : 'SEND'}
               </button>
             </form>
           ) : (
-            // Not connected - show connect prompt instead of input
             <div style={{
               padding: '12px 8px',
               borderTop: '2px solid #000',
@@ -404,7 +466,10 @@ const ChatInterface = () => {
             color: '#666',
             textAlign: 'center'
           }}>
-            {walletConnected ? username : 'Read-only'} | {filteredMessages.length} messages | <span style={{ color: isConnected ? '#125000' : '#f42a2a', fontWeight: 'bold' }}>LIVE</span>
+            {walletConnected ? username : 'Read-only'} | {filteredMessages.length}/{messages.length} messages
+            {isConnected && (
+              <span style={{ color: '#00aa00', marginLeft: '5px' }}>● Live</span>
+            )}
           </div>
         </>
       )}
