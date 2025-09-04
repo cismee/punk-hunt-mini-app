@@ -127,7 +127,6 @@ export default function Ded() {
                   id: Date.now() + Math.random(),
                   message: "You Missed!",
                   txHash: hash,
-                  boxShadow: '4px 4px 0 black',
                   backgroundColor: '#fbb304'
                 };
               } else if (owned) {
@@ -135,7 +134,6 @@ export default function Ded() {
                   id: Date.now() + Math.random(),
                   message: `You Shot your Own Duck #${tokenId}!`,
                   txHash: hash,
-                  boxShadow: '4px 4px 0 black',
                   backgroundColor: '#f42a2a'
                 };
               } else {
@@ -143,7 +141,6 @@ export default function Ded() {
                   id: Date.now() + Math.random(),
                   message: `You hit Duck #${tokenId}!`,
                   txHash: hash,
-                  boxShadow: '4px 4px 0 black',
                   backgroundColor: '#339c1d'
                 };
               }

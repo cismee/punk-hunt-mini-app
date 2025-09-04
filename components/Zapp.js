@@ -120,8 +120,7 @@ export default function Zapp() {
             className="bg-[#ff650b] text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
             style={{
               animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both',
-              boxShadow: '4px 4px 0 black'
+              animationFillMode: 'both'
             }}
           >
             <div className="flex justify-between items-start">

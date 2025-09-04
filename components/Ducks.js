@@ -28,23 +28,45 @@ function Ducks() {
     hash
   } = useGameContract();
 
-  // Show notification when mint is confirmed and hash is available
+  // Show notifications when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
       setProcessedHashes(prev => new Set([...prev, hash]));
       
-      const notification = {
+      // Duck notification
+      const duckNotification = {
         id: Date.now() + Math.random(),
+        type: 'duck',
         amount: mintedAmount,
         hash: hash
       };
       
-      setNotifications(prev => [...prev, notification]);
+      // Zapper notification (1 zapper per duck minted)
+      const zapperNotification = {
+        id: Date.now() + Math.random() + 1,
+        type: 'zapper',
+        amount: mintedAmount,
+        hash: hash
+      };
+      
+      // Add duck notification first
+      setNotifications(prev => [...prev, duckNotification]);
+      
+      // Add zapper notification after a short delay
+      setTimeout(() => {
+        setNotifications(prev => [...prev, zapperNotification]);
+      }, 300);
+      
       setMintedAmount(null);
       
+      // Remove notifications after 5 seconds
       setTimeout(() => {
-        setNotifications(prev => prev.filter(n => n.id !== notification.id));
+        setNotifications(prev => prev.filter(n => n.id !== duckNotification.id));
       }, 5000);
+      
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== zapperNotification.id));
+      }, 5300);
     }
   }, [isConfirmed, hash, mintedAmount, processedHashes]);
 
@@ -160,17 +182,21 @@ function Ducks() {
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="bg-blue-600 text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
+            className={`text-white p-3 min-w-[250px] shadow-lg animate-slide-down ${
+              notification.type === 'duck' ? 'bg-blue-600' : 'bg-[#ff650b]'
+            }`}
             style={{
               animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both',
-              boxShadow: '4px 4px 0 black'
+              animationFillMode: 'both'
             }}
           >
             <div className="flex justify-between items-start">
               <div>
                 <div className="mb-2 font-bold text-sm">
-                  You minted {notification.amount} ducks!
+                  {notification.type === 'duck' 
+                    ? `You minted ${notification.amount} ducks!`
+                    : `You received ${notification.amount} free zappers!`
+                  }
                 </div>
                 <a 
                   href={`https://basescan.org/tx/${notification.hash}`}
@@ -185,7 +211,7 @@ function Ducks() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                X
+                ×
               </button>
             </div>
           </div>
@@ -250,11 +276,10 @@ function Ducks() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksMinted ?? 'â€¦'} Minted!
+                {cachedGameData.ducksMinted ?? '…'} Minted!
               </h2>
               
               <p className="text-black m-n4">Duck Prize Pool: <span className="text-white text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
-
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
                 Mint a Duck, Get a Free Zapper.
