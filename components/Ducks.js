@@ -155,7 +155,7 @@ function Ducks() {
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';
     if (showSuccess) return 'SUCCESS!';
-    return `MINT ${amount} DUCKS`;
+    return `MINT ${amount} DUCKS!`;
   };
 
   // Helper functions for prize pool calculations using server data

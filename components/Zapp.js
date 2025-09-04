@@ -94,7 +94,7 @@ export default function Zapp() {
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';
     if (showSuccess) return 'SUCCESS!';
-    return `MINT ${amount} ZAPPERS`;
+    return `MINT ${amount} ZAPPERS!`;
   };
 
   const calculateZapperPrizePool = () => {
