@@ -3,7 +3,24 @@ const logo = './img/nav_icon.png';
 import { useDisconnect, useAccount, useConnect, useConnectors } from 'wagmi';
 import { useCachedUserData } from './hooks/useCachedData';
 import { useEffect, useState } from 'react';
-import { getPreferredConnector } from '../wagmi-config';
+
+// Simple connector preference function without external import
+const getPreferredConnector = (connectors) => {
+  // In Base mini-app context, prefer injected wallet
+  if (typeof window !== 'undefined' && window.ethereum) {
+    // Check if we're in a Coinbase Wallet context
+    if (window.ethereum.isCoinbaseWallet) {
+      return connectors.find(c => c.id === 'coinbaseWalletSDK') || connectors.find(c => c.name?.toLowerCase().includes('coinbase'));
+    }
+    // Check for MetaMask
+    if (window.ethereum.isMetaMask) {
+      return connectors.find(c => c.id === 'metaMask') || connectors.find(c => c.name?.toLowerCase().includes('metamask'));
+    }
+  }
+  
+  // Default to first injected connector
+  return connectors.find(c => c.id === 'injected') || connectors[0];
+};
 
 const App = () => {
   const { disconnect } = useDisconnect();
