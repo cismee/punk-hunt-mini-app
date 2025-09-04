@@ -1,18 +1,20 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { base } from "wagmi/chains";
+import { base, baseSepolia } from "wagmi/chains";
 import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
-import { WagmiProvider } from "wagmi";
+import { WagmiProvider, createConfig } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { http } from "viem";
 
-// Create wagmi config - you can use your existing config from wagmi-config.js
-const config = getDefaultConfig({
-  appName: 'BaseHunt',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'BASE_HUNT',
-  chains: [base],
-  ssr: true, // Set to true for Next.js
+// Create wagmi config matching your existing setup
+const config = createConfig({
+  chains: [base, baseSepolia],
+  transports: {
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
+  },
+  ssr: true,
 });
 
 // Create a client for React Query
