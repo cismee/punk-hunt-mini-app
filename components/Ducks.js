@@ -163,7 +163,8 @@ function Ducks() {
             className="bg-blue-600 text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
             style={{
               animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both'
+              animationFillMode: 'both',
+              boxShadow: '4px 4px 0 black'
             }}
           >
             <div className="flex justify-between items-start">
@@ -184,7 +185,7 @@ function Ducks() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                âœ•
+                X
               </button>
             </div>
           </div>
