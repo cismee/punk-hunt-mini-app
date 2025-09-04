@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData, useCachedUserData } from './hooks/useCachedData';
 import { useMiniKit } from './hooks/useMiniKit';
-import { publicClient } from '../minikit-config';
+import { publicClient } from './minikit-config';
 import { CONTRACTS } from './contracts';
 import { decodeEventLog } from 'viem';
 
