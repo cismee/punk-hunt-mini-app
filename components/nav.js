@@ -1,14 +1,17 @@
 import './nav.css';
 const logo = './img/nav_icon.png';
-import { useDisconnect, useAccount, useConnect } from 'wagmi';
+import { useDisconnect, useAccount, useConnect, useConnectors } from 'wagmi';
 import { useCachedUserData } from './hooks/useCachedData';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getPreferredConnector } from '../wagmi-config';
 
 const App = () => {
   const { disconnect } = useDisconnect();
-  const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { address, isConnected, connector } = useAccount();
+  const { connect, error: connectError, isPending: isConnecting } = useConnect();
+  const connectors = useConnectors();
   const { duckBalance, zapperBalance, zapCount, loading, refetch } = useCachedUserData(address);
+  const [connectionAttempted, setConnectionAttempted] = useState(false);
 
   // Auto-refresh data periodically when connected
   useEffect(() => {
@@ -21,13 +24,42 @@ const App = () => {
     }
   }, [address, refetch]);
 
+  // Auto-connect in Base mini-app environment
+  useEffect(() => {
+    const attemptAutoConnect = async () => {
+      if (!isConnected && !connectionAttempted && !isConnecting) {
+        setConnectionAttempted(true);
+        
+        // Check if we're in a mini-app environment with injected wallet
+        if (typeof window !== 'undefined' && window.ethereum) {
+          try {
+            const preferredConnector = getPreferredConnector(connectors);
+            if (preferredConnector) {
+              console.log('Auto-connecting with preferred connector:', preferredConnector.name);
+              await connect({ connector: preferredConnector });
+            }
+          } catch (error) {
+            console.log('Auto-connect failed, user will need to connect manually:', error);
+          }
+        }
+      }
+    };
+
+    // Small delay to ensure connectors are initialized
+    const timer = setTimeout(attemptAutoConnect, 100);
+    return () => clearTimeout(timer);
+  }, [isConnected, connectionAttempted, isConnecting, connectors, connect]);
+
   // Debug logging
   console.log('Nav debug (cached):', {
     userDuckBalance: duckBalance,
     userZapperBalance: zapperBalance,
     userKillCount: zapCount,
     address,
-    loading
+    loading,
+    isConnected,
+    connector: connector?.name,
+    connectError: connectError?.message
   });
 
   // Sound effect handlers
@@ -49,17 +81,31 @@ const App = () => {
     }, 100);
   };
 
-  const handleConnect = () => {
-    // For Base mini-apps, try to connect with the first available connector
-    // Usually this will be the injected connector (Base App's built-in wallet)
-    const injectedConnector = connectors.find(connector => 
-      connector.id === 'injected' || connector.name.toLowerCase().includes('injected')
-    );
-    
-    if (injectedConnector) {
-      connect({ connector: injectedConnector });
-    } else if (connectors[0]) {
-      connect({ connector: connectors[0] });
+  const handleConnect = async () => {
+    try {
+      setConnectionAttempted(true);
+      const preferredConnector = getPreferredConnector(connectors);
+      
+      if (preferredConnector) {
+        console.log('Connecting with preferred connector:', preferredConnector.name);
+        await connect({ connector: preferredConnector });
+      } else if (connectors[0]) {
+        console.log('Fallback to first available connector:', connectors[0].name);
+        await connect({ connector: connectors[0] });
+      }
+    } catch (error) {
+      console.error('Connection failed:', error);
+      // Reset connection attempt flag on failure so user can try again
+      setConnectionAttempted(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+      setConnectionAttempted(false); // Allow reconnection
+    } catch (error) {
+      console.error('Disconnect failed:', error);
     }
   };
 
@@ -78,17 +124,31 @@ const App = () => {
           {/* Right Section */}
           <div className="flex items-center justify-end">
             {!isConnected ? (
-              // Not connected - show connect button
-              <button
-                className="nes-btn is-primary text-xs px-3 py-2"
-                onClick={handleConnect}
-                type="button"
-              >
-                CONNECT
-              </button>
+              // Not connected - show connect button with loading state
+              <div className="flex items-center gap-2">
+                <button
+                  className="nes-btn is-primary text-xs px-3 py-2"
+                  onClick={handleConnect}
+                  disabled={isConnecting}
+                  type="button"
+                >
+                  {isConnecting ? 'CONNECTING...' : 'CONNECT'}
+                </button>
+                
+                {connectError && (
+                  <div className="text-red-400 text-xs max-w-32 truncate" title={connectError.message}>
+                    Connection failed
+                  </div>
+                )}
+              </div>
             ) : (
               // Connected - show balances and disconnect button
               <div className="flex items-center gap-3">
+                {/* Connection indicator */}
+                <div className="flex items-center text-green-400 text-xs">
+                  <span title={`Connected via ${connector?.name}`}>●</span>
+                </div>
+
                 {/* User Balances */}
                 <div className="flex items-center gap-2 text-white text-sm">
                   <a 
@@ -132,8 +192,9 @@ const App = () => {
                 {/* Disconnect Button */}
                 <button
                   className="nes-btn text-xs px-2 py-1"
-                  onClick={() => disconnect()}
+                  onClick={handleDisconnect}
                   type="button"
+                  title={`Disconnect ${connector?.name}`}
                 >
                   X
                 </button>

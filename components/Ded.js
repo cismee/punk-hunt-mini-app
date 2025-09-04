@@ -1,6 +1,6 @@
-// components/Ded.js
+// components/Ded.js - Enhanced with better state management
 import { useAccount } from 'wagmi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData, useCachedUserData } from './hooks/useCachedData';
 import { usePublicClient } from 'wagmi';
@@ -75,10 +75,10 @@ export default function Ded() {
   const [amount, setAmount] = useState('5');
   const [huntingStartSupply, setHuntingStartSupply] = useState(0);
   const [notifications, setNotifications] = useState([]);
-  const [showShotsFired, setShowShotsFired] = useState(false);
-  const [zappersSent, setZappersSent] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const [eventProcessingComplete, setEventProcessingComplete] = useState(false);
   const publicClient = usePublicClient();
+  const lastNotificationRef = useRef(null);
   
   const cachedGameData = useCachedGameData();
   const cachedUserData = useCachedUserData(address);
@@ -89,16 +89,20 @@ export default function Ded() {
     isConfirming,
     isConfirmed,
     error,
-    hash
+    hash,
+    transactionStage,
+    isTransacting,
+    resetTransactionState
   } = useGameContract();
 
-  // Fetch events when transaction is confirmed
+  // Enhanced event fetching when transaction is confirmed
   useEffect(() => {
     const fetchTransactionEvents = async () => {
-      if (isConfirmed && hash && address && zappersSent && !processedHashes.has(hash)) {
+      if (isConfirmed && hash && address && amount && !processedHashes.has(hash)) {
         console.log('Transaction confirmed, fetching events for hash:', hash);
         
         setProcessedHashes(prev => new Set([...prev, hash]));
+        setEventProcessingComplete(false);
         
         try {
           const receipt = await publicClient.getTransactionReceipt({ hash });
@@ -110,87 +114,133 @@ export default function Ded() {
           
           console.log('Main contract logs:', mainContractLogs);
           
-          mainContractLogs.forEach((log, index) => {
-            let notification;
+          if (mainContractLogs.length === 0) {
+            // No events found, create a generic notification
+            const notification = {
+              id: `shot-${hash}-${Date.now()}`,
+              message: `${amount} Shots fired!`,
+              txHash: hash,
+              backgroundColor: '#97E500',
+              timestamp: Date.now()
+            };
             
-            try {
-              const decodedLog = decodeEventLog({
-                abi: [SENT_ZAPPER_EVENT_ABI],
-                data: log.data,
-                topics: log.topics
-              });
+            setNotifications(prev => [...prev, notification]);
+            setTimeout(() => {
+              setNotifications(prev => prev.filter(n => n.id !== notification.id));
+            }, 6000);
+          } else {
+            // Process each event log
+            mainContractLogs.forEach((log, index) => {
+              let notification;
               
-              const { tokenId, hit, owned } = decodedLog.args;
-              
-              if (!hit) {
+              try {
+                const decodedLog = decodeEventLog({
+                  abi: [SENT_ZAPPER_EVENT_ABI],
+                  data: log.data,
+                  topics: log.topics
+                });
+                
+                const { tokenId, hit, owned } = decodedLog.args;
+                
+                if (!hit) {
+                  notification = {
+                    id: `miss-${hash}-${index}-${Date.now()}`,
+                    message: "You Missed!",
+                    txHash: hash,
+                    backgroundColor: '#fbb304',
+                    timestamp: Date.now()
+                  };
+                } else if (owned) {
+                  notification = {
+                    id: `friendly-fire-${hash}-${index}-${Date.now()}`,
+                    message: `You Shot your Own Duck #${tokenId}!`,
+                    txHash: hash,
+                    backgroundColor: '#f42a2a',
+                    timestamp: Date.now()
+                  };
+                } else {
+                  notification = {
+                    id: `hit-${hash}-${index}-${Date.now()}`,
+                    message: `You hit Duck #${tokenId}!`,
+                    txHash: hash,
+                    backgroundColor: '#339c1d',
+                    timestamp: Date.now()
+                  };
+                }
+                
+              } catch (decodeError) {
+                console.error('Failed to decode log:', decodeError);
                 notification = {
-                  id: Date.now() + Math.random(),
-                  message: "You Missed!",
+                  id: `generic-shot-${hash}-${index}-${Date.now()}`,
+                  message: `Shot fired!`,
                   txHash: hash,
-                  backgroundColor: '#fbb304'
-                };
-              } else if (owned) {
-                notification = {
-                  id: Date.now() + Math.random(),
-                  message: `You Shot your Own Duck #${tokenId}!`,
-                  txHash: hash,
-                  backgroundColor: '#f42a2a'
-                };
-              } else {
-                notification = {
-                  id: Date.now() + Math.random(),
-                  message: `You hit Duck #${tokenId}!`,
-                  txHash: hash,
-                  backgroundColor: '#339c1d'
+                  backgroundColor: '#97E500',
+                  timestamp: Date.now()
                 };
               }
               
-            } catch (decodeError) {
-              console.error('Failed to decode log:', decodeError);
-              notification = {
-                id: Date.now() + Math.random(),
-                message: `Shot fired!`,
-                txHash: hash,
-                backgroundColor: '#97E500'
-              };
-            }
-            
-            setTimeout(() => {
-              setNotifications(prev => [...prev, notification]);
-              
+              // Stagger notifications with delay
               setTimeout(() => {
-                setNotifications(prev => prev.filter(n => n.id !== notification.id));
-              }, 5000);
-            }, index * 200);
-          });
+                setNotifications(prev => {
+                  // Prevent duplicates
+                  const isDuplicate = prev.some(existing => 
+                    existing.txHash === hash && existing.message === notification.message
+                  );
+                  
+                  if (isDuplicate) {
+                    console.log('Preventing duplicate shooting notification');
+                    return prev;
+                  }
+                  
+                  return [...prev, notification];
+                });
+                
+                // Auto-remove notification after 6 seconds
+                setTimeout(() => {
+                  setNotifications(prev => prev.filter(n => n.id !== notification.id));
+                }, 6000);
+              }, index * 200);
+            });
+          }
           
-          setZappersSent(null);
+          setEventProcessingComplete(true);
           
         } catch (error) {
           console.error('Error fetching transaction events:', error);
-          setZappersSent(null);
+          
+          // Fallback notification on error
+          const fallbackNotification = {
+            id: `fallback-${hash}-${Date.now()}`,
+            message: `${amount} Shots fired!`,
+            txHash: hash,
+            backgroundColor: '#97E500',
+            timestamp: Date.now()
+          };
+          
+          setNotifications(prev => [...prev, fallbackNotification]);
+          setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== fallbackNotification.id));
+          }, 6000);
+          
+          setEventProcessingComplete(true);
         }
       }
     };
     
     fetchTransactionEvents();
-  }, [isConfirmed, hash, address, publicClient, zappersSent, processedHashes]);
+  }, [isConfirmed, hash, address, publicClient, amount, processedHashes]);
+
+  // Reset transaction state when amount changes
+  useEffect(() => {
+    if (transactionStage === 'idle' && amount !== lastNotificationRef.current?.amount) {
+      lastNotificationRef.current = null;
+      setEventProcessingComplete(false);
+    }
+  }, [amount, transactionStage]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
-
-  // Reset button text after transaction confirms
-  useEffect(() => {
-    if (isConfirmed) {
-      setShowShotsFired(true);
-      const timer = setTimeout(() => {
-        setShowShotsFired(false);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isConfirmed]);
 
   // Track when hunting season first opens and capture duck supply
   useEffect(() => {
@@ -217,7 +267,9 @@ export default function Ded() {
       isConnected, 
       amount, 
       address, 
-      huntingSeason: cachedGameData.huntingSeason 
+      huntingSeason: cachedGameData.huntingSeason,
+      transactionStage,
+      zapperBalance: cachedUserData.zapperBalance
     });
     
     if (window.playButtonSound) {
@@ -246,17 +298,28 @@ export default function Ded() {
       });
       return;
     }
-    
-    console.log('Attempting to shoot zappers...', { amount: parseInt(amount), address });
-    
-    setZappersSent(parseInt(amount));
+
+    // Prevent multiple transactions
+    if (isTransacting) {
+      console.log('Shooting transaction already in progress');
+      return;
+    }
     
     try {
+      console.log('Attempting to shoot zappers...', { 
+        amount: parseInt(amount), 
+        address,
+        stage: transactionStage 
+      });
+      
       await sendZappers(parseInt(amount));
+      
+      // Refresh user data after initiating transaction
       setTimeout(() => cachedUserData.refetch(), 2000);
+      
     } catch (err) {
       console.error('Shooting failed:', err);
-      setZappersSent(null);
+      // Error is handled by the hook
     }
   };
 
@@ -270,10 +333,22 @@ export default function Ded() {
     if (parseInt(amount) > cachedUserData.zapperBalance) {
       return `NEED ${amount - cachedUserData.zapperBalance} MORE ZAPPERS`;
     }
-    if (isPending) return 'CONFIRM IN WALLET...';
-    if (isConfirming) return 'FIRING...';
-    if (showShotsFired) return 'SHOTS FIRED!';
-    return `SHOOT ${amount} DUCKS!`;
+    
+    // Use enhanced transaction state
+    switch (transactionStage) {
+      case 'preparing':
+        return 'PREPARING...';
+      case 'pending':
+        return 'CONFIRM IN WALLET...';
+      case 'confirming':
+        return 'FIRING...';
+      case 'confirmed':
+        return 'SHOTS FIRED!';
+      case 'error':
+        return 'TRY AGAIN';
+      default:
+        return `SHOOT ${amount} DUCKS!`;
+    }
   };
 
   const isButtonDisabled = () => {
@@ -281,11 +356,26 @@ export default function Ded() {
     return !isConnected || 
            liveDucks <= 1 ||
            !cachedGameData.huntingSeason || 
-           isPending || 
-           isConfirming || 
+           isTransacting || 
            !amount || 
            parseInt(amount) <= 0 ||
            parseInt(amount) > cachedUserData.zapperBalance;
+  };
+
+  const getButtonClass = () => {
+    let baseClass = "btn-nes is-warning p-2 min-h-[44px] touch-manipulation";
+    
+    if (isButtonDisabled()) {
+      baseClass += " opacity-60 cursor-not-allowed";
+    }
+    
+    if (transactionStage === 'error') {
+      baseClass += " !bg-red-100 !border-red-400 !text-red-700";
+    } else if (transactionStage === 'confirmed') {
+      baseClass += " !bg-green-100 !border-green-400";
+    }
+    
+    return baseClass;
   };
 
   const getProgressValue = () => {
@@ -296,14 +386,17 @@ export default function Ded() {
 
   return (
     <>
-      {/* Multiple Notifications */}
-      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[280px]">
+      {/* Enhanced Notifications with different colors based on result */}
+      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[320px]">
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
+            className="text-white p-3 rounded-lg shadow-lg animate-slide-down border-l-4"
             style={{
               backgroundColor: notification.backgroundColor,
+              borderLeftColor: notification.backgroundColor === '#339c1d' ? '#22c55e' : 
+                              notification.backgroundColor === '#f42a2a' ? '#ef4444' :
+                              notification.backgroundColor === '#fbb304' ? '#f59e0b' : '#84cc16',
               animationDelay: `${index * 0.1}s`,
               animationFillMode: 'both'
             }}
@@ -311,22 +404,26 @@ export default function Ded() {
             <div className="flex justify-between items-start">
               <div>
                 <div className="mb-2 font-bold text-sm">
+                  {notification.message.includes('hit Duck') ? '🎯 ' : 
+                   notification.message.includes('Missed') ? '❌ ' : 
+                   notification.message.includes('Own Duck') ? '⚠️ ' : '🔫 '}
                   {notification.message}
                 </div>
                 <a 
                   href={`https://basescan.org/tx/${notification.txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white underline text-xs"
+                  className="text-gray-200 underline text-xs hover:text-white transition-colors"
                 >
-                  VIEW TX
+                  VIEW TRANSACTION →
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
+                className="bg-transparent border-none text-white text-xl cursor-pointer p-0 leading-none hover:opacity-70 transition-opacity"
+                title="Close notification"
               >
-                âœ•
+                ✕
               </button>
             </div>
           </div>
@@ -353,14 +450,16 @@ export default function Ded() {
                   className="nes-input mx-2 mb-2 p-2 w-12 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
                   id="shoot_field"
+                  disabled={isTransacting}
                 />
                 Ducks!
               </h1>
 
               <button 
-                className="btn-nes is-warning p-2 min-h-[44px] touch-manipulation"
+                className={getButtonClass()}
                 onClick={handleShoot}
                 disabled={isButtonDisabled()}
+                title={isButtonDisabled() ? 'Cannot shoot right now' : 'Shoot ducks'}
               >
                 {getButtonText()}
               </button>
@@ -368,7 +467,7 @@ export default function Ded() {
               <div className="p-2 space-y-1">
                 <div className="text-sm text-white">
                   <span className="text-black font-bold">TX FEE</span><br />
-                  Zappers: {cachedUserData.zapperBalance}
+                  Zappers: {cachedUserData.zapperBalance || 0}
                 </div>
                 <h2 className="mt-2 text-base sm:text-lg font-bold"
                     style={{ 
@@ -378,9 +477,17 @@ export default function Ded() {
                 </h2>
               </div>
 
+              {/* Enhanced Error Display */}
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs">
-                  Error: {error.shortMessage || error.message}
+                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs max-w-md mx-auto">
+                  <div className="font-bold">Transaction Error:</div>
+                  <div>{error.shortMessage || error.message || error}</div>
+                  <button 
+                    onClick={resetTransactionState}
+                    className="mt-1 text-red-600 underline text-xs"
+                  >
+                    Try Again
+                  </button>
                 </div>
               )}
 
@@ -445,6 +552,17 @@ export default function Ded() {
         
         .touch-manipulation {
           touch-action: manipulation;
+        }
+
+        /* Enhanced button states */
+        .btn-nes:disabled {
+          cursor: not-allowed !important;
+          opacity: 0.6;
+        }
+        
+        .btn-nes:not(:disabled):hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
       `}</style>
     </>

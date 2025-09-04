@@ -1,6 +1,6 @@
-// components/Zapp.js
+// components/Zapp.js - Enhanced with better state management
 import { useAccount } from 'wagmi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
 
@@ -10,9 +10,8 @@ export default function Zapp() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
   const [notifications, setNotifications] = useState([]);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [mintedAmount, setMintedAmount] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const lastNotificationRef = useRef(null);
   
   const cachedGameData = useCachedGameData();
   
@@ -22,47 +21,63 @@ export default function Zapp() {
     isConfirming,
     isConfirmed,
     error,
-    hash
+    hash,
+    transactionStage,
+    isTransacting,
+    resetTransactionState
   } = useGameContract();
 
-  // Show notification when mint is confirmed and hash is available
+  // Enhanced notification handling with better duplicate prevention
   useEffect(() => {
-    if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
+    if (isConfirmed && hash && amount && !processedHashes.has(hash)) {
+      console.log('Processing confirmed zapper transaction:', { hash, amount });
+      
       setProcessedHashes(prev => new Set([...prev, hash]));
       
       const notification = {
-        id: Date.now() + Math.random(),
-        amount: mintedAmount,
-        hash: hash
+        id: `zapper-${hash}-${Date.now()}`, // More unique ID
+        amount: parseInt(amount),
+        hash: hash,
+        timestamp: Date.now()
       };
       
-      setNotifications(prev => [...prev, notification]);
-      setMintedAmount(null);
+      // Prevent duplicate notifications by checking recent notifications
+      setNotifications(prev => {
+        const isDuplicateRecent = prev.some(existing => 
+          existing.hash === hash || 
+          (Date.now() - existing.timestamp < 5000 && existing.amount === notification.amount)
+        );
+        
+        if (isDuplicateRecent) {
+          console.log('Preventing duplicate zapper notification for hash:', hash);
+          return prev;
+        }
+        
+        return [...prev, notification];
+      });
       
+      // Auto-remove notification after 6 seconds
       setTimeout(() => {
         setNotifications(prev => prev.filter(n => n.id !== notification.id));
-      }, 5000);
-    }
-  }, [isConfirmed, hash, mintedAmount, processedHashes]);
-
-  // Reset button text after transaction confirms
-  useEffect(() => {
-    if (isConfirmed) {
-      setShowSuccess(true);
-      const timer = setTimeout(() => {
-        setShowSuccess(false);
-      }, 1000);
+      }, 6000);
       
-      return () => clearTimeout(timer);
+      lastNotificationRef.current = notification;
     }
-  }, [isConfirmed]);
+  }, [isConfirmed, hash, amount, processedHashes]);
+
+  // Reset transaction state when amount changes (new transaction)
+  useEffect(() => {
+    if (transactionStage === 'idle' && amount !== lastNotificationRef.current?.amount) {
+      lastNotificationRef.current = null;
+    }
+  }, [amount, transactionStage]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
   const handleMint = async () => {
-    console.log('Mint zappers button clicked', { isConnected, amount, address });
+    console.log('Mint zappers button clicked', { isConnected, amount, address, transactionStage });
     
     if (window.playButtonSound) {
       window.playButtonSound('zappmint');
@@ -77,24 +92,45 @@ export default function Zapp() {
       console.log('Invalid amount:', amount);
       return;
     }
-    
-    console.log('Attempting to mint zappers...', { amount: parseInt(amount), address });
-    setMintedAmount(parseInt(amount));
+
+    // Prevent multiple transactions
+    if (isTransacting) {
+      console.log('Zapper transaction already in progress');
+      return;
+    }
     
     try {
+      console.log('Attempting to mint zappers...', { 
+        amount: parseInt(amount), 
+        address,
+        stage: transactionStage 
+      });
+      
       await mintZappers(parseInt(amount));
     } catch (err) {
       console.error('Zapper minting failed:', err);
-      setMintedAmount(null);
+      // Error is handled by the hook
     }
   };
 
   const getButtonText = () => {
     if (!isConnected) return 'CONNECT WALLET';
-    if (isPending) return 'CONFIRM IN WALLET...';
-    if (isConfirming) return 'MINTING...';
-    if (showSuccess) return 'SUCCESS!';
-    return `MINT ${amount} ZAPPERS`;
+    
+    // Use enhanced transaction state
+    switch (transactionStage) {
+      case 'preparing':
+        return 'PREPARING...';
+      case 'pending':
+        return 'CONFIRM IN WALLET...';
+      case 'confirming':
+        return 'MINTING...';
+      case 'confirmed':
+        return 'SUCCESS!';
+      case 'error':
+        return 'TRY AGAIN';
+      default:
+        return `MINT ${amount} ZAPPERS`;
+    }
   };
 
   const calculateZapperPrizePool = () => {
@@ -107,17 +143,36 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
-    return !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
+    return !isConnected || 
+           isTransacting || 
+           !amount || 
+           parseInt(amount) <= 0;
+  };
+
+  const getButtonClass = () => {
+    let baseClass = "btn-nes is-success p-2 min-h-[44px] touch-manipulation";
+    
+    if (isButtonDisabled()) {
+      baseClass += " opacity-60 cursor-not-allowed";
+    }
+    
+    if (transactionStage === 'error') {
+      baseClass += " !bg-red-100 !border-red-400 !text-red-700";
+    } else if (transactionStage === 'confirmed') {
+      baseClass += " !bg-green-100 !border-green-400";
+    }
+    
+    return baseClass;
   };
 
   return (
     <>
-      {/* Multiple Notifications */}
-      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[280px]">
+      {/* Enhanced Notifications */}
+      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[320px]">
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="bg-[#ff650b] text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
+            className="bg-[#ff650b] text-white p-3 rounded-lg shadow-lg animate-slide-down border-l-4 border-orange-400"
             style={{
               animationDelay: `${index * 0.1}s`,
               animationFillMode: 'both'
@@ -126,22 +181,23 @@ export default function Zapp() {
             <div className="flex justify-between items-start">
               <div>
                 <div className="mb-2 font-bold text-sm">
-                  You minted {notification.amount} zappers!
+                  ⚡ You minted {notification.amount} zappers!
                 </div>
                 <a 
                   href={`https://basescan.org/tx/${notification.hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white underline text-xs"
+                  className="text-orange-200 underline text-xs hover:text-white transition-colors"
                 >
-                  VIEW TX
+                  VIEW TRANSACTION →
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
+                className="bg-transparent border-none text-white text-xl cursor-pointer p-0 leading-none hover:opacity-70 transition-opacity"
+                title="Close notification"
               >
-                âœ•
+                ✕
               </button>
             </div>
           </div>
@@ -167,32 +223,42 @@ export default function Zapp() {
                   className="nes-input p-2 mx-2 mb-2 w-12 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
                   id="inline_field"
+                  disabled={isTransacting}
                 />{' '}
                 Zappers!
               </h1>
 
               <button 
-                className="btn-nes is-success p-2 min-h-[44px] touch-manipulation"
+                className={getButtonClass()}
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
+                title={isButtonDisabled() ? 'Cannot mint right now' : 'Mint zappers'}
               >
                 {getButtonText()}
               </button>
               
               <div className="p-2 space-y-1">
                 <p className="text-black text-base font-bold m-0">
-                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
+                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E each` : 'Loading price...'}
                 </p>
               </div>
 
+              {/* Enhanced Error Display */}
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs">
-                  Error: {error.shortMessage || error.message}
+                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs max-w-md mx-auto">
+                  <div className="font-bold">Transaction Error:</div>
+                  <div>{error.shortMessage || error.message || error}</div>
+                  <button 
+                    onClick={resetTransactionState}
+                    className="mt-1 text-red-600 underline text-xs"
+                  >
+                    Try Again
+                  </button>
                 </div>
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
+                {cachedGameData.zappersMinted ?? '…'} Minted!
               </h2>
 
               <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>
@@ -251,6 +317,17 @@ export default function Zapp() {
         
         .touch-manipulation {
           touch-action: manipulation;
+        }
+
+        /* Enhanced button states */
+        .btn-nes:disabled {
+          cursor: not-allowed !important;
+          opacity: 0.6;
+        }
+        
+        .btn-nes:not(:disabled):hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
       `}</style>
     </>
