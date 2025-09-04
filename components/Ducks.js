@@ -1,4 +1,4 @@
-// components/Ducks.js - Enhanced notification system
+// components/Ducks.js - Bulletproof simple version
 import { useAccount } from 'wagmi';
 import { useState, useEffect, useRef } from 'react';
 import { useGameContract } from './hooks/useGameContract';
@@ -10,12 +10,9 @@ const fence = '/img/fence_alt.png';
 function Ducks() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
-  const [timeLeft, setTimeLeft] = useState('');
   const [notifications, setNotifications] = useState([]);
-  const [processedHashes, setProcessedHashes] = useState(new Set());
-  const lastMintAmount = useRef(null);
+  const notificationId = useRef(0);
   
-  // Use cached data instead of direct contract calls
   const cachedGameData = useCachedGameData();
   
   const {
@@ -28,161 +25,85 @@ function Ducks() {
     resetTransactionState
   } = useGameContract();
 
-  // Store amount when starting transaction
-  useEffect(() => {
-    if (isPending && amount) {
-      lastMintAmount.current = parseInt(amount);
-      console.log('Stored mint amount for notification:', lastMintAmount.current);
-    }
-  }, [isPending, amount]);
-
-  // Primary notification trigger - transaction confirmed
-  useEffect(() => {
-    if (isConfirmed && hash && lastMintAmount.current && !processedHashes.has(hash)) {
-      console.log('Primary notification trigger - transaction confirmed:', { hash, amount: lastMintAmount.current });
-      
-      setProcessedHashes(prev => new Set([...prev, hash]));
-      
-      const notification = {
-        id: `duck-${hash}-${Date.now()}`,
-        amount: lastMintAmount.current,
-        hash: hash,
-        timestamp: Date.now(),
-        source: 'confirmed'
-      };
-      
-      setNotifications(prev => [...prev, notification]);
-      
-      // Remove notification after 6 seconds
-      setTimeout(() => {
-        setNotifications(prev => prev.filter(n => n.id !== notification.id));
-      }, 6000);
-      
-      // Clear the stored amount
-      lastMintAmount.current = null;
-    }
-  }, [isConfirmed, hash, processedHashes]);
-
-  // Secondary notification trigger - listen for custom events
+  // Simple notification system that listens for the custom event
   useEffect(() => {
     const handleTransactionConfirmed = (event) => {
-      const { hash: eventHash } = event.detail;
+      const { hash: confirmedHash } = event.detail;
       
-      if (eventHash && lastMintAmount.current && !processedHashes.has(eventHash)) {
-        console.log('Secondary notification trigger - custom event:', { hash: eventHash, amount: lastMintAmount.current });
-        
-        setProcessedHashes(prev => new Set([...prev, eventHash]));
+      if (confirmedHash && amount) {
+        console.log('Duck mint confirmed via custom event:', confirmedHash);
         
         const notification = {
-          id: `duck-event-${eventHash}-${Date.now()}`,
-          amount: lastMintAmount.current,
-          hash: eventHash,
-          timestamp: Date.now(),
-          source: 'event'
+          id: `duck-${++notificationId.current}`,
+          amount: parseInt(amount),
+          hash: confirmedHash,
+          timestamp: Date.now()
         };
         
         setNotifications(prev => [...prev, notification]);
         
+        // Remove after 6 seconds
         setTimeout(() => {
           setNotifications(prev => prev.filter(n => n.id !== notification.id));
         }, 6000);
-        
-        lastMintAmount.current = null;
       }
     };
 
     window.addEventListener('transactionConfirmed', handleTransactionConfirmed);
     return () => window.removeEventListener('transactionConfirmed', handleTransactionConfirmed);
-  }, [processedHashes]);
+  }, [amount]);
 
-  // Fallback notification trigger - detect balance changes
-  const previousDuckBalance = useRef(null);
-  const { duckBalance } = cachedGameData;
-  
+  // Backup notification system - if wagmi state changes work
   useEffect(() => {
-    // If we have a stored mint amount and duck balance increased
-    if (lastMintAmount.current && 
-        previousDuckBalance.current !== null && 
-        duckBalance > previousDuckBalance.current) {
+    if (isConfirmed && hash && amount) {
+      console.log('Duck mint confirmed via wagmi state:', hash);
       
-      const balanceIncrease = duckBalance - previousDuckBalance.current;
-      
-      console.log('Fallback notification trigger - balance increase detected:', { 
-        expected: lastMintAmount.current, 
-        actual: balanceIncrease,
-        newBalance: duckBalance 
-      });
-      
-      // Create fallback notification if we haven't already notified for this amount
-      const notification = {
-        id: `duck-fallback-${Date.now()}`,
-        amount: balanceIncrease,
-        hash: hash || 'unknown',
-        timestamp: Date.now(),
-        source: 'fallback'
-      };
-      
-      setNotifications(prev => [...prev, notification]);
-      
+      // Small delay to avoid duplicate with custom event
       setTimeout(() => {
-        setNotifications(prev => prev.filter(n => n.id !== notification.id));
-      }, 6000);
-      
-      lastMintAmount.current = null;
+        // Check if we already have a notification for this hash
+        const hasNotification = notifications.some(n => n.hash === hash);
+        
+        if (!hasNotification) {
+          const notification = {
+            id: `duck-backup-${++notificationId.current}`,
+            amount: parseInt(amount),
+            hash: hash,
+            timestamp: Date.now()
+          };
+          
+          setNotifications(prev => [...prev, notification]);
+          
+          setTimeout(() => {
+            setNotifications(prev => prev.filter(n => n.id !== notification.id));
+          }, 6000);
+        }
+      }, 100);
     }
-    
-    previousDuckBalance.current = duckBalance;
-  }, [duckBalance, hash]);
+  }, [isConfirmed, hash, amount, notifications]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
-  // Update countdown timer
-  useEffect(() => {
-    const mintEndTimestamp = cachedGameData.ducksMintEndTimestamp || 
-                            (Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60));
-
-    const updateTimer = () => {
-      const now = Date.now();
-      const endTime = mintEndTimestamp * 1000;
-      const difference = endTime - now;
-
-      if (difference <= 0) {
-        setTimeLeft('HAPPY HUNTING!');
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-      const formattedDays = days.toString().padStart(2, '0');
-      const formattedHours = hours.toString().padStart(2, '0');
-      const formattedMinutes = minutes.toString().padStart(2, '0');
-      const formattedSeconds = seconds.toString().padStart(2, '0');
-
-      setTimeLeft(`${formattedDays}:${formattedHours}:${formattedMinutes}:${formattedSeconds}`);
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [cachedGameData.ducksMintEndTimestamp]);
-
   const handleMint = async () => {
-    console.log('Mint button clicked', { isConnected, amount, address });
+    console.log('Duck mint button clicked:', { isConnected, amount, address, isPending, isConfirming });
     
     if (window.playButtonSound) {
       window.playButtonSound('ducks');
     }
     
-    if (!isConnected || !amount || amount <= 0) {
-      console.log('Cannot mint:', { isConnected, amount });
+    // Check if we can mint
+    if (!isConnected) {
+      console.log('Wallet not connected');
+      return;
+    }
+    
+    if (!amount || amount <= 0) {
+      console.log('Invalid amount');
       return;
     }
 
+    // Prevent double-clicks during transaction
     if (isPending || isConfirming) {
       console.log('Transaction already in progress');
       return;
@@ -190,15 +111,15 @@ function Ducks() {
     
     try {
       await mintDucks(parseInt(amount));
+      console.log('Duck mint function called successfully');
     } catch (err) {
-      console.error('Duck minting failed:', err);
+      console.error('Duck minting error:', err);
     }
   };
 
-  // Simplified button text logic
+  // Simple button text logic
   const getButtonText = () => {
     if (!isConnected) return 'CONNECT WALLET';
-    if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';
     if (isConfirmed) return 'SUCCESS!';
@@ -214,7 +135,6 @@ function Ducks() {
 
   const isButtonDisabled = () => {
     return !isConnected || 
-           timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
            isConfirming || 
            !amount || 
@@ -223,15 +143,14 @@ function Ducks() {
 
   return (
     <>
-      {/* Notifications */}
+      {/* Simple Notifications */}
       <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[320px]">
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="bg-blue-600 text-white p-3 rounded-lg shadow-lg animate-slide-down border-l-4 border-blue-400"
+            className="bg-blue-600 text-white p-3 rounded-lg shadow-lg"
             style={{
-              animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both'
+              animation: `slideDown 0.3s ease-out ${index * 0.1}s both`
             }}
           >
             <div className="flex justify-between items-start">
@@ -243,15 +162,15 @@ function Ducks() {
                   href={`https://basescan.org/tx/${notification.hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-200 underline text-xs hover:text-white transition-colors"
+                  className="text-blue-200 underline text-xs hover:text-white"
                 >
-                  VIEW TRANSACTION →
+                  VIEW TRANSACTION
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-xl cursor-pointer p-0 leading-none hover:opacity-70 transition-opacity"
-                title="Close notification"
+                className="bg-transparent border-none text-white text-xl cursor-pointer p-0 hover:opacity-70"
+                title="Close"
               >
                 ✕
               </button>
@@ -284,19 +203,19 @@ function Ducks() {
                   min="1"
                   className="nes-input p-2 mb-2 sm:w-16 text-center mx-2"
                   style={{ fontSize: '16px' }}
-                  id="inline_field"
                   disabled={isPending || isConfirming}
                 />
                 Ducks!
               </h1>
               
               <button 
-                className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer touch-manipulation"
+                className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer"
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
                 style={{
                   opacity: isButtonDisabled() ? 0.6 : 1,
-                  cursor: isButtonDisabled() ? 'not-allowed' : 'pointer'
+                  cursor: isButtonDisabled() ? 'not-allowed' : 'pointer',
+                  minHeight: '44px'
                 }}
               >
                 {getButtonText()}
@@ -304,26 +223,18 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E each` : 'Loading price...'}
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E each` : 'Loading...'}
                 </p>
-                {timeLeft && (
-                  <p className="mt-2 text-sm sm:text-base font-bold"
-                     style={{ 
-                       color: timeLeft === 'HAPPY HUNTING!' ? '#ea6126' : '#f42a2a'
-                     }}>
-                    {timeLeft === 'HAPPY HUNTING!' ? timeLeft : `Mint Ends in: ${timeLeft}`}
-                  </p>
-                )}
               </div>
 
-              {/* Error Display */}
+              {/* Simple Error Display */}
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs max-w-md mx-auto">
-                  <div className="font-bold">Transaction Error:</div>
-                  <div>{error.shortMessage || error.message || error}</div>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs">
+                  <div className="font-bold">Error:</div>
+                  <div>{error.shortMessage || error.message}</div>
                   <button 
                     onClick={resetTransactionState}
-                    className="mt-1 text-red-600 underline text-xs"
+                    className="mt-1 text-red-600 underline"
                   >
                     Try Again
                   </button>
@@ -331,41 +242,14 @@ function Ducks() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksMinted ?? '…'} Minted!
+                {cachedGameData.ducksMinted || 0} Minted!
               </h2>
               
-              <p className="text-black m-n4">Duck Prize Pool: <span className="text-white text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
+              <p className="text-black">Prize Pool: <span className="text-white">{calculateDuckPrizePool()}E</span></p>
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
                 Mint a Duck, Get a Free Zapper.
               </h3>
-
-              <a 
-                href="#faq"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (window.playButtonSound) {
-                    window.playButtonSound('faq');
-                  }
-                  const element = document.getElementById('faq');
-                  if (element) {
-                    element.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                      inline: 'nearest'
-                    });
-                  }
-                }}
-                style={{ 
-                  textDecoration: 'underline',
-                  color: '#ff650b'
-                }}
-                className="block mt-2 mb-6"
-              >
-                <h3 style={{ color: '#ff650b' }} className="text-sm sm:text-base font-bold">
-                  Last 3 ducks win bluechip NFTs!
-                </h3>
-              </a>
             </div>
           </div>
         </div>
@@ -376,7 +260,7 @@ function Ducks() {
       </section>
 
       <style jsx>{`
-        @keyframes slide-down {
+        @keyframes slideDown {
           from {
             transform: translateY(-100%);
             opacity: 0;
@@ -385,14 +269,6 @@ function Ducks() {
             transform: translateY(0);
             opacity: 1;
           }
-        }
-        
-        .animate-slide-down {
-          animation: slide-down 0.3s ease-out;
-        }
-        
-        .touch-manipulation {
-          touch-action: manipulation;
         }
       `}</style>
     </>
