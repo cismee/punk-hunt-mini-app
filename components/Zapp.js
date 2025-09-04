@@ -1,13 +1,13 @@
-// components/Zapp.js - Updated for MiniKit
+// components/Zapp.js
+import { useAccount } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
-import { useMiniKit } from './hooks/useMiniKit';
 
 const zapp = '/img/zapp_animation.gif';
 
 export default function Zapp() {
-  const { address, isConnected } = useMiniKit();
+  const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
   const [notifications, setNotifications] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -141,7 +141,7 @@ export default function Zapp() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ×
+                âœ•
               </button>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function Zapp() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? '…'} Minted!
+                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
               </h2>
 
               <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>

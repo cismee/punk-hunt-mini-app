@@ -1,9 +1,9 @@
-// components/Ded.js - Updated for MiniKit
+// components/Ded.js
+import { useAccount } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData, useCachedUserData } from './hooks/useCachedData';
-import { useMiniKit } from './hooks/useMiniKit';
-import { publicClient } from './minikit-config';
+import { usePublicClient } from 'wagmi';
 import { CONTRACTS } from './contracts';
 import { decodeEventLog } from 'viem';
 
@@ -71,13 +71,14 @@ const SENT_ZAPPER_EVENT_ABI = {
 };
 
 export default function Ded() {
-  const { address, isConnected } = useMiniKit();
+  const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
   const [huntingStartSupply, setHuntingStartSupply] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showShotsFired, setShowShotsFired] = useState(false);
   const [zappersSent, setZappersSent] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const publicClient = usePublicClient();
   
   const cachedGameData = useCachedGameData();
   const cachedUserData = useCachedUserData(address);
@@ -173,7 +174,7 @@ export default function Ded() {
     };
     
     fetchTransactionEvents();
-  }, [isConfirmed, hash, address, zappersSent, processedHashes]);
+  }, [isConfirmed, hash, address, publicClient, zappersSent, processedHashes]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
@@ -325,7 +326,7 @@ export default function Ded() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ×
+                âœ•
               </button>
             </div>
           </div>

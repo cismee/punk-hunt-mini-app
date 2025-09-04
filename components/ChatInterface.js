@@ -1,6 +1,5 @@
-// components/ChatInterface.js - Updated for MiniKit
 import React, { useState, useEffect, useRef } from 'react';
-import { useMiniKit } from './hooks/useMiniKit';
+import { useAccount } from 'wagmi';
 import { io } from 'socket.io-client';
 
 const ChatInterface = () => {
@@ -17,8 +16,8 @@ const ChatInterface = () => {
   const messagesEndRef = useRef(null);
   const chatRef = useRef(null);
   
-  // Get wallet connection info from MiniKit
-  const { address, isConnected: walletConnected } = useMiniKit();
+  // Get wallet connection info
+  const { address, isConnected: walletConnected } = useAccount();
 
   // Format address for display - matches server.js format
   const formatAddress = (addr) => {

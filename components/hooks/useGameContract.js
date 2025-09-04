@@ -1,73 +1,32 @@
 /* global BigInt */
-// src/hooks/useGameContract.js - Updated for MiniKit integration
-import { useState, useEffect } from 'react';
-import { parseEther, encodeFunctionData } from 'viem';
-import { useMiniKit } from './useMiniKit';
-import { publicClient, currentChain } from '../minikit-config';
+// src/hooks/useGameContract.js - Keep existing transaction logic, replace reads
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { parseEther } from 'viem';
+import { useEffect } from 'react';
 import { CONTRACTS, MAIN_ABI } from '../contracts';
 import { useCachedGameData, useCachedUserData } from './useCachedData';
 
 export function useGameContract() {
-  const { address, isConnected, sendTransaction } = useMiniKit();
-  const [transactionState, setTransactionState] = useState({
-    hash: null,
-    isPending: false,
-    isConfirming: false,
-    isConfirmed: false,
-    error: null
-  });
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+  const { address } = useAccount();
 
   // Replace all useReadContract calls with cached data
   const cachedGameData = useCachedGameData();
   const cachedUserData = useCachedUserData(address);
 
-  // Wait for transaction confirmation
+  // Invalidate user cache after successful transactions
   useEffect(() => {
-    let interval;
-    
-    if (transactionState.hash && transactionState.isConfirming) {
-      interval = setInterval(async () => {
-        try {
-          const receipt = await publicClient.getTransactionReceipt({ 
-            hash: transactionState.hash 
-          });
-          
-          if (receipt) {
-            setTransactionState(prev => ({
-              ...prev,
-              isConfirming: false,
-              isConfirmed: true
-            }));
-            
-            // Invalidate cache after successful transaction
-            if (address) {
-              setTimeout(() => {
-                cachedUserData.invalidateCache();
-              }, 2000);
-            }
-          }
-        } catch (error) {
-          // Transaction might still be pending
-          console.log('Checking transaction confirmation...', error.message);
-        }
+    if (isConfirmed && address) {
+      console.log('Transaction confirmed, invalidating cache for:', address);
+      // Add delay to allow blockchain to update
+      setTimeout(() => {
+        cachedUserData.invalidateCache();
       }, 2000);
     }
+  }, [isConfirmed, address, cachedUserData]);
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [transactionState.hash, transactionState.isConfirming, address, cachedUserData]);
-
-  const resetTransactionState = () => {
-    setTransactionState({
-      hash: null,
-      isPending: false,
-      isConfirming: false,
-      isConfirmed: false,
-      error: null
-    });
-  };
-
+  // Keep existing transaction functions unchanged
   const mintDucks = async (amount) => {
     if (!cachedGameData.duckPrice || !amount) {
       throw new Error('Duck price not loaded or invalid amount');
@@ -76,43 +35,16 @@ export function useGameContract() {
     const totalCost = parseEther(cachedGameData.duckPrice) * BigInt(amount);
     console.log('Minting ducks:', { amount, price: cachedGameData.duckPrice, totalCost: totalCost.toString() });
     
-    resetTransactionState();
-    
     try {
-      setTransactionState(prev => ({ ...prev, isPending: true }));
-
-      const data = encodeFunctionData({
+      await writeContract({
+        address: CONTRACTS.MAIN,
         abi: MAIN_ABI,
         functionName: 'mintDucks',
-        args: [amount]
+        args: [amount],
+        value: totalCost,
       });
-
-      const transactionRequest = {
-        to: CONTRACTS.MAIN,
-        data,
-        value: totalCost.toString(),
-        chainId: currentChain.id
-      };
-
-      const hash = await sendTransaction(transactionRequest);
-      
-      setTransactionState({
-        hash,
-        isPending: false,
-        isConfirming: true,
-        isConfirmed: false,
-        error: null
-      });
-
     } catch (err) {
       console.error('Mint ducks failed:', err);
-      setTransactionState({
-        hash: null,
-        isPending: false,
-        isConfirming: false,
-        isConfirmed: false,
-        error: err
-      });
       throw err;
     }
   };
@@ -125,43 +57,16 @@ export function useGameContract() {
     const totalCost = parseEther(cachedGameData.zapperPrice) * BigInt(amount);
     console.log('Minting zappers:', { amount, price: cachedGameData.zapperPrice, totalCost: totalCost.toString() });
     
-    resetTransactionState();
-    
     try {
-      setTransactionState(prev => ({ ...prev, isPending: true }));
-
-      const data = encodeFunctionData({
+      await writeContract({
+        address: CONTRACTS.MAIN,
         abi: MAIN_ABI,
         functionName: 'mintZappers',
-        args: [amount]
+        args: [amount],
+        value: totalCost,
       });
-
-      const transactionRequest = {
-        to: CONTRACTS.MAIN,
-        data,
-        value: totalCost.toString(),
-        chainId: currentChain.id
-      };
-
-      const hash = await sendTransaction(transactionRequest);
-      
-      setTransactionState({
-        hash,
-        isPending: false,
-        isConfirming: true,
-        isConfirmed: false,
-        error: null
-      });
-
     } catch (err) {
       console.error('Mint zappers failed:', err);
-      setTransactionState({
-        hash: null,
-        isPending: false,
-        isConfirming: false,
-        isConfirmed: false,
-        error: err
-      });
       throw err;
     }
   };
@@ -173,42 +78,15 @@ export function useGameContract() {
 
     console.log('Sending zappers:', { amount });
     
-    resetTransactionState();
-    
     try {
-      setTransactionState(prev => ({ ...prev, isPending: true }));
-
-      const data = encodeFunctionData({
+      await writeContract({
+        address: CONTRACTS.MAIN,
         abi: MAIN_ABI,
         functionName: 'sendZappers',
-        args: [amount]
+        args: [amount],
       });
-
-      const transactionRequest = {
-        to: CONTRACTS.MAIN,
-        data,
-        chainId: currentChain.id
-      };
-
-      const hash = await sendTransaction(transactionRequest);
-      
-      setTransactionState({
-        hash,
-        isPending: false,
-        isConfirming: true,
-        isConfirmed: false,
-        error: null
-      });
-
     } catch (err) {
       console.error('Send zappers failed:', err);
-      setTransactionState({
-        hash: null,
-        isPending: false,
-        isConfirming: false,
-        isConfirmed: false,
-        error: err
-      });
       throw err;
     }
   };
@@ -224,21 +102,21 @@ export function useGameContract() {
     userDuckBalance: cachedUserData.duckBalance,
     userZapperBalance: cachedUserData.zapperBalance,
     
-    // Transaction functions
+    // Keep existing transaction functions
     mintDucks,
     mintZappers,
     sendZappers,
     refetchZapperBalance: cachedUserData.refetch,
     refetchDuckBalance: cachedUserData.refetch,
     
-    // Transaction state
-    isPending: transactionState.isPending,
-    isConfirming: transactionState.isConfirming,
-    isConfirmed: transactionState.isConfirmed,
-    error: transactionState.error,
-    hash: transactionState.hash,
+    // Keep existing transaction state
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash,
     
-    // Cache loading/error states
+    // Expose cache loading/error states
     cacheLoading: cachedGameData.loading || cachedUserData.loading,
     cacheError: cachedGameData.error || cachedUserData.error,
   };

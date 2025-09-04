@@ -1,14 +1,14 @@
-// components/Ducks.js - Updated for MiniKit
+// components/Ducks.js
+import { useAccount } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
-import { useMiniKit } from './hooks/useMiniKit';
 
 const duck = '/img/duck_animation_002.gif';
 const fence = '/img/fence_alt.png';
 
 function Ducks() {
-  const { address, isConnected } = useMiniKit();
+  const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState('5');
   const [timeLeft, setTimeLeft] = useState('');
   const [notifications, setNotifications] = useState([]);
@@ -120,7 +120,7 @@ function Ducks() {
     setMintedAmount(parseInt(amount));
     
     try {
-      await mintDucks(parseInt(amount));
+      await mintDucks(parseInt(amount), address);
     } catch (err) {
       console.error('Minting failed:', err);
       setMintedAmount(null);
@@ -184,7 +184,7 @@ function Ducks() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ×
+                âœ•
               </button>
             </div>
           </div>
@@ -249,10 +249,11 @@ function Ducks() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksMinted ?? '…'} Minted!
+                {cachedGameData.ducksMinted ?? 'â€¦'} Minted!
               </h2>
               
               <p className="text-black m-n4">Duck Prize Pool: <span className="text-white text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
+
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
                 Mint a Duck, Get a Free Zapper.

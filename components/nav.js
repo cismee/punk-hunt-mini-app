@@ -1,12 +1,13 @@
-// components/nav.js - Updated for MiniKit
 import './nav.css';
 const logo = './img/nav_icon.png';
-import { useMiniKit } from './hooks/useMiniKit';
+import { useDisconnect, useAccount, useConnect } from 'wagmi';
 import { useCachedUserData } from './hooks/useCachedData';
 import { useEffect } from 'react';
 
 const App = () => {
-  const { address, isConnected, connectWallet, disconnect, isLoading } = useMiniKit();
+  const { disconnect } = useDisconnect();
+  const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   const { duckBalance, zapperBalance, zapCount, loading, refetch } = useCachedUserData(address);
 
   // Auto-refresh data periodically when connected
@@ -48,17 +49,22 @@ const App = () => {
     }, 100);
   };
 
-  const handleConnect = async () => {
-    try {
-      await connectWallet();
-    } catch (error) {
-      console.error('Connection failed:', error);
-      // In a real app, you might show a toast notification here
+  const handleConnect = () => {
+    // For Base mini-apps, try to connect with the first available connector
+    // Usually this will be the injected connector (Base App's built-in wallet)
+    const injectedConnector = connectors.find(connector => 
+      connector.id === 'injected' || connector.name.toLowerCase().includes('injected')
+    );
+    
+    if (injectedConnector) {
+      connect({ connector: injectedConnector });
+    } else if (connectors[0]) {
+      connect({ connector: connectors[0] });
     }
   };
 
   // Only show loading on initial load when we have no data yet
-  const showLoading = (loading && (duckBalance === null || duckBalance === undefined)) || isLoading;
+  const showLoading = loading && (duckBalance === null || duckBalance === undefined);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full px-2 nav bg-black">
@@ -76,10 +82,9 @@ const App = () => {
               <button
                 className="nes-btn is-primary text-xs px-3 py-2"
                 onClick={handleConnect}
-                disabled={isLoading}
                 type="button"
               >
-                {isLoading ? 'CONNECTING...' : 'CONNECT'}
+                CONNECT
               </button>
             ) : (
               // Connected - show balances and disconnect button
@@ -127,7 +132,7 @@ const App = () => {
                 {/* Disconnect Button */}
                 <button
                   className="nes-btn text-xs px-2 py-1"
-                  onClick={disconnect}
+                  onClick={() => disconnect()}
                   type="button"
                 >
                   X
