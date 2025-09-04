@@ -1,16 +1,24 @@
-// components/Ded.js - Enhanced notification system for shooting
-import { useAccount } from 'wagmi';
-import { useState, useEffect, useRef } from 'react';
+// components/Ded.js - Updated for MiniKit
+import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData, useCachedUserData } from './hooks/useCachedData';
-import { usePublicClient } from 'wagmi';
+import { useMiniKit } from './hooks/useMiniKit';
+import { publicClient } from '../minikit-config';
 import { CONTRACTS } from './contracts';
 import { decodeEventLog } from 'viem';
 
 const pepe = '/img/rekt_animation_002.gif';
 
-// Progress bar component
-function PixelProgress({ value, max = 100, height = 16, frame = '#000', track = '#fff', fill = '#f42a2a', padding = 4 }) {
+// Simple solid-frame progress bar with checker pattern
+function PixelProgress({
+  value,
+  max = 100,
+  height = 16,
+  frame = '#000',
+  track = '#fff',
+  fill  = '#f42a2a',
+  padding = 4
+}) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const checkerSize = 1;
   
@@ -32,7 +40,14 @@ function PixelProgress({ value, max = 100, height = 16, frame = '#000', track = 
           style={{ 
             height: '100%', 
             width: `${pct}%`, 
-            background: `repeating-conic-gradient(${fill} 0% 25%, ${track} 25% 50%, ${fill} 50% 75%, ${track} 75% 100%)`,
+            background: `
+              repeating-conic-gradient(
+                ${fill} 0% 25%, 
+                ${track} 25% 50%, 
+                ${fill} 50% 75%, 
+                ${track} 75% 100%
+              )
+            `,
             backgroundSize: `${checkerSize}px ${checkerSize}px`
           }} 
         />
@@ -41,6 +56,7 @@ function PixelProgress({ value, max = 100, height = 16, frame = '#000', track = 
   );
 }
 
+// SentZapper event ABI for decoding
 const SENT_ZAPPER_EVENT_ABI = {
   type: 'event',
   name: 'SentZapper',
@@ -55,12 +71,13 @@ const SENT_ZAPPER_EVENT_ABI = {
 };
 
 export default function Ded() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useMiniKit();
   const [amount, setAmount] = useState('5');
+  const [huntingStartSupply, setHuntingStartSupply] = useState(0);
   const [notifications, setNotifications] = useState([]);
+  const [showShotsFired, setShowShotsFired] = useState(false);
+  const [zappersSent, setZappersSent] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
-  const publicClient = usePublicClient();
-  const lastShootAmount = useRef(null);
   
   const cachedGameData = useCachedGameData();
   const cachedUserData = useCachedUserData(address);
@@ -71,207 +88,174 @@ export default function Ded() {
     isConfirming,
     isConfirmed,
     error,
-    hash,
-    resetTransactionState
+    hash
   } = useGameContract();
 
-  // Store amount when starting transaction
-  useEffect(() => {
-    if (isPending && amount) {
-      lastShootAmount.current = parseInt(amount);
-      console.log('Stored shoot amount for notifications:', lastShootAmount.current);
-    }
-  }, [isPending, amount]);
-
-  // Enhanced event processing when transaction is confirmed
+  // Fetch events when transaction is confirmed
   useEffect(() => {
     const fetchTransactionEvents = async () => {
-      if (isConfirmed && hash && address && lastShootAmount.current && !processedHashes.has(hash)) {
-        console.log('Processing shooting transaction events:', { hash, amount: lastShootAmount.current });
+      if (isConfirmed && hash && address && zappersSent && !processedHashes.has(hash)) {
+        console.log('Transaction confirmed, fetching events for hash:', hash);
         
         setProcessedHashes(prev => new Set([...prev, hash]));
         
         try {
           const receipt = await publicClient.getTransactionReceipt({ hash });
+          console.log('Transaction receipt:', receipt);
+          
           const mainContractLogs = receipt.logs.filter(log => 
             log.address.toLowerCase() === CONTRACTS.MAIN.toLowerCase()
           );
           
-          if (mainContractLogs.length === 0) {
-            // Fallback notification
-            const notification = {
-              id: `shot-fallback-${hash}-${Date.now()}`,
-              message: `${lastShootAmount.current} Shots fired!`,
-              txHash: hash,
-              backgroundColor: '#97E500',
-              timestamp: Date.now(),
-              source: 'fallback'
-            };
+          console.log('Main contract logs:', mainContractLogs);
+          
+          mainContractLogs.forEach((log, index) => {
+            let notification;
             
-            setNotifications(prev => [...prev, notification]);
-            setTimeout(() => {
-              setNotifications(prev => prev.filter(n => n.id !== notification.id));
-            }, 6000);
-          } else {
-            // Process each event log
-            mainContractLogs.forEach((log, index) => {
-              let notification;
+            try {
+              const decodedLog = decodeEventLog({
+                abi: [SENT_ZAPPER_EVENT_ABI],
+                data: log.data,
+                topics: log.topics
+              });
               
-              try {
-                const decodedLog = decodeEventLog({
-                  abi: [SENT_ZAPPER_EVENT_ABI],
-                  data: log.data,
-                  topics: log.topics
-                });
-                
-                const { tokenId, hit, owned } = decodedLog.args;
-                
-                if (!hit) {
-                  notification = {
-                    id: `miss-${hash}-${index}-${Date.now()}`,
-                    message: "You Missed!",
-                    txHash: hash,
-                    backgroundColor: '#fbb304',
-                    timestamp: Date.now(),
-                    source: 'event'
-                  };
-                } else if (owned) {
-                  notification = {
-                    id: `friendly-fire-${hash}-${index}-${Date.now()}`,
-                    message: `You Shot your Own Duck #${tokenId}!`,
-                    txHash: hash,
-                    backgroundColor: '#f42a2a',
-                    timestamp: Date.now(),
-                    source: 'event'
-                  };
-                } else {
-                  notification = {
-                    id: `hit-${hash}-${index}-${Date.now()}`,
-                    message: `You hit Duck #${tokenId}!`,
-                    txHash: hash,
-                    backgroundColor: '#339c1d',
-                    timestamp: Date.now(),
-                    source: 'event'
-                  };
-                }
-                
-              } catch (decodeError) {
-                console.error('Failed to decode log:', decodeError);
+              const { tokenId, hit, owned } = decodedLog.args;
+              
+              if (!hit) {
                 notification = {
-                  id: `generic-shot-${hash}-${index}-${Date.now()}`,
-                  message: `Shot fired!`,
+                  id: Date.now() + Math.random(),
+                  message: "You Missed!",
                   txHash: hash,
-                  backgroundColor: '#97E500',
-                  timestamp: Date.now(),
-                  source: 'decode-fallback'
+                  backgroundColor: '#fbb304'
+                };
+              } else if (owned) {
+                notification = {
+                  id: Date.now() + Math.random(),
+                  message: `You Shot your Own Duck #${tokenId}!`,
+                  txHash: hash,
+                  backgroundColor: '#f42a2a'
+                };
+              } else {
+                notification = {
+                  id: Date.now() + Math.random(),
+                  message: `You hit Duck #${tokenId}!`,
+                  txHash: hash,
+                  backgroundColor: '#339c1d'
                 };
               }
               
-              // Stagger notifications
+            } catch (decodeError) {
+              console.error('Failed to decode log:', decodeError);
+              notification = {
+                id: Date.now() + Math.random(),
+                message: `Shot fired!`,
+                txHash: hash,
+                backgroundColor: '#97E500'
+              };
+            }
+            
+            setTimeout(() => {
+              setNotifications(prev => [...prev, notification]);
+              
               setTimeout(() => {
-                setNotifications(prev => [...prev, notification]);
-                
-                setTimeout(() => {
-                  setNotifications(prev => prev.filter(n => n.id !== notification.id));
-                }, 6000);
-              }, index * 200);
-            });
-          }
+                setNotifications(prev => prev.filter(n => n.id !== notification.id));
+              }, 5000);
+            }, index * 200);
+          });
+          
+          setZappersSent(null);
           
         } catch (error) {
-          console.error('Error fetching shooting events:', error);
-          
-          // Final fallback notification
-          const fallbackNotification = {
-            id: `error-fallback-${hash}-${Date.now()}`,
-            message: `${lastShootAmount.current} Shots fired!`,
-            txHash: hash,
-            backgroundColor: '#97E500',
-            timestamp: Date.now(),
-            source: 'error-fallback'
-          };
-          
-          setNotifications(prev => [...prev, fallbackNotification]);
-          setTimeout(() => {
-            setNotifications(prev => prev.filter(n => n.id !== fallbackNotification.id));
-          }, 6000);
+          console.error('Error fetching transaction events:', error);
+          setZappersSent(null);
         }
-        
-        lastShootAmount.current = null;
       }
     };
     
     fetchTransactionEvents();
-  }, [isConfirmed, hash, address, publicClient, processedHashes]);
-
-  // Secondary notification trigger - custom events
-  useEffect(() => {
-    const handleTransactionConfirmed = (event) => {
-      const { hash: eventHash } = event.detail;
-      
-      if (eventHash && lastShootAmount.current && !processedHashes.has(eventHash)) {
-        console.log('Custom event shooting notification:', { hash: eventHash, amount: lastShootAmount.current });
-        
-        const notification = {
-          id: `shoot-event-${eventHash}-${Date.now()}`,
-          message: `${lastShootAmount.current} Shots fired!`,
-          txHash: eventHash,
-          backgroundColor: '#97E500',
-          timestamp: Date.now(),
-          source: 'custom-event'
-        };
-        
-        setNotifications(prev => [...prev, notification]);
-        setTimeout(() => {
-          setNotifications(prev => prev.filter(n => n.id !== notification.id));
-        }, 6000);
-        
-        // Don't clear amount here - let event processing handle it
-      }
-    };
-
-    window.addEventListener('transactionConfirmed', handleTransactionConfirmed);
-    return () => window.removeEventListener('transactionConfirmed', handleTransactionConfirmed);
-  }, [processedHashes]);
+  }, [isConfirmed, hash, address, zappersSent, processedHashes]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
+
+  // Reset button text after transaction confirms
+  useEffect(() => {
+    if (isConfirmed) {
+      setShowShotsFired(true);
+      const timer = setTimeout(() => {
+        setShowShotsFired(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isConfirmed]);
+
+  // Track when hunting season first opens and capture duck supply
+  useEffect(() => {
+    if (cachedGameData.huntingSeason && huntingStartSupply === 0 && cachedGameData.ducksMinted > 0) {
+      const currentSupply = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
+      setHuntingStartSupply(currentSupply);
+      console.log('Hunting season opened with supply:', currentSupply);
+    }
+  }, [cachedGameData.huntingSeason, cachedGameData.ducksMinted, cachedGameData.ducksRekt, huntingStartSupply]);
+
+  // Update user's zapper balance periodically
+  useEffect(() => {
+    if (isConnected && address) {
+      const interval = setInterval(() => {
+        cachedUserData.refetch();
+      }, 10000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isConnected, address, cachedUserData]);
 
   const handleShoot = async () => {
     console.log('Shoot button clicked', { 
       isConnected, 
       amount, 
       address, 
-      huntingSeason: cachedGameData.huntingSeason,
-      zapperBalance: cachedUserData.zapperBalance
+      huntingSeason: cachedGameData.huntingSeason 
     });
     
     if (window.playButtonSound) {
       window.playButtonSound('burn');
     }
     
-    if (!isConnected || !cachedGameData.huntingSeason || !amount || amount <= 0) {
-      console.log('Cannot shoot - invalid conditions');
+    if (!isConnected) {
+      console.log('Wallet not connected');
+      return;
+    }
+    
+    if (!cachedGameData.huntingSeason) {
+      console.log('Hunting season not active');
+      return;
+    }
+    
+    if (!amount || amount <= 0) {
+      console.log('Invalid amount:', amount);
       return;
     }
 
     if (parseInt(amount) > cachedUserData.zapperBalance) {
-      console.log('Not enough zappers');
+      console.log('Not enough zappers:', { 
+        requested: amount, 
+        available: cachedUserData.zapperBalance 
+      });
       return;
     }
-
-    if (isPending || isConfirming) {
-      console.log('Shooting transaction already in progress');
-      return;
-    }
+    
+    console.log('Attempting to shoot zappers...', { amount: parseInt(amount), address });
+    
+    setZappersSent(parseInt(amount));
     
     try {
       await sendZappers(parseInt(amount));
       setTimeout(() => cachedUserData.refetch(), 2000);
     } catch (err) {
       console.error('Shooting failed:', err);
-      lastShootAmount.current = null;
+      setZappersSent(null);
     }
   };
 
@@ -287,7 +271,7 @@ export default function Ded() {
     }
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'FIRING...';
-    if (isConfirmed) return 'SHOTS FIRED!';
+    if (showShotsFired) return 'SHOTS FIRED!';
     return `SHOOT ${amount} DUCKS!`;
   };
 
@@ -311,17 +295,14 @@ export default function Ded() {
 
   return (
     <>
-      {/* Enhanced Notifications with result-based colors */}
-      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[320px]">
+      {/* Multiple Notifications */}
+      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[280px]">
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="text-white p-3 rounded-lg shadow-lg animate-slide-down border-l-4"
+            className="text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
             style={{
               backgroundColor: notification.backgroundColor,
-              borderLeftColor: notification.backgroundColor === '#339c1d' ? '#22c55e' : 
-                              notification.backgroundColor === '#f42a2a' ? '#ef4444' :
-                              notification.backgroundColor === '#fbb304' ? '#f59e0b' : '#84cc16',
               animationDelay: `${index * 0.1}s`,
               animationFillMode: 'both'
             }}
@@ -329,29 +310,22 @@ export default function Ded() {
             <div className="flex justify-between items-start">
               <div>
                 <div className="mb-2 font-bold text-sm">
-                  {notification.message.includes('hit Duck') ? '🎯 ' : 
-                   notification.message.includes('Missed') ? '❌ ' : 
-                   notification.message.includes('Own Duck') ? '⚠️ ' : '🔫 '}
                   {notification.message}
                 </div>
                 <a 
                   href={`https://basescan.org/tx/${notification.txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-200 underline text-xs hover:text-white transition-colors"
+                  className="text-white underline text-xs"
                 >
-                  VIEW TRANSACTION →
+                  VIEW TX
                 </a>
-                <div className="text-xs opacity-75 mt-1">
-                  Source: {notification.source}
-                </div>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-xl cursor-pointer p-0 leading-none hover:opacity-70 transition-opacity"
-                title="Close notification"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ✕
+                ×
               </button>
             </div>
           </div>
@@ -378,7 +352,6 @@ export default function Ded() {
                   className="nes-input mx-2 mb-2 p-2 w-12 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
                   id="shoot_field"
-                  disabled={isPending || isConfirming}
                 />
                 Ducks!
               </h1>
@@ -387,10 +360,6 @@ export default function Ded() {
                 className="btn-nes is-warning p-2 min-h-[44px] touch-manipulation"
                 onClick={handleShoot}
                 disabled={isButtonDisabled()}
-                style={{
-                  opacity: isButtonDisabled() ? 0.6 : 1,
-                  cursor: isButtonDisabled() ? 'not-allowed' : 'pointer'
-                }}
               >
                 {getButtonText()}
               </button>
@@ -398,7 +367,7 @@ export default function Ded() {
               <div className="p-2 space-y-1">
                 <div className="text-sm text-white">
                   <span className="text-black font-bold">TX FEE</span><br />
-                  Zappers: {cachedUserData.zapperBalance || 0}
+                  Zappers: {cachedUserData.zapperBalance}
                 </div>
                 <h2 className="mt-2 text-base sm:text-lg font-bold"
                     style={{ 
@@ -409,18 +378,12 @@ export default function Ded() {
               </div>
 
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs max-w-md mx-auto">
-                  <div className="font-bold">Transaction Error:</div>
-                  <div>{error.shortMessage || error.message || error}</div>
-                  <button 
-                    onClick={resetTransactionState}
-                    className="mt-1 text-red-600 underline text-xs"
-                  >
-                    Try Again
-                  </button>
+                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs">
+                  Error: {error.shortMessage || error.message}
                 </div>
               )}
 
+              {/* Progress bar showing elimination progress */}
               <div className="mt-3 mx-auto w-3/4">
                 <PixelProgress value={getProgressValue()} max={100} height={32} />
               </div>
@@ -457,6 +420,7 @@ export default function Ded() {
           </div>
         </div>
         
+        {/* Pepe image in separate container - no gutters */}
         <div className="w-full">
           <img src={pepe} alt="Ded ducks illustration" className="w-full h-auto block" />
         </div>

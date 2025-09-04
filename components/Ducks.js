@@ -1,18 +1,22 @@
-// components/Ducks.js - Bulletproof simple version
-import { useAccount } from 'wagmi';
-import { useState, useEffect, useRef } from 'react';
+// components/Ducks.js - Updated for MiniKit
+import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
+import { useMiniKit } from './hooks/useMiniKit';
 
 const duck = '/img/duck_animation_002.gif';
 const fence = '/img/fence_alt.png';
 
 function Ducks() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useMiniKit();
   const [amount, setAmount] = useState('5');
+  const [timeLeft, setTimeLeft] = useState('');
   const [notifications, setNotifications] = useState([]);
-  const notificationId = useRef(0);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [mintedAmount, setMintedAmount] = useState(null);
+  const [processedHashes, setProcessedHashes] = useState(new Set());
   
+  // Use cached data instead of direct contract calls
   const cachedGameData = useCachedGameData();
   
   const {
@@ -21,111 +25,118 @@ function Ducks() {
     isConfirming,
     isConfirmed,
     error,
-    hash,
-    resetTransactionState
+    hash
   } = useGameContract();
 
-  // Simple notification system that listens for the custom event
+  // Show notification when mint is confirmed and hash is available
   useEffect(() => {
-    const handleTransactionConfirmed = (event) => {
-      const { hash: confirmedHash } = event.detail;
+    if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
+      setProcessedHashes(prev => new Set([...prev, hash]));
       
-      if (confirmedHash && amount) {
-        console.log('Duck mint confirmed via custom event:', confirmedHash);
-        
-        const notification = {
-          id: `duck-${++notificationId.current}`,
-          amount: parseInt(amount),
-          hash: confirmedHash,
-          timestamp: Date.now()
-        };
-        
-        setNotifications(prev => [...prev, notification]);
-        
-        // Remove after 6 seconds
-        setTimeout(() => {
-          setNotifications(prev => prev.filter(n => n.id !== notification.id));
-        }, 6000);
-      }
-    };
-
-    window.addEventListener('transactionConfirmed', handleTransactionConfirmed);
-    return () => window.removeEventListener('transactionConfirmed', handleTransactionConfirmed);
-  }, [amount]);
-
-  // Backup notification system - if wagmi state changes work
-  useEffect(() => {
-    if (isConfirmed && hash && amount) {
-      console.log('Duck mint confirmed via wagmi state:', hash);
+      const notification = {
+        id: Date.now() + Math.random(),
+        amount: mintedAmount,
+        hash: hash
+      };
       
-      // Small delay to avoid duplicate with custom event
+      setNotifications(prev => [...prev, notification]);
+      setMintedAmount(null);
+      
       setTimeout(() => {
-        // Check if we already have a notification for this hash
-        const hasNotification = notifications.some(n => n.hash === hash);
-        
-        if (!hasNotification) {
-          const notification = {
-            id: `duck-backup-${++notificationId.current}`,
-            amount: parseInt(amount),
-            hash: hash,
-            timestamp: Date.now()
-          };
-          
-          setNotifications(prev => [...prev, notification]);
-          
-          setTimeout(() => {
-            setNotifications(prev => prev.filter(n => n.id !== notification.id));
-          }, 6000);
-        }
-      }, 100);
+        setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      }, 5000);
     }
-  }, [isConfirmed, hash, amount, notifications]);
+  }, [isConfirmed, hash, mintedAmount, processedHashes]);
+
+  // Reset button text after transaction confirms
+  useEffect(() => {
+    if (isConfirmed) {
+      setShowSuccess(true);
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isConfirmed]);
 
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
+  // Update countdown timer using cached mint end timestamp with fallback
+  useEffect(() => {
+    // Use cached timestamp or fallback to 14 days from now
+    const mintEndTimestamp = cachedGameData.ducksMintEndTimestamp || 
+                            (Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60));
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const endTime = mintEndTimestamp * 1000; // Convert to milliseconds
+      const difference = endTime - now;
+
+      if (difference <= 0) {
+        setTimeLeft('HAPPY HUNTING!');
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      const formattedDays = days.toString().padStart(2, '0');
+      const formattedHours = hours.toString().padStart(2, '0');
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      const formattedSeconds = seconds.toString().padStart(2, '0');
+
+      setTimeLeft(`${formattedDays}:${formattedHours}:${formattedMinutes}:${formattedSeconds}`);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [cachedGameData.ducksMintEndTimestamp]); // Will work even if undefined
+
   const handleMint = async () => {
-    console.log('Duck mint button clicked:', { isConnected, amount, address, isPending, isConfirming });
+    console.log('Mint button clicked', { isConnected, amount, address });
     
+    // Play duck sound when button is clicked
     if (window.playButtonSound) {
       window.playButtonSound('ducks');
     }
     
-    // Check if we can mint
     if (!isConnected) {
       console.log('Wallet not connected');
       return;
     }
     
     if (!amount || amount <= 0) {
-      console.log('Invalid amount');
-      return;
-    }
-
-    // Prevent double-clicks during transaction
-    if (isPending || isConfirming) {
-      console.log('Transaction already in progress');
+      console.log('Invalid amount:', amount);
       return;
     }
     
+    console.log('Attempting to mint...', { amount: parseInt(amount), address });
+    setMintedAmount(parseInt(amount));
+    
     try {
       await mintDucks(parseInt(amount));
-      console.log('Duck mint function called successfully');
     } catch (err) {
-      console.error('Duck minting error:', err);
+      console.error('Minting failed:', err);
+      setMintedAmount(null);
     }
   };
 
-  // Simple button text logic
   const getButtonText = () => {
     if (!isConnected) return 'CONNECT WALLET';
+    if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';
-    if (isConfirmed) return 'SUCCESS!';
+    if (showSuccess) return 'SUCCESS!';
     return `MINT ${amount} DUCKS`;
   };
 
+  // Helper functions for prize pool calculations using server data
   const calculateDuckPrizePool = () => {
     if (!cachedGameData.ducksMinted || !cachedGameData.duckPrice) return '0.000';
     const totalDuckRevenue = parseFloat(cachedGameData.duckPrice) * cachedGameData.ducksMinted;
@@ -135,6 +146,7 @@ function Ducks() {
 
   const isButtonDisabled = () => {
     return !isConnected || 
+           timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
            isConfirming || 
            !amount || 
@@ -143,36 +155,36 @@ function Ducks() {
 
   return (
     <>
-      {/* Simple Notifications */}
-      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[320px]">
+      {/* Multiple Notifications */}
+      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[280px]">
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="bg-blue-600 text-white p-3 rounded-lg shadow-lg"
+            className="bg-blue-600 text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
             style={{
-              animation: `slideDown 0.3s ease-out ${index * 0.1}s both`
+              animationDelay: `${index * 0.1}s`,
+              animationFillMode: 'both'
             }}
           >
             <div className="flex justify-between items-start">
               <div>
                 <div className="mb-2 font-bold text-sm">
-                  🦆 You minted {notification.amount} ducks!
+                  You minted {notification.amount} ducks!
                 </div>
                 <a 
                   href={`https://basescan.org/tx/${notification.hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-200 underline text-xs hover:text-white"
+                  className="text-white underline text-xs"
                 >
-                  VIEW TRANSACTION
+                  VIEW TX
                 </a>
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-xl cursor-pointer p-0 hover:opacity-70"
-                title="Close"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ✕
+                ×
               </button>
             </div>
           </div>
@@ -201,66 +213,90 @@ function Ducks() {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   min="1"
-                  className="nes-input p-2 mb-2 sm:w-16 text-center mx-2"
+                  className="nes-input p-2 mb-2 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
-                  disabled={isPending || isConfirming}
+                  id="inline_field"
                 />
                 Ducks!
               </h1>
               
               <button 
-                className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer"
+                className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer touch-manipulation"
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
-                style={{
-                  opacity: isButtonDisabled() ? 0.6 : 1,
-                  cursor: isButtonDisabled() ? 'not-allowed' : 'pointer',
-                  minHeight: '44px'
-                }}
               >
                 {getButtonText()}
               </button>
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E each` : 'Loading...'}
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
                 </p>
+                {timeLeft && (
+                  <p className="mt-2 text-sm sm:text-base font-bold"
+                     style={{ 
+                       color: timeLeft === 'HAPPY HUNTING!' ? '#ea6126' : '#f42a2a'
+                     }}>
+                    {timeLeft === 'HAPPY HUNTING!' ? timeLeft : `Mint Ends in: ${timeLeft}`}
+                  </p>
+                )}
               </div>
 
-              {/* Simple Error Display */}
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mt-2 text-xs">
-                  <div className="font-bold">Error:</div>
-                  <div>{error.shortMessage || error.message}</div>
-                  <button 
-                    onClick={resetTransactionState}
-                    className="mt-1 text-red-600 underline"
-                  >
-                    Try Again
-                  </button>
+                  Error: {error.shortMessage || error.message}
                 </div>
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksMinted || 0} Minted!
+                {cachedGameData.ducksMinted ?? '…'} Minted!
               </h2>
               
-              <p className="text-black">Prize Pool: <span className="text-white">{calculateDuckPrizePool()}E</span></p>
+              <p className="text-black m-n4">Duck Prize Pool: <span className="text-white text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
 
               <h3 className="mx-4 text-black text-sm sm:text-base">
                 Mint a Duck, Get a Free Zapper.
               </h3>
+
+              <a 
+                href="#faq"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Play FAQ sound when this link is clicked
+                  if (window.playButtonSound) {
+                    window.playButtonSound('faq');
+                  }
+                  const element = document.getElementById('faq');
+                  if (element) {
+                    element.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                      inline: 'nearest'
+                    });
+                  }
+                }}
+                style={{ 
+                  textDecoration: 'underline',
+                  color: '#ff650b'
+                }}
+                className="block mt-2 mb-6"
+              >
+                <h3 style={{ color: '#ff650b' }} className="text-sm sm:text-base font-bold">
+                  Last 3 ducks win bluechip NFTs!
+                </h3>
+              </a>
             </div>
           </div>
         </div>
         
+        {/* Fence image in separate container */}
         <div className="w-full">
           <img src={fence} className="w-full h-auto block" alt="Fence decoration" />
         </div>
       </section>
 
       <style jsx>{`
-        @keyframes slideDown {
+        @keyframes slide-down {
           from {
             transform: translateY(-100%);
             opacity: 0;
@@ -269,6 +305,14 @@ function Ducks() {
             transform: translateY(0);
             opacity: 1;
           }
+        }
+        
+        .animate-slide-down {
+          animation: slide-down 0.3s ease-out;
+        }
+        
+        .touch-manipulation {
+          touch-action: manipulation;
         }
       `}</style>
     </>
