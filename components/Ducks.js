@@ -177,7 +177,7 @@ function Ducks() {
                   rel="noopener noreferrer"
                   className="text-white underline text-xs"
                 >
-                  TX
+                  VIEW TX
                 </a>
               </div>
               <button
