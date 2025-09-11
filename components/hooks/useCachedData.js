@@ -15,7 +15,10 @@ export function useCachedGameData() {
     zappersBurned: 0,
     ducksMintEndTimestamp: null,
     lastUpdate: 0,
-    winner: '0x0000000000000000000000000000000000000000'
+    winner: '0x0000000000000000000000000000000000000000',
+    secondPlace: '0x0000000000000000000000000000000000000000',
+    thirdPlace: '0x0000000000000000000000000000000000000000',
+    topShooter: '0x0000000000000000000000000000000000000000',
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,7 +66,10 @@ export function useCachedGameData() {
           zappersBurned: gameData.zappersBurned,
           ducksMintEndTimestamp: gameData.ducksMintEndTimestamp,
           lastUpdate: gameData.lastUpdate,
-          winner: gameData.winner || '0x0000000000000000000000000000000000000000'
+          winner: gameData.winner || '0x0000000000000000000000000000000000000000',
+          secondPlace: gameData.secondPlace || '0x0000000000000000000000000000000000000000',
+          thirdPlace: gameData.thirdPlace || '0x0000000000000000000000000000000000000000',
+          topShooter: gameData.topShooter || '0x0000000000000000000000000000000000000000'
         });
         setError(null);
         
@@ -75,8 +81,8 @@ export function useCachedGameData() {
         if (data.ducksMinted === 0 && !data.duckPrice) {
           setData(prev => ({
             ...prev,
-            duckPrice: '0.00555', // Match server defaults
-            zapperPrice: '0.001984',
+            duckPrice: '0.00222', // Match server defaults
+            zapperPrice: '0.0001984',
             huntingSeason: false
           }));
         }
