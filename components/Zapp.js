@@ -25,6 +25,13 @@ export default function Zapp() {
     hash
   } = useGameContract();
 
+  // Debug logging to see what we're getting
+  useEffect(() => {
+    console.log('Zapp.js - Cached game data:', cachedGameData);
+    console.log('Zapp.js - Winner value:', cachedGameData.winner);
+    console.log('Zapp.js - Winner type:', typeof cachedGameData.winner);
+  }, [cachedGameData.winner]);
+
   // Show notification when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -90,8 +97,10 @@ export default function Zapp() {
   };
 
   const getButtonText = () => {
-    // Check if game is over (winner declared)
-    if (cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000') {
+    // Check if game is over (winner declared) - updated logic for your server
+    if (cachedGameData.winner && 
+        cachedGameData.winner !== '0x0000000000000000000000000000000000000000' &&
+        cachedGameData.winner.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
       return 'GAME OVER!';
     }
     
@@ -112,7 +121,12 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
-    return cachedGameData.winner !== '0x0000000000000000000000000000000000000000' ||
+    // Check if game is over (winner declared) - updated logic for your server
+    const gameOver = cachedGameData.winner && 
+                     cachedGameData.winner !== '0x0000000000000000000000000000000000000000' &&
+                     cachedGameData.winner.toLowerCase() !== '0x0000000000000000000000000000000000000000';
+    
+    return gameOver ||
            !isConnected || 
            isPending || 
            isConfirming || 

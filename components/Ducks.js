@@ -28,6 +28,13 @@ function Ducks() {
     hash
   } = useGameContract();
 
+  // Debug logging to see what we're getting
+  useEffect(() => {
+    console.log('Ducks.js - Cached game data:', cachedGameData);
+    console.log('Ducks.js - Winner value:', cachedGameData.winner);
+    console.log('Ducks.js - Winner type:', typeof cachedGameData.winner);
+  }, [cachedGameData.winner]);
+
   // Show notifications when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -150,8 +157,10 @@ function Ducks() {
   };
 
   const getButtonText = () => {
-    // Check if game is over (winner declared)
-    if (cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000') {
+    // Check if game is over (winner declared) - updated logic for your server
+    if (cachedGameData.winner && 
+        cachedGameData.winner !== '0x0000000000000000000000000000000000000000' &&
+        cachedGameData.winner.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
       return 'GAME OVER!';
     }
     
@@ -172,7 +181,12 @@ function Ducks() {
   };
 
   const isButtonDisabled = () => {
-    return cachedGameData.winner !== '0x0000000000000000000000000000000000000000' ||
+    // Check if game is over (winner declared) - updated logic for your server
+    const gameOver = cachedGameData.winner && 
+                     cachedGameData.winner !== '0x0000000000000000000000000000000000000000' &&
+                     cachedGameData.winner.toLowerCase() !== '0x0000000000000000000000000000000000000000';
+    
+    return gameOver ||
            !isConnected || 
            timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
