@@ -255,15 +255,8 @@ const ChatInterface = () => {
         alignItems: 'center',
         cursor: 'pointer'
       }} onClick={() => setIsMinimized(!isMinimized)}>
-        <span>
-          TROLLBOX {isConnected ? 'ðŸŸ¢' : 'ðŸ"´'} 
-          {!isMinimized && (
-            <span style={{ fontSize: '10px', marginLeft: '5px' }}>
-              {connectionStatus}
-            </span>
-          )}
-        </span>
-        <span>{isMinimized ? 'â–²' : 'â–¼'}</span>
+        <span>TROLLBOX {isConnected ? '🟢' : '🔴'}</span>
+        <span>{isMinimized ? '▲' : '▼'}</span>
       </div>
 
       {!isMinimized && (
@@ -320,16 +313,16 @@ const ChatInterface = () => {
                 FINAL RESULTS
               </div>
               <div style={{ marginBottom: '8px' }}>
-                ðŸ† 1st: {formatAddress(cachedGameData.winner)}
+                🏆 1st: {formatAddress(cachedGameData.winner)}
               </div>
               <div style={{ marginBottom: '8px' }}>
-                ðŸ¥ˆ 2nd: {formatAddress(cachedGameData.secondPlace)}
+                🥈 2nd: {formatAddress(cachedGameData.secondPlace)}
               </div>
               <div style={{ marginBottom: '8px' }}>
-                ðŸ¥‰ 3rd: {formatAddress(cachedGameData.thirdPlace)}
+                🥉 3rd: {formatAddress(cachedGameData.thirdPlace)}
               </div>
               <div style={{ color: '#ff4444', fontSize: '11px' }}>
-                ðŸŽ¯ Top Shooter: {formatAddress(cachedGameData.topShooter)}
+                🎯 Top Shooter: {formatAddress(cachedGameData.topShooter)}
               </div>
             </div>
           )}
@@ -361,7 +354,7 @@ const ChatInterface = () => {
                   color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#3a3afc',
                   fontWeight: 'bold'
                 }}>
-                  {msg.user === 'SYSTEM' ? 'ðŸ¤– ' : `${msg.user}: `}
+                  {msg.user === 'SYSTEM' ? '🤖' : `${msg.user}: `}
                 </span>
                 <span style={{ 
                   color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#000'
