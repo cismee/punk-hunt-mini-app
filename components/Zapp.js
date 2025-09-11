@@ -189,8 +189,8 @@ export default function Zapp() {
                   {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
                 </p>
                 {isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold text-red-600">
-                    The game has ended!
+                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#aa32d2' }}>
+                    GAME OVER!
                   </p>
                 )}
               </div>

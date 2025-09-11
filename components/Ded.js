@@ -385,9 +385,9 @@ export default function Ded() {
                   </h2>
                 )}
                 {isGameOver && (
-                  <h2 className="mt-2 text-base sm:text-lg font-bold text-red-600">
-                    The game has ended!
-                  </h2>
+                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#97e500' }}>
+                    GAME OVER!
+                  </p>
                 )}
               </div>
 
