@@ -62,7 +62,8 @@ export function useCachedGameData() {
           ducksBurned: gameData.ducksBurned || gameData.ducksRekt, // Server uses ducksRekt for both
           zappersBurned: gameData.zappersBurned,
           ducksMintEndTimestamp: gameData.ducksMintEndTimestamp,
-          lastUpdate: gameData.lastUpdate
+          lastUpdate: gameData.lastUpdate,
+          winner: gameData.winner  // ADD THIS LINE
         });
         setError(null);
         
