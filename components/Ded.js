@@ -306,18 +306,7 @@ export default function Ded() {
     if (isGameOver) {
       return (
         <>
-          GAME OVER!<br />
-          <a 
-            href={`https://opensea.io/${cachedGameData.winner}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ 
-              color: 'black', 
-              textDecoration: 'underline' 
-            }}
-          >
-            {cachedGameData.winner}
-          </a> WINS!
+          GAME OVER!
         </>
       );
     }
