@@ -343,7 +343,7 @@ const ChatInterface = () => {
                 </a>
               </div>
               <div style={{ color: '#ff4444', color: '#000'}}>
-                🎯 Top Shooter: <a 
+                🎯 Top Shot: <a 
                   href={`https://opensea.io/${cachedGameData.topShooter}`}
                   target="_blank"
                   rel="noopener noreferrer"
