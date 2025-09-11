@@ -379,7 +379,7 @@ export default function Ded() {
                 {!isGameOver && (
                   <h2 className="mt-2 text-base sm:text-lg font-bold"
                       style={{ 
-                        color: cachedGameData.huntingSeason ? '#125000' : '#f42a2a'
+                        color: cachedGameData.huntingSeason ? '#97e500' : '#f42a2a'
                       }}>
                     {cachedGameData.huntingSeason ? "IT'S HUNTING SZN!" : "Hunting SZN Coming Soon"}
                   </h2>

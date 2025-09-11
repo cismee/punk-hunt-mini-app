@@ -275,7 +275,7 @@ function Ducks() {
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
                      style={{ 
-                       color: timeLeft === 'HAPPY HUNTING!' ? '#ea6126' : '#f42a2a'
+                       color: timeLeft === 'HAPPY HUNTING!' ? '#ff650b' : '#f42a2a'
                      }}>
                     {timeLeft === 'HAPPY HUNTING!' ? timeLeft : `Mint Ends in: ${timeLeft}`}
                   </p>
