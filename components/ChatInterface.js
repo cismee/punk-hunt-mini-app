@@ -332,9 +332,12 @@ const ChatInterface = () => {
             padding: '10px',
             backgroundColor: '#f8f8f8'
           }}>
-            {filteredMessages.length === 0 && isConnected && (
+            {filteredMessages.length === 0 && (
               <div style={{ color: '#666', fontSize: '11px', textAlign: 'center', padding: '20px' }}>
-                {showUserMessagesOnly ? 'No user messages yet...' : 'Chat is loading...'}
+                {!isConnected ? 'Connecting to chat...' :
+                 gameEnded ? 'No messages - Game has ended' :
+                 showUserMessagesOnly ? 'No user messages yet...' : 
+                 'No messages yet...'}
               </div>
             )}
             
