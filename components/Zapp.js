@@ -90,6 +90,11 @@ export default function Zapp() {
   };
 
   const getButtonText = () => {
+    // Check if game is over (winner declared)
+    if (cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000') {
+      return 'GAME OVER!';
+    }
+    
     if (!isConnected) return 'CONNECT WALLET';
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';
@@ -107,7 +112,12 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
-    return !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
+    return cachedGameData.winner !== '0x0000000000000000000000000000000000000000' ||
+           !isConnected || 
+           isPending || 
+           isConfirming || 
+           !amount || 
+           parseInt(amount) <= 0;
   };
 
   return (
@@ -192,7 +202,7 @@ export default function Zapp() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
+                {cachedGameData.zappersMinted ?? '…'} Minted!
               </h2>
 
               <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>

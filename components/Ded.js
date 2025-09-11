@@ -261,6 +261,11 @@ export default function Ded() {
   };
 
   const getButtonText = () => {
+    // Check if game is over (winner declared)
+    if (cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000') {
+      return 'GAME OVER!';
+    }
+    
     if (!isConnected) return 'CONNECT WALLET';
     
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
@@ -278,7 +283,8 @@ export default function Ded() {
 
   const isButtonDisabled = () => {
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
-    return !isConnected || 
+    return cachedGameData.winner !== '0x0000000000000000000000000000000000000000' ||
+           !isConnected || 
            liveDucks <= 1 ||
            !cachedGameData.huntingSeason || 
            isPending || 

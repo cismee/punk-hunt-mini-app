@@ -17,6 +17,13 @@ export const MAIN_ABI = [
     "type": "function"
   },
   {
+  "inputs": [],
+  "name": "winner",
+  "outputs": [{"name": "", "type": "address"}],
+  "stateMutability": "view",
+  "type": "function"
+  },
+  {
     "inputs": [{"name": "_amount", "type": "uint256"}],
     "name": "mintZappers", 
     "outputs": [],

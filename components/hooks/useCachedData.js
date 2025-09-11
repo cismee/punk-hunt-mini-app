@@ -14,7 +14,8 @@ export function useCachedGameData() {
     ducksBurned: 0,
     zappersBurned: 0,
     ducksMintEndTimestamp: null,
-    lastUpdate: 0
+    lastUpdate: 0,
+    winner: '0x0000000000000000000000000000000000000000'
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

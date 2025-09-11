@@ -150,6 +150,11 @@ function Ducks() {
   };
 
   const getButtonText = () => {
+    // Check if game is over (winner declared)
+    if (cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000') {
+      return 'GAME OVER!';
+    }
+    
     if (!isConnected) return 'CONNECT WALLET';
     if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
     if (isPending) return 'CONFIRM IN WALLET...';
@@ -167,7 +172,8 @@ function Ducks() {
   };
 
   const isButtonDisabled = () => {
-    return !isConnected || 
+    return cachedGameData.winner !== '0x0000000000000000000000000000000000000000' ||
+           !isConnected || 
            timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
            isConfirming || 
