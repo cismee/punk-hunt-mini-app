@@ -309,7 +309,7 @@ const ChatInterface = () => {
               fontWeight: 'bold',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: '14px', marginBottom: '10px', color: '#d4af37' }}>
+              <div style={{ fontSize: '14px', marginBottom: '10px', color: '#ff650b' }}>
                 FINAL RESULTS
               </div>
               <div style={{ marginBottom: '8px', color: '#000' }}>
