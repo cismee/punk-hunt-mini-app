@@ -281,8 +281,8 @@ function Ducks() {
                   </p>
                 )}
                 {isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold text-red-600">
-                    The game has ended!
+                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#ff650b' }}>
+                    GAME OVER!
                   </p>
                 )}
               </div>
