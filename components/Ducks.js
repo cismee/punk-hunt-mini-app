@@ -18,6 +18,13 @@ function Ducks() {
   
   // Use cached data instead of direct contract calls
   const cachedGameData = useCachedGameData();
+
+  // Add the debug code here:
+  console.log('Winner debug:', {
+  winner: cachedGameData.winner,
+  isGameOver: cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000',
+  comparison: cachedGameData.winner !== '0x0000000000000000000000000000000000000000'
+  });
   
   const {
     mintDucks,
