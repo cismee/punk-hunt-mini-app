@@ -160,7 +160,7 @@ function Ducks() {
   };
 
   const getButtonText = () => {
-    if (isGameOver) return 'GAME OVER';
+    if (isGameOver) return 'GAME OVER!';
     if (!isConnected) return 'CONNECT WALLET';
     if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
     if (isPending) return 'CONFIRM IN WALLET...';

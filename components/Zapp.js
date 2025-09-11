@@ -93,7 +93,7 @@ export default function Zapp() {
   };
 
   const getButtonText = () => {
-    if (isGameOver) return 'GAME OVER';
+    if (isGameOver) return 'GAME OVER!';
     if (!isConnected) return 'CONNECT WALLET';
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';

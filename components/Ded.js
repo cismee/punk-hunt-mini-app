@@ -264,7 +264,7 @@ export default function Ded() {
   };
 
   const getButtonText = () => {
-    if (isGameOver) return 'GAME OVER';
+    if (isGameOver) return 'GAME OVER!';
     if (!isConnected) return 'CONNECT WALLET';
     
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
