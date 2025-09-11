@@ -256,14 +256,14 @@ const ChatInterface = () => {
         cursor: 'pointer'
       }} onClick={() => setIsMinimized(!isMinimized)}>
         <span>
-          TROLLBOX {isConnected ? '🟢' : '🔴'} 
+          TROLLBOX {isConnected ? 'ðŸŸ¢' : 'ðŸ"´'} 
           {!isMinimized && (
             <span style={{ fontSize: '10px', marginLeft: '5px' }}>
               {connectionStatus}
             </span>
           )}
         </span>
-        <span>{isMinimized ? '▲' : '▼'}</span>
+        <span>{isMinimized ? 'â–²' : 'â–¼'}</span>
       </div>
 
       {!isMinimized && (
@@ -271,24 +271,35 @@ const ChatInterface = () => {
           {/* Filter Toggle */}
           <div style={{
             padding: '6px 12px',
-            backgroundColor: '#f0f0f0',
+            backgroundColor: gameEnded ? '#f5f5f5' : '#f0f0f0',
             borderBottom: '1px solid #ddd',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            fontSize: '11px'
+            fontSize: '11px',
+            opacity: gameEnded ? 0.6 : 1
           }}>
-            <span>Show only user messages:</span>
-            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+            <span style={{ color: gameEnded ? '#999' : '#000' }}>
+              Show only user messages:
+            </span>
+            <label style={{ 
+              cursor: gameEnded ? 'not-allowed' : 'pointer', 
+              display: 'flex', 
+              alignItems: 'center' 
+            }}>
               <input
                 type="checkbox"
                 checked={showUserMessagesOnly}
-                onChange={(e) => setShowUserMessagesOnly(e.target.checked)}
-                style={{ marginRight: '4px' }}
+                onChange={(e) => !gameEnded && setShowUserMessagesOnly(e.target.checked)}
+                style={{ 
+                  marginRight: '4px',
+                  cursor: gameEnded ? 'not-allowed' : 'pointer'
+                }}
+                disabled={gameEnded}
               />
               <span style={{ 
                 fontSize: '10px',
-                color: showUserMessagesOnly ? '#aa32d2' : '#666'
+                color: gameEnded ? '#999' : (showUserMessagesOnly ? '#aa32d2' : '#666')
               }}>
                 {showUserMessagesOnly ? 'ON' : 'OFF'}
               </span>
@@ -309,16 +320,16 @@ const ChatInterface = () => {
                 FINAL RESULTS
               </div>
               <div style={{ marginBottom: '8px' }}>
-                🏆 1st: {formatAddress(cachedGameData.winner)}
+                ðŸ† 1st: {formatAddress(cachedGameData.winner)}
               </div>
               <div style={{ marginBottom: '8px' }}>
-                🥈 2nd: {formatAddress(cachedGameData.secondPlace)}
+                ðŸ¥ˆ 2nd: {formatAddress(cachedGameData.secondPlace)}
               </div>
               <div style={{ marginBottom: '8px' }}>
-                🥉 3rd: {formatAddress(cachedGameData.thirdPlace)}
+                ðŸ¥‰ 3rd: {formatAddress(cachedGameData.thirdPlace)}
               </div>
               <div style={{ color: '#ff4444', fontSize: '11px' }}>
-                🎯 Top Shooter: {formatAddress(cachedGameData.topShooter)}
+                ðŸŽ¯ Top Shooter: {formatAddress(cachedGameData.topShooter)}
               </div>
             </div>
           )}
@@ -350,7 +361,7 @@ const ChatInterface = () => {
                   color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#3a3afc',
                   fontWeight: 'bold'
                 }}>
-                  {msg.user === 'SYSTEM' ? '🤖 ' : `${msg.user}: `}
+                  {msg.user === 'SYSTEM' ? 'ðŸ¤– ' : `${msg.user}: `}
                 </span>
                 <span style={{ 
                   color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#000'
@@ -440,7 +451,7 @@ const ChatInterface = () => {
           }}>
             {walletConnected ? username : 'Read-only'} | {filteredMessages.length}/{messages.length} messages
             {isConnected && (
-              <span style={{ color: '#00aa00', marginLeft: '5px' }}>● Live</span>
+              <span style={{ color: '#00aa00', marginLeft: '5px' }}>â— Live</span>
             )}
           </div>
         </>
