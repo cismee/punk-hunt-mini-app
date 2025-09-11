@@ -63,7 +63,7 @@ export function useCachedGameData() {
           zappersBurned: gameData.zappersBurned,
           ducksMintEndTimestamp: gameData.ducksMintEndTimestamp,
           lastUpdate: gameData.lastUpdate,
-          winner: gameData.winner  // ADD THIS LINE
+          winner: gameData.winner || '0x0000000000000000000000000000000000000000'
         });
         setError(null);
         
