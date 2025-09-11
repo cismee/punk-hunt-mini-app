@@ -92,13 +92,6 @@ export default function Ded() {
     hash
   } = useGameContract();
 
-  // Debug logging to see what we're getting
-  useEffect(() => {
-    console.log('Ded.js - Cached game data:', cachedGameData);
-    console.log('Ded.js - Winner value:', cachedGameData.winner);
-    console.log('Ded.js - Winner type:', typeof cachedGameData.winner);
-  }, [cachedGameData.winner]);
-
   // Fetch events when transaction is confirmed
   useEffect(() => {
     const fetchTransactionEvents = async () => {
@@ -268,13 +261,6 @@ export default function Ded() {
   };
 
   const getButtonText = () => {
-    // Check if game is over (winner declared) - updated logic for your server
-    if (cachedGameData.winner && 
-        cachedGameData.winner !== '0x0000000000000000000000000000000000000000' &&
-        cachedGameData.winner.toLowerCase() !== '0x0000000000000000000000000000000000000000') {
-      return 'GAME OVER!';
-    }
-    
     if (!isConnected) return 'CONNECT WALLET';
     
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
@@ -291,14 +277,8 @@ export default function Ded() {
   };
 
   const isButtonDisabled = () => {
-    // Check if game is over (winner declared) - updated logic for your server
-    const gameOver = cachedGameData.winner && 
-                     cachedGameData.winner !== '0x0000000000000000000000000000000000000000' &&
-                     cachedGameData.winner.toLowerCase() !== '0x0000000000000000000000000000000000000000';
-    
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
-    return gameOver ||
-           !isConnected || 
+    return !isConnected || 
            liveDucks <= 1 ||
            !cachedGameData.huntingSeason || 
            isPending || 
