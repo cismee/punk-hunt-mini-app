@@ -92,6 +92,9 @@ export default function Ded() {
     hash
   } = useGameContract();
 
+  // Check if game is over (winner is not zero address)
+  const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
+
   // Fetch events when transaction is confirmed
   useEffect(() => {
     const fetchTransactionEvents = async () => {
@@ -261,6 +264,7 @@ export default function Ded() {
   };
 
   const getButtonText = () => {
+    if (isGameOver) return 'GAME OVER';
     if (!isConnected) return 'CONNECT WALLET';
     
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
@@ -278,7 +282,8 @@ export default function Ded() {
 
   const isButtonDisabled = () => {
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
-    return !isConnected || 
+    return isGameOver ||
+           !isConnected || 
            liveDucks <= 1 ||
            !cachedGameData.huntingSeason || 
            isPending || 
@@ -353,6 +358,7 @@ export default function Ded() {
                   className="nes-input mx-2 mb-2 p-2 w-12 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
                   id="shoot_field"
+                  disabled={isGameOver}
                 />
                 Ducks!
               </h1>
@@ -370,12 +376,19 @@ export default function Ded() {
                   <span className="text-black font-bold">TX FEE</span><br />
                   Zappers: {cachedUserData.zapperBalance}
                 </div>
-                <h2 className="mt-2 text-base sm:text-lg font-bold"
-                    style={{ 
-                      color: cachedGameData.huntingSeason ? '#125000' : '#f42a2a'
-                    }}>
-                  {cachedGameData.huntingSeason ? "IT'S HUNTING SZN!" : "Hunting SZN Coming Soon"}
-                </h2>
+                {!isGameOver && (
+                  <h2 className="mt-2 text-base sm:text-lg font-bold"
+                      style={{ 
+                        color: cachedGameData.huntingSeason ? '#125000' : '#f42a2a'
+                      }}>
+                    {cachedGameData.huntingSeason ? "IT'S HUNTING SZN!" : "Hunting SZN Coming Soon"}
+                  </h2>
+                )}
+                {isGameOver && (
+                  <h2 className="mt-2 text-base sm:text-lg font-bold text-red-600">
+                    The game has ended!
+                  </h2>
+                )}
               </div>
 
               {error && (

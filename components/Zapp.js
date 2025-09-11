@@ -25,6 +25,9 @@ export default function Zapp() {
     hash
   } = useGameContract();
 
+  // Check if game is over (winner is not zero address)
+  const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
+
   // Show notification when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -90,6 +93,7 @@ export default function Zapp() {
   };
 
   const getButtonText = () => {
+    if (isGameOver) return 'GAME OVER';
     if (!isConnected) return 'CONNECT WALLET';
     if (isPending) return 'CONFIRM IN WALLET...';
     if (isConfirming) return 'MINTING...';
@@ -107,7 +111,7 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
-    return !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
+    return isGameOver || !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
 
   return (
@@ -167,6 +171,7 @@ export default function Zapp() {
                   className="nes-input p-2 mx-2 mb-2 w-12 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
                   id="inline_field"
+                  disabled={isGameOver}
                 />{' '}
                 Zappers!
               </h1>
@@ -183,6 +188,11 @@ export default function Zapp() {
                 <p className="text-black text-base font-bold m-0">
                   {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
                 </p>
+                {isGameOver && (
+                  <p className="mt-2 text-sm sm:text-base font-bold text-red-600">
+                    The game has ended!
+                  </p>
+                )}
               </div>
 
               {error && (
@@ -192,7 +202,7 @@ export default function Zapp() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
+                {cachedGameData.zappersMinted ?? '…'} Minted!
               </h2>
 
               <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>

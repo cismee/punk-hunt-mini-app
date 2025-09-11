@@ -28,6 +28,9 @@ function Ducks() {
     hash
   } = useGameContract();
 
+  // Check if game is over (winner is not zero address)
+  const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
+
   // Show notifications when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -150,6 +153,7 @@ function Ducks() {
   };
 
   const getButtonText = () => {
+    if (isGameOver) return 'GAME OVER';
     if (!isConnected) return 'CONNECT WALLET';
     if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
     if (isPending) return 'CONFIRM IN WALLET...';
@@ -167,7 +171,8 @@ function Ducks() {
   };
 
   const isButtonDisabled = () => {
-    return !isConnected || 
+    return isGameOver ||
+           !isConnected || 
            timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
            isConfirming || 
@@ -243,6 +248,7 @@ function Ducks() {
                   className="nes-input p-2 mb-2 sm:w-16 text-center"
                   style={{ fontSize: '16px' }}
                   id="inline_field"
+                  disabled={isGameOver}
                 />
                 Ducks!
               </h1>
@@ -259,12 +265,17 @@ function Ducks() {
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
                   {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
                 </p>
-                {timeLeft && (
+                {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
                      style={{ 
                        color: timeLeft === 'HAPPY HUNTING!' ? '#ea6126' : '#f42a2a'
                      }}>
                     {timeLeft === 'HAPPY HUNTING!' ? timeLeft : `Mint Ends in: ${timeLeft}`}
+                  </p>
+                )}
+                {isGameOver && (
+                  <p className="mt-2 text-sm sm:text-base font-bold text-red-600">
+                    The game has ended!
                   </p>
                 )}
               </div>
