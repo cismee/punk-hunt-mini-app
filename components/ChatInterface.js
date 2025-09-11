@@ -327,7 +327,7 @@ const ChatInterface = () => {
           </div>
 
           {/* Final Results Display */}
-          {gameEnded && finalResults && (
+          {gameEnded && (
             <div style={{
               padding: '15px',
               backgroundColor: '#ffef99',
@@ -340,16 +340,16 @@ const ChatInterface = () => {
                 FINAL RESULTS
               </div>
               <div style={{ marginBottom: '8px' }}>
-                1st: {formatAddress(finalResults.winner)}
+                🏆 1st: {formatAddress(cachedGameData.winner)}
               </div>
               <div style={{ marginBottom: '8px' }}>
-                2nd: {formatAddress(finalResults.secondPlace)}
+                🥈 2nd: {formatAddress(cachedGameData.secondPlace)}
               </div>
               <div style={{ marginBottom: '8px' }}>
-                3rd: {formatAddress(finalResults.thirdPlace)}
+                🥉 3rd: {formatAddress(cachedGameData.thirdPlace)}
               </div>
               <div style={{ color: '#ff4444', fontSize: '11px' }}>
-                Top Shooter: {formatAddress(finalResults.topShooter.address)} ({finalResults.topShooter.zaps} zaps)
+                🎯 Top Shooter: {formatAddress(cachedGameData.topShooter)}
               </div>
             </div>
           )}
@@ -411,7 +411,7 @@ const ChatInterface = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={
-                  gameEnded ? "Game ended - chat disabled" : 
+                  gameEnded ? "Trollbox Closed" : 
                   !isConnected ? "Connecting..." :
                   "Type message..."
                 }
@@ -442,7 +442,7 @@ const ChatInterface = () => {
                 }}
                 disabled={!isConnected || !message.trim() || gameEnded}
               >
-                {gameEnded ? 'GAME OVER' : 
+                {gameEnded ? 'GAME OVER!' : 
                  !isConnected ? 'OFFLINE' : 'SEND'}
               </button>
             </form>
