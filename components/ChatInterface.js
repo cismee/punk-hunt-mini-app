@@ -313,16 +313,44 @@ const ChatInterface = () => {
                 FINAL RESULTS
               </div>
               <div style={{ marginBottom: '8px' }}>
-                🏆 1st: {formatAddress(cachedGameData.winner)}
+                🏆 1st: <a 
+                  href={`https://opensea.io/${cachedGameData.winner}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#000', textDecoration: 'underline' }}
+                >
+                  {formatAddress(cachedGameData.winner)}
+                </a>
               </div>
               <div style={{ marginBottom: '8px' }}>
-                🥈 2nd: {formatAddress(cachedGameData.secondPlace)}
+                🥈 2nd: <a 
+                  href={`https://opensea.io/${cachedGameData.secondPlace}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#000', textDecoration: 'underline' }}
+                >
+                  {formatAddress(cachedGameData.secondPlace)}
+                </a>
               </div>
               <div style={{ marginBottom: '8px' }}>
-                🥉 3rd: {formatAddress(cachedGameData.thirdPlace)}
+                🥉 3rd: <a 
+                  href={`https://opensea.io/${cachedGameData.thirdPlace}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '##000', textDecoration: 'underline' }}
+                >
+                  {formatAddress(cachedGameData.thirdPlace)}
+                </a>
               </div>
               <div style={{ color: '#ff4444', fontSize: '11px' }}>
-                🎯 Top Shooter: {formatAddress(cachedGameData.topShooter)}
+                🎯 Top Shooter: <a 
+                  href={`https://opensea.io/${cachedGameData.topShooter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#000', textDecoration: 'underline' }}
+                >
+                  {formatAddress(cachedGameData.topShooter)}
+                </a>
               </div>
             </div>
           )}
