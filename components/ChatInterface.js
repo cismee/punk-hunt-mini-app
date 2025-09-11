@@ -312,7 +312,7 @@ const ChatInterface = () => {
               <div style={{ fontSize: '14px', marginBottom: '10px', color: '#d4af37' }}>
                 FINAL RESULTS
               </div>
-              <div style={{ marginBottom: '8px' }}>
+              <div style={{ marginBottom: '8px', color: '#000' }}>
                 🏆 1st: <a 
                   href={`https://opensea.io/${cachedGameData.winner}`}
                   target="_blank"
@@ -322,7 +322,7 @@ const ChatInterface = () => {
                   {formatAddress(cachedGameData.winner)}
                 </a>
               </div>
-              <div style={{ marginBottom: '8px' }}>
+              <div style={{ marginBottom: '8px', color: '#000' }}>
                 🥈 2nd: <a 
                   href={`https://opensea.io/${cachedGameData.secondPlace}`}
                   target="_blank"
@@ -332,7 +332,7 @@ const ChatInterface = () => {
                   {formatAddress(cachedGameData.secondPlace)}
                 </a>
               </div>
-              <div style={{ marginBottom: '8px' }}>
+              <div style={{ marginBottom: '8px', color: '#000' }}>
                 🥉 3rd: <a 
                   href={`https://opensea.io/${cachedGameData.thirdPlace}`}
                   target="_blank"
@@ -342,7 +342,7 @@ const ChatInterface = () => {
                   {formatAddress(cachedGameData.thirdPlace)}
                 </a>
               </div>
-              <div style={{ color: '#ff4444', fontSize: '11px' }}>
+              <div style={{ color: '#ff4444', color: '#000'}}>
                 🎯 Top Shooter: <a 
                   href={`https://opensea.io/${cachedGameData.topShooter}`}
                   target="_blank"
