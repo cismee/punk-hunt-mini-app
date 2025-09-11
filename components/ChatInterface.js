@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { io } from 'socket.io-client';
+import { useCachedGameData } from './hooks/useCachedData';
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
@@ -9,8 +10,6 @@ const ChatInterface = () => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [dimensions, setDimensions] = useState({ width: 350, height: 400 });
   const [isResizing, setIsResizing] = useState(false);
-  const [gameEnded, setGameEnded] = useState(false);
-  const [finalResults, setFinalResults] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('Connecting...');
   const [showUserMessagesOnly, setShowUserMessagesOnly] = useState(false);
   const socketRef = useRef(null);
@@ -20,9 +19,17 @@ const ChatInterface = () => {
   // Get wallet connection info
   const { address, isConnected: walletConnected } = useAccount();
 
+  // Get game data from cache
+  const cachedGameData = useCachedGameData();
+
+  // Check if game has ended (winner is not null and not zero address)
+  const gameEnded = cachedGameData.winner && 
+                   cachedGameData.winner !== null && 
+                   cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
+
   // Format address for display - matches server.js format
   const formatAddress = (addr) => {
-    if (!addr) return 'Anonymous';
+    if (!addr || addr === '0x0000000000000000000000000000000000000000') return 'TBD';
     return `${addr.slice(0, 4)}...${addr.slice(-4)}`;
   };
 
@@ -32,39 +39,6 @@ const ChatInterface = () => {
   const filteredMessages = showUserMessagesOnly 
     ? messages.filter(msg => !msg.isSystem && msg.user !== 'SYSTEM')
     : messages;
-
-  // Read final placements from contract when game ends
-  useEffect(() => {
-    if (!gameEnded) return;
-    
-    const fetchFinalResults = async () => {
-      try {
-        // This would typically fetch from your leaderboard API
-        const response = await fetch('https://punkhunt.gg/api/leaderboard');
-        const data = await response.json();
-        
-        setFinalResults({
-          winner: data.topHolders?.[0]?.address || "0x0000...0000",
-          secondPlace: data.topHolders?.[1]?.address || "0x0000...0000", 
-          thirdPlace: data.topHolders?.[2]?.address || "0x0000...0000",
-          topShooter: { 
-            address: data.topHunters?.[0]?.address || "0x0000...0000", 
-            zaps: data.topHunters?.[0]?.zapCount || 0 
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching final results:', error);
-        setFinalResults({
-          winner: "0x0000...0000",
-          secondPlace: "0x0000...0000", 
-          thirdPlace: "0x0000...0000",
-          topShooter: { address: "0x0000...0000", zaps: 0 }
-        });
-      }
-    };
-
-    fetchFinalResults();
-  }, [gameEnded]);
 
   // Scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -113,7 +87,7 @@ const ChatInterface = () => {
 
   // Socket.IO connection - matches server.js configuration
   useEffect(() => {
-    console.log('🔌 Initializing WebSocket connection to punkhunt.gg...');
+    console.log('Initializing WebSocket connection to punkhunt.gg...');
     
     // Connect to server with matching CORS origins
     const socket = io('https://punkhunt.gg', {
@@ -125,30 +99,30 @@ const ChatInterface = () => {
     socket.on('connect', () => {
       setIsConnected(true);
       setConnectionStatus('Connected');
-      console.log('✅ Connected to backend chat server');
+      console.log('Connected to backend chat server');
     });
 
     socket.on('disconnect', (reason) => {
       setIsConnected(false);
       setConnectionStatus(`Disconnected: ${reason}`);
-      console.log('❌ Disconnected from backend chat server:', reason);
+      console.log('Disconnected from backend chat server:', reason);
     });
 
     socket.on('connect_error', (error) => {
       setIsConnected(false);
       setConnectionStatus(`Connection Error: ${error.message}`);
-      console.error('🚫 Connection error:', error);
+      console.error('Connection error:', error);
     });
 
     // Load chat history when connected - server sends last 50 messages
     socket.on('chatHistory', (history) => {
-      console.log('📜 Received chat history:', history);
+      console.log('Received chat history:', history);
       setMessages(history || []);
     });
 
     // Listen for new chat messages from server
     socket.on('newChatMessage', (messageData) => {
-      console.log('💬 Received new message:', messageData);
+      console.log('Received new message:', messageData);
       
       // Use a more robust duplicate check
       setMessages(prev => {
@@ -162,7 +136,7 @@ const ChatInterface = () => {
         });
         
         if (isDuplicate) {
-          console.log('🔄 Duplicate message detected, skipping:', messageData);
+          console.log('Duplicate message detected, skipping:', messageData);
           return prev;
         }
         
@@ -172,29 +146,24 @@ const ChatInterface = () => {
 
     // Listen for contract events that affect game state
     socket.on('contractEvent', (eventData) => {
-      console.log('📊 Contract event received:', eventData);
-      
-      // Check if game ended (only 1 duck remaining)
-      if (eventData.type === 'PlayerEliminated' && eventData.remainingSupply === 1) {
-        setGameEnded(true);
-      }
+      console.log('Contract event received:', eventData);
     });
 
     // Listen for game state updates from server
     socket.on('gameStateUpdate', (gameState) => {
-      console.log('🎮 Game state update:', gameState);
+      console.log('Game state update:', gameState);
       // Could use this to update UI elements
     });
 
     socket.on('leaderboardUpdate', (leaderboard) => {
-      console.log('🏆 Leaderboard update:', leaderboard);
+      console.log('Leaderboard update:', leaderboard);
       // Could use this to update leaderboard display
     });
 
     socketRef.current = socket;
 
     return () => {
-      console.log('🔌 Cleaning up WebSocket connection...');
+      console.log('Cleaning up WebSocket connection...');
       socket.disconnect();
     };
   }, []); // Empty dependency array - only connect once
@@ -220,7 +189,7 @@ const ChatInterface = () => {
     };
 
     try {
-      console.log('📤 Sending message:', messageData);
+      console.log('Sending message:', messageData);
       
       // DON'T add message to local state - let server broadcast it back
       // This prevents duplicates
@@ -356,7 +325,7 @@ const ChatInterface = () => {
 
           {/* Messages area - shows filtered messages */}
           <div style={{
-            height: gameEnded && finalResults 
+            height: gameEnded 
               ? `${dimensions.height - 255}px` 
               : `${dimensions.height - 155}px`,
             overflowY: 'auto',
