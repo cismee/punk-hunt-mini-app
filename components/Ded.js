@@ -294,9 +294,35 @@ export default function Ded() {
   };
 
   const getProgressValue = () => {
+    // If game is over, show 100%
+    if (isGameOver) return 100;
+    
     if (cachedGameData.ducksMinted === 0) return 0;
     const progress = (cachedGameData.ducksRekt / cachedGameData.ducksMinted) * 100;
     return Math.min(100, Math.max(0, progress));
+  };
+
+  const getDuckStatusText = () => {
+    if (isGameOver) {
+      return (
+        <>
+          GAME OVER!<br />
+          <a 
+            href={`https://opensea.io/${cachedGameData.winner}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ 
+              color: 'black', 
+              textDecoration: 'underline' 
+            }}
+          >
+            {cachedGameData.winner}
+          </a> WINS!
+        </>
+      );
+    }
+    
+    return `${cachedGameData.ducksRekt}/${cachedGameData.ducksMinted} Ded Ducks!`;
   };
 
   return (
@@ -403,7 +429,7 @@ export default function Ded() {
               </div>
 
               <h2 className="mt-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksRekt}/{cachedGameData.ducksMinted} Ded Ducks!
+                {getDuckStatusText()}
               </h2>
               <h3 className="p-2 mx-2 text-black text-sm sm:text-base">
                 The game ends when one duck remains.
