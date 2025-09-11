@@ -317,7 +317,7 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.winner}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#000', textDecoration: 'underline' }}
+                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.winner)}
                 </a>
@@ -327,7 +327,7 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.secondPlace}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#000', textDecoration: 'underline' }}
+                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.secondPlace)}
                 </a>
@@ -337,7 +337,7 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.thirdPlace}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '##000', textDecoration: 'underline' }}
+                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.thirdPlace)}
                 </a>
@@ -347,7 +347,7 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.topShooter}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#000', textDecoration: 'underline' }}
+                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.topShooter)}
                 </a>
