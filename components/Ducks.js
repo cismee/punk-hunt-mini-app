@@ -177,15 +177,6 @@ function Ducks() {
     return prizePool.toFixed(3);
   };
 
-  // Calculate total price based on amount input
-  const calculateTotalPrice = () => {
-    if (!cachedGameData.duckPrice || !amount || parseInt(amount) <= 0) {
-      return 'Loading price...';
-    }
-    const totalPrice = parseFloat(cachedGameData.duckPrice) * parseInt(amount);
-    return `${totalPrice.toFixed(3)}E`;
-  };
-
   const isButtonDisabled = () => {
     return isGameOver ||
            !isConnected || 
@@ -279,7 +270,7 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {calculateTotalPrice()}
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
                 </p>
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
