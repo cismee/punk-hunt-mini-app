@@ -261,43 +261,41 @@ const ChatInterface = () => {
 
       {!isMinimized && (
         <>
-          {/* Filter Toggle */}
-          <div style={{
-            padding: '6px 12px',
-            backgroundColor: gameEnded ? '#f5f5f5' : '#f0f0f0',
-            borderBottom: '1px solid #ddd',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '11px',
-            opacity: gameEnded ? 0.6 : 1
-          }}>
-            <span style={{ color: gameEnded ? '#999' : '#000' }}>
-              Show only user messages:
-            </span>
-            <label style={{ 
-              cursor: gameEnded ? 'not-allowed' : 'pointer', 
-              display: 'flex', 
-              alignItems: 'center' 
+          {/* Filter Toggle - Hidden when game ended */}
+          {!gameEnded && (
+            <div style={{
+              padding: '6px 12px',
+              backgroundColor: '#f0f0f0',
+              borderBottom: '1px solid #ddd',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '11px'
             }}>
-              <input
-                type="checkbox"
-                checked={showUserMessagesOnly}
-                onChange={(e) => !gameEnded && setShowUserMessagesOnly(e.target.checked)}
-                style={{ 
-                  marginRight: '4px',
-                  cursor: gameEnded ? 'not-allowed' : 'pointer'
-                }}
-                disabled={gameEnded}
-              />
-              <span style={{ 
-                fontSize: '10px',
-                color: gameEnded ? '#999' : (showUserMessagesOnly ? '#aa32d2' : '#666')
+              <span>Show only user messages:</span>
+              <label style={{ 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center' 
               }}>
-                {showUserMessagesOnly ? 'ON' : 'OFF'}
-              </span>
-            </label>
-          </div>
+                <input
+                  type="checkbox"
+                  checked={showUserMessagesOnly}
+                  onChange={(e) => setShowUserMessagesOnly(e.target.checked)}
+                  style={{ 
+                    marginRight: '4px',
+                    cursor: 'pointer'
+                  }}
+                />
+                <span style={{ 
+                  fontSize: '10px',
+                  color: showUserMessagesOnly ? '#aa32d2' : '#666'
+                }}>
+                  {showUserMessagesOnly ? 'ON' : 'OFF'}
+                </span>
+              </label>
+            </div>
+          )}
 
           {/* Final Results Display */}
           {gameEnded && (
@@ -317,7 +315,7 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.winner}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
+                  style={{ fontSize: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.winner)}
                 </a>
@@ -327,7 +325,7 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.secondPlace}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
+                  style={{ fontSize: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.secondPlace)}
                 </a>
@@ -337,17 +335,17 @@ const ChatInterface = () => {
                   href={`https://opensea.io/${cachedGameData.thirdPlace}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
+                  style={{ fontSize: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.thirdPlace)}
                 </a>
               </div>
-              <div style={{ color: '#ff4444', color: '#000'}}>
+              <div style={{ color: '#000' }}>
                 🎯 Top Shot: <a 
                   href={`https://opensea.io/${cachedGameData.topShooter}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ size: '1em', color: '#000', textDecoration: 'underline' }}
+                  style={{ fontSize: '1em', color: '#000', textDecoration: 'underline' }}
                 >
                   {formatAddress(cachedGameData.topShooter)}
                 </a>
@@ -355,53 +353,52 @@ const ChatInterface = () => {
             </div>
           )}
 
-          {/* Messages area - shows filtered messages */}
-          <div style={{
-            height: gameEnded 
-              ? `${dimensions.height - 255}px` 
-              : `${dimensions.height - 155}px`,
-            overflowY: 'auto',
-            padding: '10px',
-            backgroundColor: '#f8f8f8'
-          }}>
-            {filteredMessages.length === 0 && (
-              <div style={{ color: '#666', fontSize: '11px', textAlign: 'center', padding: '20px' }}>
-                {!isConnected ? 'Connecting to chat...' :
-                 gameEnded ? 'Game Over!' :
-                 showUserMessagesOnly ? 'No user messages yet...' : 
-                 'No messages yet...'}
-              </div>
-            )}
-            
-            {filteredMessages.map((msg, index) => (
-              <div key={`${msg.timestamp}-${index}-${msg.user}`} style={{
-                marginBottom: '5px',
-                wordWrap: 'break-word'
-              }}>
-                <span style={{
-                  color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#3a3afc',
-                  fontWeight: 'bold'
+          {/* Messages area - Hidden when game ended */}
+          {!gameEnded && (
+            <div style={{
+              height: `${dimensions.height - 155}px`,
+              overflowY: 'auto',
+              padding: '10px',
+              backgroundColor: '#f8f8f8'
+            }}>
+              {filteredMessages.length === 0 && (
+                <div style={{ color: '#666', fontSize: '11px', textAlign: 'center', padding: '20px' }}>
+                  {!isConnected ? 'Connecting to chat...' :
+                   showUserMessagesOnly ? 'No user messages yet...' : 
+                   'No messages yet...'}
+                </div>
+              )}
+              
+              {filteredMessages.map((msg, index) => (
+                <div key={`${msg.timestamp}-${index}-${msg.user}`} style={{
+                  marginBottom: '5px',
+                  wordWrap: 'break-word'
                 }}>
-                  {msg.user === 'SYSTEM' ? '🤖' : `${msg.user}: `}
-                </span>
-                <span style={{ 
-                  color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#000'
-                }}>
-                  {msg.message}
-                </span>
-                {msg.timestamp && (
-                  <span style={{ 
-                    color: '#999', 
-                    fontSize: '10px', 
-                    marginLeft: '5px' 
+                  <span style={{
+                    color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#3a3afc',
+                    fontWeight: 'bold'
                   }}>
-                    {new Date(msg.timestamp).toLocaleTimeString()}
+                    {msg.user === 'SYSTEM' ? '🤖' : `${msg.user}: `}
                   </span>
-                )}
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
+                  <span style={{ 
+                    color: msg.isSystem || msg.user === 'SYSTEM' ? '#aa32d2' : '#000'
+                  }}>
+                    {msg.message}
+                  </span>
+                  {msg.timestamp && (
+                    <span style={{ 
+                      color: '#999', 
+                      fontSize: '10px', 
+                      marginLeft: '5px' 
+                    }}>
+                      {new Date(msg.timestamp).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
 
           {/* Message input - conditional based on wallet connection */}
           {walletConnected ? (
@@ -463,18 +460,20 @@ const ChatInterface = () => {
             </div>
           )}
 
-          {/* Status info */}
-          <div style={{
-            padding: '2px 8px',
-            fontSize: '10px',
-            color: '#666',
-            textAlign: 'center'
-          }}>
-            {walletConnected ? username : 'Read-only'} | {filteredMessages.length}/{messages.length} messages
-            {isConnected && (
-              <span style={{ color: '#00aa00', marginLeft: '5px' }}>â— Live</span>
-            )}
-          </div>
+          {/* Status info - Updated for game ended state */}
+          {!gameEnded && (
+            <div style={{
+              padding: '2px 8px',
+              fontSize: '10px',
+              color: '#666',
+              textAlign: 'center'
+            }}>
+              {walletConnected ? username : 'Read-only'} | {filteredMessages.length}/{messages.length} messages
+              {isConnected && (
+                <span style={{ color: '#00aa00', marginLeft: '5px' }}>• Live</span>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
