@@ -91,6 +91,41 @@ function Stats() {
     return prizePool.toFixed(3);
   };
 
+  // Create modified holders list with winner/secondPlace/thirdPlace override
+  const getDisplayHolders = () => {
+    const zeroAddress = '0x0000000000000000000000000000000000000000';
+    
+    // Start with original holders list
+    let displayHolders = [...holders];
+    
+    // If we have secondPlace and it's not zero address, inject it at position 2
+    if (cachedGameData.secondPlace && cachedGameData.secondPlace !== zeroAddress) {
+      // Remove secondPlace from original position if it exists
+      displayHolders = displayHolders.filter(holder => holder.address !== cachedGameData.secondPlace);
+      
+      // Insert at position 1 (index 1 = 2nd place)
+      displayHolders.splice(1, 0, {
+        address: cachedGameData.secondPlace,
+        balance: 'WINNER' // Or you could show actual balance if available
+      });
+    }
+    
+    // If we have thirdPlace and it's not zero address, inject it at position 3
+    if (cachedGameData.thirdPlace && cachedGameData.thirdPlace !== zeroAddress) {
+      // Remove thirdPlace from original position if it exists
+      displayHolders = displayHolders.filter(holder => holder.address !== cachedGameData.thirdPlace);
+      
+      // Insert at position 2 (index 2 = 3rd place)
+      displayHolders.splice(2, 0, {
+        address: cachedGameData.thirdPlace,
+        balance: 'WINNER' // Or you could show actual balance if available
+      });
+    }
+    
+    // Limit to top 5
+    return displayHolders.slice(0, 5);
+  };
+
   // Show loading state while cache is loading
   if (cachedGameData.loading) {
     return (
@@ -152,9 +187,9 @@ function Stats() {
                   <p className="text-[#3BC3FD] text-sm sm:text-base">-</p>
                 </div>
               </div>
-            ) : holders.length > 0 ? (
+            ) : holders.length > 0 || cachedGameData.secondPlace !== '0x0000000000000000000000000000000000000000' || cachedGameData.thirdPlace !== '0x0000000000000000000000000000000000000000' ? (
               <>
-                {holders.map((holder, index) => (
+                {getDisplayHolders().map((holder, index) => (
                   <div key={holder.address} className="flex stats py-1">
                     <div className="w-1/2 text-left">
                       <p className="text-[#3BC3FD] text-sm sm:text-base">
@@ -170,11 +205,11 @@ function Stats() {
                 ))}
                 
                 {/* Fill remaining positions with placeholders */}
-                {[...Array(Math.max(0, 5 - holders.length))].map((_, index) => (
+                {[...Array(Math.max(0, 5 - getDisplayHolders().length))].map((_, index) => (
                   <div key={`placeholder-${index}`} className="flex stats py-1">
                     <div className="w-1/2 text-left">
                       <p className="text-[#3BC3FD] text-sm sm:text-base">
-                        {holders.length + index + 1}. <AddressLink address="0x000000000000000000000000000000000000dEaD" style={{ color: '#3BC3FD' }}>
+                        {getDisplayHolders().length + index + 1}. <AddressLink address="0x000000000000000000000000000000000000dEaD" style={{ color: '#3BC3FD' }}>
                           {formatAddress("0x000000000000000000000000000000000000dEaD")}
                         </AddressLink>
                       </p>
