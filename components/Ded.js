@@ -346,7 +346,7 @@ export default function Ded() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                X
+                ✕
               </button>
             </div>
           </div>
