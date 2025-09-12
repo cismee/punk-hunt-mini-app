@@ -400,64 +400,65 @@ const ChatInterface = () => {
             </div>
           )}
 
-          {/* Message input - conditional based on wallet connection */}
-          {walletConnected ? (
-            <form onSubmit={sendMessage} style={{
-              display: 'flex',
-              padding: '8px',
-              borderTop: '2px solid #000'
-            }}>
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={
-                  gameEnded ? "Trollbox Closed" : 
-                  !isConnected ? "Connecting..." :
-                  "Type message..."
-                }
-                style={{
-                  flex: 1,
-                  padding: '5px',
-                  border: '2px solid #000',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  marginRight: '5px',
-                  backgroundColor: (gameEnded || !isConnected) ? '#f0f0f0' : '#fff',
-                  color: (gameEnded || !isConnected) ? '#999' : '#000'
-                }}
-                maxLength={200}
-                disabled={!isConnected || gameEnded}
-              />
-              <button
-                type="submit"
-                style={{
-                  padding: '5px 10px',
-                  backgroundColor: (isConnected && !gameEnded) ? '#97E500' : '#ccc',
-                  border: '2px solid #000',
-                  color: '#000',
-                  fontWeight: 'bold',
-                  cursor: (isConnected && !gameEnded) ? 'pointer' : 'not-allowed',
-                  fontSize: '12px',
-                  fontFamily: 'monospace'
-                }}
-                disabled={!isConnected || !message.trim() || gameEnded}
-              >
-                {gameEnded ? 'GAME OVER!' : 
-                 !isConnected ? 'OFFLINE' : 'SEND'}
-              </button>
-            </form>
-          ) : (
-            <div style={{
-              padding: '12px 8px',
-              borderTop: '2px solid #000',
-              textAlign: 'center',
-              backgroundColor: '#fff',
-              color: '#666',
-              fontSize: '11px'
-            }}>
-              Connect wallet to send messages
-            </div>
+          {/* Message input - Hidden when game ended */}
+          {!gameEnded && (
+            <>
+              {walletConnected ? (
+                <form onSubmit={sendMessage} style={{
+                  display: 'flex',
+                  padding: '8px',
+                  borderTop: '2px solid #000'
+                }}>
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={
+                      !isConnected ? "Connecting..." : "Type message..."
+                    }
+                    style={{
+                      flex: 1,
+                      padding: '5px',
+                      border: '2px solid #000',
+                      fontSize: '12px',
+                      fontFamily: 'monospace',
+                      marginRight: '5px',
+                      backgroundColor: !isConnected ? '#f0f0f0' : '#fff',
+                      color: !isConnected ? '#999' : '#000'
+                    }}
+                    maxLength={200}
+                    disabled={!isConnected}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      padding: '5px 10px',
+                      backgroundColor: isConnected ? '#97E500' : '#ccc',
+                      border: '2px solid #000',
+                      color: '#000',
+                      fontWeight: 'bold',
+                      cursor: isConnected ? 'pointer' : 'not-allowed',
+                      fontSize: '12px',
+                      fontFamily: 'monospace'
+                    }}
+                    disabled={!isConnected || !message.trim()}
+                  >
+                    {!isConnected ? 'OFFLINE' : 'SEND'}
+                  </button>
+                </form>
+              ) : (
+                <div style={{
+                  padding: '12px 8px',
+                  borderTop: '2px solid #000',
+                  textAlign: 'center',
+                  backgroundColor: '#fff',
+                  color: '#666',
+                  fontSize: '11px'
+                }}>
+                  Connect wallet to send messages
+                </div>
+              )}
+            </>
           )}
 
           {/* Status info - Updated for game ended state */}
