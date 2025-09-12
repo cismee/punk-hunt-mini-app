@@ -110,6 +110,15 @@ export default function Zapp() {
     return prizePool.toFixed(3);
   };
 
+  // Calculate total price based on amount input
+  const calculateTotalPrice = () => {
+    if (!cachedGameData.zapperPrice || !amount || parseInt(amount) <= 0) {
+      return 'Loading price...';
+    }
+    const totalPrice = parseFloat(cachedGameData.zapperPrice) * parseInt(amount);
+    return `${totalPrice.toFixed(3)}E`;
+  };
+
   const isButtonDisabled = () => {
     return isGameOver || !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
@@ -186,7 +195,7 @@ export default function Zapp() {
               
               <div className="p-2 space-y-1">
                 <p className="text-black text-base font-bold m-0">
-                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
+                  {calculateTotalPrice()}
                 </p>
                 {isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#aa32d2' }}>
@@ -202,7 +211,7 @@ export default function Zapp() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
+                {cachedGameData.zappersMinted ?? '…'} Minted!
               </h2>
 
               <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>

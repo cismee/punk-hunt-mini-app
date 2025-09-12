@@ -177,6 +177,15 @@ function Ducks() {
     return prizePool.toFixed(3);
   };
 
+  // Calculate total price based on amount input
+  const calculateTotalPrice = () => {
+    if (!cachedGameData.duckPrice || !amount || parseInt(amount) <= 0) {
+      return 'Loading price...';
+    }
+    const totalPrice = parseFloat(cachedGameData.duckPrice) * parseInt(amount);
+    return `${totalPrice.toFixed(3)}E`;
+  };
+
   const isButtonDisabled = () => {
     return isGameOver ||
            !isConnected || 
@@ -223,7 +232,7 @@ function Ducks() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                Ã—
+                ×
               </button>
             </div>
           </div>
@@ -270,7 +279,7 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
+                  {calculateTotalPrice()}
                 </p>
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
@@ -294,7 +303,7 @@ function Ducks() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksMinted ?? 'â€¦'} Minted!
+                {cachedGameData.ducksMinted ?? '…'} Minted!
               </h2>
               
               <p className="text-black m-n4">Duck Prize Pool: <span className="text-white text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
