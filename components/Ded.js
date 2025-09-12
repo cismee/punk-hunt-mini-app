@@ -72,7 +72,7 @@ const SENT_ZAPPER_EVENT_ABI = {
 
 export default function Ded() {
   const { address, isConnected } = useAccount();
-  const [amount, setAmount] = useState('1');
+  const [amount, setAmount] = useState('5');
   const [huntingStartSupply, setHuntingStartSupply] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showShotsFired, setShowShotsFired] = useState(false);
