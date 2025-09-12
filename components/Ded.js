@@ -78,6 +78,7 @@ export default function Ded() {
   const [showShotsFired, setShowShotsFired] = useState(false);
   const [zappersSent, setZappersSent] = useState(null);
   const [processedHashes, setProcessedHashes] = useState(new Set());
+  const [notificationCounter, setNotificationCounter] = useState(0);
   const publicClient = usePublicClient();
   
   const cachedGameData = useCachedGameData();
@@ -95,7 +96,7 @@ export default function Ded() {
   // Check if game is over (winner is not zero address)
   const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
 
-  // Fetch events when transaction is confirmed
+  // Fixed notification creation with better ID generation and batching
   useEffect(() => {
     const fetchTransactionEvents = async () => {
       if (isConfirmed && hash && address && zappersSent && !processedHashes.has(hash)) {
@@ -113,6 +114,9 @@ export default function Ded() {
           
           console.log('Main contract logs:', mainContractLogs);
           
+          // Batch process all notifications to avoid timing issues
+          const newNotifications = [];
+          
           mainContractLogs.forEach((log, index) => {
             let notification;
             
@@ -125,23 +129,26 @@ export default function Ded() {
               
               const { tokenId, hit, owned } = decodedLog.args;
               
+              // Generate unique ID using counter + timestamp + index
+              const uniqueId = `${Date.now()}_${notificationCounter + index}_${Math.random().toString(36).substr(2, 9)}`;
+              
               if (!hit) {
                 notification = {
-                  id: Date.now() + Math.random(),
+                  id: uniqueId,
                   message: "You Missed!",
                   txHash: hash,
                   backgroundColor: '#fbb304'
                 };
               } else if (owned) {
                 notification = {
-                  id: Date.now() + Math.random(),
+                  id: uniqueId,
                   message: `You Shot your Own Duck #${tokenId}!`,
                   txHash: hash,
                   backgroundColor: '#f42a2a'
                 };
               } else {
                 notification = {
-                  id: Date.now() + Math.random(),
+                  id: uniqueId,
                   message: `You hit Duck #${tokenId}!`,
                   txHash: hash,
                   backgroundColor: '#339c1d'
@@ -150,21 +157,31 @@ export default function Ded() {
               
             } catch (decodeError) {
               console.error('Failed to decode log:', decodeError);
+              const uniqueId = `${Date.now()}_${notificationCounter + index}_${Math.random().toString(36).substr(2, 9)}`;
               notification = {
-                id: Date.now() + Math.random(),
+                id: uniqueId,
                 message: `Shot fired!`,
                 txHash: hash,
                 backgroundColor: '#aa32d2'
               };
             }
             
+            newNotifications.push(notification);
+          });
+          
+          // Update counter for next batch
+          setNotificationCounter(prev => prev + mainContractLogs.length);
+          
+          // Add notifications with staggered timing
+          newNotifications.forEach((notification, index) => {
             setTimeout(() => {
               setNotifications(prev => [...prev, notification]);
               
+              // Auto-remove after 5 seconds
               setTimeout(() => {
                 setNotifications(prev => prev.filter(n => n.id !== notification.id));
               }, 5000);
-            }, index * 200);
+            }, index * 150); // Reduced from 200ms to 150ms for faster display
           });
           
           setZappersSent(null);
@@ -177,11 +194,20 @@ export default function Ded() {
     };
     
     fetchTransactionEvents();
-  }, [isConfirmed, hash, address, publicClient, zappersSent, processedHashes]);
+  }, [isConfirmed, hash, address, publicClient, zappersSent, processedHashes, notificationCounter]);
 
+  // Enhanced close notification function
   const closeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
+
+  // Optional cleanup for excessive notifications
+  useEffect(() => {
+    if (notifications.length > 10) {
+      const oldestIds = notifications.slice(0, notifications.length - 10).map(n => n.id);
+      setNotifications(prev => prev.filter(n => !oldestIds.includes(n.id)));
+    }
+  }, [notifications.length]);
 
   // Reset button text after transaction confirms
   useEffect(() => {
@@ -316,20 +342,21 @@ export default function Ded() {
 
   return (
     <>
-      {/* Multiple Notifications */}
-      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 max-w-[280px]">
+      {/* Multiple Notifications - Fixed version with Tailwind */}
+      <div className="fixed top-20 right-2 z-50 flex flex-col gap-2 w-80">
         {notifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="text-white p-3 min-w-[250px] shadow-lg animate-slide-down"
+            className="text-white p-3 w-full shadow-lg animate-slide-down overflow-hidden break-words"
             style={{
               backgroundColor: notification.backgroundColor,
               animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both'
+              animationFillMode: 'both',
+              boxShadow: '4px 4px 0 black'
             }}
           >
             <div className="flex justify-between items-start">
-              <div>
+              <div className="flex-1 mr-2">
                 <div className="mb-2 font-bold text-sm">
                   {notification.message}
                 </div>
@@ -344,7 +371,7 @@ export default function Ded() {
               </div>
               <button
                 onClick={() => closeNotification(notification.id)}
-                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
+                className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none flex-shrink-0"
               >
                 ✕
               </button>
@@ -458,7 +485,7 @@ export default function Ded() {
       <style jsx>{`
         @keyframes slide-down {
           from {
-            transform: translateY(-100%);
+            transform: translateY(-20px);
             opacity: 0;
           }
           to {
