@@ -38,6 +38,18 @@ function Ducks() {
   // Check if game is over (winner is not zero address)
   const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
 
+  // Calculate total price dynamically
+  const calculateTotalPrice = () => {
+    if (!cachedGameData.duckPrice || !amount || parseInt(amount) <= 0) {
+      return 'Loading price...';
+    }
+    
+    const totalPrice = parseFloat(cachedGameData.duckPrice) * parseInt(amount);
+    // Remove trailing zeros by converting to string and using parseFloat to remove them
+    const formattedPrice = parseFloat(totalPrice.toString()).toString();
+    return `${formattedPrice}E`;
+  };
+
   // Show notifications when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -270,7 +282,7 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
+                  {calculateTotalPrice()}
                 </p>
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
