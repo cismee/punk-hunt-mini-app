@@ -177,13 +177,24 @@ function Ducks() {
     return prizePool.toFixed(3);
   };
 
-  // Calculate total price based on amount input
+  // Calculate total price based on amount input (convert from Wei to ETH)
   const calculateTotalPrice = () => {
     if (!cachedGameData.duckPrice || !amount || parseInt(amount) <= 0) {
       return 'Loading price...';
     }
-    const totalPrice = parseFloat(cachedGameData.duckPrice) * parseInt(amount);
-    return `${totalPrice.toFixed(3)}E`;
+    // Convert from Wei (string) to ETH and multiply by quantity
+    const priceInWei = cachedGameData.duckPrice;
+    const priceInEth = parseFloat(priceInWei) / 1e18; // Convert Wei to ETH
+    const totalPrice = priceInEth * parseInt(amount);
+    
+    // Format based on the size of the number
+    if (totalPrice >= 0.001) {
+      return `${totalPrice.toFixed(3)}E`;
+    } else if (totalPrice >= 0.000001) {
+      return `${(totalPrice * 1000).toFixed(3)}mE`; // Show in milliETH
+    } else {
+      return `${(totalPrice * 1000000).toFixed(3)}μE`; // Show in microETH
+    }
   };
 
   const isButtonDisabled = () => {
