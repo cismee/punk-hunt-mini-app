@@ -110,26 +110,6 @@ export default function Zapp() {
     return prizePool.toFixed(3);
   };
 
-  // Calculate total price based on amount input (convert from Wei to ETH)
-  const calculateTotalPrice = () => {
-    if (!cachedGameData.zapperPrice || !amount || parseInt(amount) <= 0) {
-      return 'Loading price...';
-    }
-    // Convert from Wei (string) to ETH and multiply by quantity
-    const priceInWei = cachedGameData.zapperPrice;
-    const priceInEth = parseFloat(priceInWei) / 1e18; // Convert Wei to ETH
-    const totalPrice = priceInEth * parseInt(amount);
-    
-    // Format based on the size of the number
-    if (totalPrice >= 0.001) {
-      return `${totalPrice.toFixed(3)}E`;
-    } else if (totalPrice >= 0.000001) {
-      return `${(totalPrice * 1000).toFixed(3)}mE`; // Show in milliETH
-    } else {
-      return `${(totalPrice * 1000000).toFixed(3)}μE`; // Show in microETH
-    }
-  };
-
   const isButtonDisabled = () => {
     return isGameOver || !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
@@ -206,7 +186,7 @@ export default function Zapp() {
               
               <div className="p-2 space-y-1">
                 <p className="text-black text-base font-bold m-0">
-                  {calculateTotalPrice()}
+                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
                 </p>
                 {isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#aa32d2' }}>
@@ -222,7 +202,7 @@ export default function Zapp() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.zappersMinted ?? '…'} Minted!
+                {cachedGameData.zappersMinted ?? 'â€¦'} Minted!
               </h2>
 
               <p className="text-white m-n4">Hunter Prize Pool: <span className="text-black text-sm sm:text-base">{calculateZapperPrizePool()}E</span></p>

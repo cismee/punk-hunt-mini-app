@@ -177,26 +177,6 @@ function Ducks() {
     return prizePool.toFixed(3);
   };
 
-  // Calculate total price based on amount input (convert from Wei to ETH)
-  const calculateTotalPrice = () => {
-    if (!cachedGameData.duckPrice || !amount || parseInt(amount) <= 0) {
-      return 'Loading price...';
-    }
-    // Convert from Wei (string) to ETH and multiply by quantity
-    const priceInWei = cachedGameData.duckPrice;
-    const priceInEth = parseFloat(priceInWei) / 1e18; // Convert Wei to ETH
-    const totalPrice = priceInEth * parseInt(amount);
-    
-    // Format based on the size of the number
-    if (totalPrice >= 0.001) {
-      return `${totalPrice.toFixed(3)}E`;
-    } else if (totalPrice >= 0.000001) {
-      return `${(totalPrice * 1000).toFixed(3)}mE`; // Show in milliETH
-    } else {
-      return `${(totalPrice * 1000000).toFixed(3)}μE`; // Show in microETH
-    }
-  };
-
   const isButtonDisabled = () => {
     return isGameOver ||
            !isConnected || 
@@ -243,7 +223,7 @@ function Ducks() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none"
               >
-                ×
+                Ã—
               </button>
             </div>
           </div>
@@ -290,7 +270,7 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {calculateTotalPrice()}
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
                 </p>
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
@@ -314,7 +294,7 @@ function Ducks() {
               )}
 
               <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
-                {cachedGameData.ducksMinted ?? '…'} Minted!
+                {cachedGameData.ducksMinted ?? 'â€¦'} Minted!
               </h2>
               
               <p className="text-black m-n4">Duck Prize Pool: <span className="text-white text-sm sm:text-base">{calculateDuckPrizePool()}E</span></p>
