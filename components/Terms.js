@@ -53,7 +53,7 @@ function Terms() {
               </button>
             </div>
             <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-              <div className="nes-container is-dark" style={{ padding: '20px', fontSize: '14px', lineHeight: '1.4' }}>
+              <div className="nes-container is-dark" style={{ padding: '8px', fontSize: '14px', lineHeight: '1.4' }}>
                 
                 <h2>TERMS OF SERVICE</h2>
                 <p><strong>Punk HUNT NFT Game</strong></p>
