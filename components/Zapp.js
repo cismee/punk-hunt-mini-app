@@ -28,6 +28,24 @@ export default function Zapp() {
   // Check if game is over (winner is not zero address)
   const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
 
+  // Calculate total price in wei
+  const calculateTotalPriceWei = () => {
+    if (!cachedGameData.zapperPrice || !amount || parseInt(amount) <= 0) {
+      return 'Loading price...';
+    }
+    
+    // Convert zapper price from ETH to wei (multiply by 10^18)
+    const zapperPriceWei = BigInt(Math.floor(parseFloat(cachedGameData.zapperPrice) * 1e18));
+    const totalPriceWei = zapperPriceWei * BigInt(parseInt(amount));
+    
+    // Convert to string and remove trailing zeros
+    let weiString = totalPriceWei.toString();
+    // Remove trailing zeros but keep at least one digit
+    weiString = weiString.replace(/0+$/, '') || '0';
+    
+    return `${weiString} wei`;
+  };
+
   // Show notification when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -185,8 +203,8 @@ export default function Zapp() {
               </button>
               
               <div className="p-2 space-y-1">
-                <p className="text-black text-base font-bold m-0">
-                  {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E` : 'Loading price...'}
+                <p className="text-black text-xs font-bold m-0">
+                  {calculateTotalPriceWei()}
                 </p>
                 {isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#aa32d2' }}>
