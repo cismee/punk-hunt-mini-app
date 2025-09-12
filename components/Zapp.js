@@ -8,7 +8,7 @@ const zapp = '/img/zapp_animation.gif';
 
 export default function Zapp() {
   const { address, isConnected } = useAccount();
-  const [amount, setAmount] = useState('5');
+  const [amount, setAmount] = useState('1');
   const [notifications, setNotifications] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [mintedAmount, setMintedAmount] = useState(null);
