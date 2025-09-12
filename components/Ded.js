@@ -154,7 +154,7 @@ export default function Ded() {
                 id: Date.now() + Math.random(),
                 message: `Shot fired!`,
                 txHash: hash,
-                backgroundColor: '#97E500'
+                backgroundColor: '#aa32d2'
               };
             }
             
