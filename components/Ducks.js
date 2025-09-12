@@ -270,7 +270,7 @@ function Ducks() {
               
               <div className="p-2 space-y-1">
                 <p style={{ color: '#000', margin: 0 }} className="font-bold">
-                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E PER` : 'Loading price...'}
                 </p>
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
