@@ -38,24 +38,6 @@ function Ducks() {
   // Check if game is over (winner is not zero address)
   const isGameOver = cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
 
-  // Calculate total price in wei
-  const calculateTotalPriceWei = () => {
-    if (!cachedGameData.duckPrice || !amount || parseInt(amount) <= 0) {
-      return 'Loading price...';
-    }
-    
-    // Convert duck price from ETH to wei (multiply by 10^18)
-    const duckPriceWei = BigInt(Math.floor(parseFloat(cachedGameData.duckPrice) * 1e18));
-    const totalPriceWei = duckPriceWei * BigInt(parseInt(amount));
-    
-    // Convert to string and remove trailing zeros
-    let weiString = totalPriceWei.toString();
-    // Remove trailing zeros but keep at least one digit
-    weiString = weiString.replace(/0+$/, '') || '0';
-    
-    return `${weiString} wei`;
-  };
-
   // Show notifications when mint is confirmed and hash is available
   useEffect(() => {
     if (isConfirmed && hash && mintedAmount && !processedHashes.has(hash)) {
@@ -287,8 +269,8 @@ function Ducks() {
               </button>
               
               <div className="p-2 space-y-1">
-                <p style={{ color: '#000', margin: 0 }} className="font-bold text-xs">
-                  {calculateTotalPriceWei()}
+                <p style={{ color: '#000', margin: 0 }} className="font-bold">
+                  {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E` : 'Loading price...'}
                 </p>
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
