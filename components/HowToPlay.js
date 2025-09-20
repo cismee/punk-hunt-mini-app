@@ -132,11 +132,11 @@ export default function HowToPlay() {
                 <a href="#burn" className="text-[#3a3afc] underline">
                   shoot ducks!
                 </a>{' '}
-                Be wary of friendly fire—it's RNG.
+                Be wary of friendly fire. It's RNG.
               </p>
               <br />
               <p className="faq">
-                <b className="text-[#f42a2a]">STEP 4:</b> LAST Duck STANDING wins!
+                <b className="text-[#f42a2a]">STEP 4:</b> LAST Duck Holder STANDING wins!
               </p>
               <br />
               <p className="faq">
@@ -148,7 +148,7 @@ export default function HowToPlay() {
               </p>
               <br />
               <p className="text-[#f42a2a] font-bold faq">
-                *Last 3 Ducks and Top Shot receive blue-chip NFTs representing up to 50% of the
+                *Last 3 Duck holders and Top Shot receive blue-chip NFTs representing up to 50% of the
                 mint funds.*
               </p>
               <br />

@@ -20,11 +20,11 @@ function Faq() {
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
                 <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo&apos;s Duck Hunt. Players compete to be
-                the <strong>last duck standing</strong> while hunting for <strong>Top Shot</strong> (most eliminations).
+                the <strong>last duck holder standing</strong> while hunting for <strong>Top Shot</strong> (most eliminations).
               </p>
               <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to zap Ducks.</p>
               <p className="faq">Eliminated ducks get <strong>burned</strong>, and pepe appears.</p>
-              <p className="faq">The hunt ends when <strong>one Duck</strong> remains.</p>
+              <p className="faq">The hunt ends when <strong>one Duck holder</strong> remains.</p>
             </div>
           </div>
         </div>
@@ -56,7 +56,7 @@ function Faq() {
               <p className="faq">
                 The objective: mint ducks and receive zappers, shoot Ducks by burning{' '}
                 <a className="underline text-black" href="#zappmint">Zappers</a>.
-                The game ends when one Duck remains. The Top 3 Last Ducks Standing and Top Shot (most hits) receive{' '}
+                The game ends when one Duck holder remains. The 3 Last Duck holders Standing and Top Shot (most hits) receive{' '}
                 <strong>blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>.
               </p>
               <p className="faq">
@@ -74,8 +74,8 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">So it&apos;s not a collectible?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Correct. This is an <strong>NFT game</strong>, not a static collectible. It&apos;s <strong>anti-collectible</strong> - your NFT will
-                likely be burned. When the game completes, only one NFT remains.
+                Correct. This is an <strong>NFT game</strong>, not a static collectible. It's <strong>anti-collectible</strong>. Your NFT will
+              likely be burned. When the game completes, only one holder remains.
               </p>
             </div>
           </div>
@@ -89,7 +89,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What happens when I get shot?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Your Duck gets <strong>rekt</strong> - the NFT is burned and its image changes to show it&apos;s eliminated. No respawns, no second chances.
+                Your Duck gets <strong>rekt</strong>. The NFT is burned and its image changes to show it&apos;s eliminated. No respawns, no second chances.
               </p>
             </div>
           </div>
@@ -103,7 +103,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How long does the game last?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Until mathematical elimination. Could be hours, days, or weeks depending on participation and elimination activity.
+                Until one duck holder remains. Could be hours, days, or weeks depending on participation and elimination activity.
               </p>
             </div>
           </div>
@@ -183,7 +183,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How are targets chosen?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                You don&apos;t pick. Each Zap fires at a <strong>random Duck</strong> for fairness. Sometimes you miss, sometimes you hit.
+                You don&apos;t pick. Each Zap fires at a <strong>random Duck</strong> for fairness. Sometimes you miss, sometimes you hit. Be weary of friendly fire.
                 Your hit rate decreases as fewer Ducks remain alive.
               </p>
             </div>
@@ -254,7 +254,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Do I get rewarded if I win?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Yes. <strong>The Top Shot</strong> (most hits) and <strong>3 Last Ducks Standing</strong> (final surviving Ducks) each receive
+                Yes. <strong>The Top Shot</strong> (most hits) and <strong>3 Last Duck holders Standing</strong> (final surviving Duck holders) each receive
                 <strong> blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>. Track standings and prize pool on the{' '} 
                 <a className="underline text-black" href="#stats"> leaderboard</a>.
               </p>

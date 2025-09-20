@@ -327,7 +327,7 @@ function Ducks() {
                 className="block mt-2 mb-6"
               >
                 <h3 style={{ color: '#ff650b' }} className="text-sm sm:text-base font-bold">
-                  Last 3 ducks win bluechip NFTs!
+                  Last 3 duck holders win bluechip NFTs!
                 </h3>
               </a>
             </div>
