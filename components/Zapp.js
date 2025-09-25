@@ -1,5 +1,5 @@
 // components/Zapp.js
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
@@ -8,6 +8,7 @@ const zapp = '/img/zapp_animation.gif';
 
 export default function Zapp() {
   const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   const [amount, setAmount] = useState('5');
   const [notifications, setNotifications] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -72,7 +73,22 @@ export default function Zapp() {
     }
     
     if (!isConnected) {
-      console.log('Wallet not connected');
+      console.log('Wallet not connected, attempting to connect...');
+      
+      // Use the same connection logic as nav.js
+      const injectedConnector = connectors.find(connector => 
+        connector.id === 'injected' || connector.name.toLowerCase().includes('injected')
+      );
+      
+      try {
+        if (injectedConnector) {
+          await connect({ connector: injectedConnector });
+        } else if (connectors[0]) {
+          await connect({ connector: connectors[0] });
+        }
+      } catch (err) {
+        console.error('Wallet connection failed:', err);
+      }
       return;
     }
     
@@ -111,7 +127,7 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
-    return isGameOver || !isConnected || isPending || isConfirming || !amount || parseInt(amount) <= 0;
+    return isGameOver || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
 
   return (

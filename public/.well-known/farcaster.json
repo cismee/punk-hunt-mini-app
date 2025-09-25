@@ -16,7 +16,7 @@
     "tagline": " OnChain NFT Duck Hunt",
     "tags": ["nft", "duck hunt", "nes", "90s", "onchain", "baseapp"],
     "primaryCategory": "games",
-    "splashBackgroundColor": "#000",
+    "splashBackgroundColor": "#000000",
     "screenshotUrls": [
       "https://punk-hunt-mini-app.vercel.app/screenshot1.png",
       "https://punk-hunt-mini-app.vercel.app/screenshot2.png"

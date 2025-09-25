@@ -5,7 +5,7 @@ const TEXT = [
   'MINT DUCKS',
   'BUY ZAPPERS',
   'SHOOT DUCKS',
-  'LAST 3 DUCKS STANDING WIN',
+  'LAST 3 DUCK HOLDERS WIN',
   'TOP SHOT WINS',
   'BLUECHIP PRIZES',
 ].join(' >>>\u00A0') + ' >>>\u00A0';

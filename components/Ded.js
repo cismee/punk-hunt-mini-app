@@ -1,5 +1,5 @@
 // components/Ded.js
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData, useCachedUserData } from './hooks/useCachedData';
@@ -72,6 +72,7 @@ const SENT_ZAPPER_EVENT_ABI = {
 
 export default function Ded() {
   const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   const [amount, setAmount] = useState('5');
   const [huntingStartSupply, setHuntingStartSupply] = useState(0);
   const [notifications, setNotifications] = useState([]);
@@ -254,7 +255,22 @@ export default function Ded() {
     }
     
     if (!isConnected) {
-      console.log('Wallet not connected');
+      console.log('Wallet not connected, attempting to connect...');
+      
+      // Use the same connection logic as nav.js
+      const injectedConnector = connectors.find(connector => 
+        connector.id === 'injected' || connector.name.toLowerCase().includes('injected')
+      );
+      
+      try {
+        if (injectedConnector) {
+          await connect({ connector: injectedConnector });
+        } else if (connectors[0]) {
+          await connect({ connector: connectors[0] });
+        }
+      } catch (err) {
+        console.error('Wallet connection failed:', err);
+      }
       return;
     }
     
@@ -309,14 +325,14 @@ export default function Ded() {
   const isButtonDisabled = () => {
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
     return isGameOver ||
-           !isConnected || 
            liveDucks <= 1 ||
-           !cachedGameData.huntingSeason || 
+           (!isConnected && cachedGameData.huntingSeason) || 
+           (!cachedGameData.huntingSeason && isConnected) ||
            isPending || 
            isConfirming || 
            !amount || 
            parseInt(amount) <= 0 ||
-           parseInt(amount) > cachedUserData.zapperBalance;
+           (isConnected && parseInt(amount) > cachedUserData.zapperBalance);
   };
 
   const getProgressValue = () => {

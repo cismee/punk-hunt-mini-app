@@ -1,5 +1,5 @@
 // components/Ducks.js
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { useGameContract } from './hooks/useGameContract';
 import { useCachedGameData } from './hooks/useCachedData';
@@ -9,6 +9,7 @@ const fence = '/img/fence_alt.png';
 
 function Ducks() {
   const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   const [amount, setAmount] = useState('5');
   const [timeLeft, setTimeLeft] = useState('');
   const [notifications, setNotifications] = useState([]);
@@ -139,7 +140,22 @@ function Ducks() {
     }
     
     if (!isConnected) {
-      console.log('Wallet not connected');
+      console.log('Wallet not connected, attempting to connect...');
+      
+      // Use the same connection logic as nav.js
+      const injectedConnector = connectors.find(connector => 
+        connector.id === 'injected' || connector.name.toLowerCase().includes('injected')
+      );
+      
+      try {
+        if (injectedConnector) {
+          await connect({ connector: injectedConnector });
+        } else if (connectors[0]) {
+          await connect({ connector: connectors[0] });
+        }
+      } catch (err) {
+        console.error('Wallet connection failed:', err);
+      }
       return;
     }
     
@@ -179,7 +195,6 @@ function Ducks() {
 
   const isButtonDisabled = () => {
     return isGameOver ||
-           !isConnected || 
            timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
            isConfirming || 
