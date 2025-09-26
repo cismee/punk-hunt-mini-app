@@ -464,7 +464,7 @@ export default function Ded() {
                 {getDuckStatusText()}
               </h2>
               <h3 className="p-2 mx-2 text-black text-sm sm:text-base">
-                The game ends when one duck remains.
+                The game ends when one duck holder remains.
               </h3>
               <a 
                 href="#faq"
