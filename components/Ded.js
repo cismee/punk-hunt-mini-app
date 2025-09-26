@@ -431,7 +431,7 @@ export default function Ded() {
               
               <div className="p-2 space-y-1">
                 <div className="text-sm text-white">
-                  <span className="text-black font-bold">TX FEE</span><br />
+                  <span className="text-black font-bold">TX FEE (50 MAX PER)</span><br />
                   Zappers: {cachedUserData.zapperBalance}
                 </div>
                 {!isGameOver && (
