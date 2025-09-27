@@ -407,17 +407,25 @@ export default function Ded() {
             <div className="w-full text-center">
               <h1 className="p-2 text-black text-lg sm:text-xl lg:text-2xl font-bold">
                 Shoot
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  min="1"
-                  max={cachedUserData.zapperBalance || 0}
-                  className="nes-input mx-2 mb-2 p-2 w-12 sm:w-16 text-center"
-                  style={{ fontSize: '16px' }}
-                  id="shoot_field"
-                  disabled={isGameOver}
-                />
+<input
+  type="number"
+  value={amount}
+  onChange={(e) => {
+    const value = e.target.value;
+    // If the value is greater than 50, set it to 50
+    if (parseInt(value) > 50) {
+      setAmount('50');
+    } else {
+      setAmount(value);
+    }
+  }}
+  min="1"
+  max="50"  // Changed from {cachedUserData.zapperBalance || 0} to "50"
+  className="nes-input mx-2 mb-2 p-2 w-12 sm:w-16 text-center"
+  style={{ fontSize: '16px' }}
+  id="shoot_field"
+  disabled={isGameOver}
+/>
                 Ducks!
               </h1>
 
