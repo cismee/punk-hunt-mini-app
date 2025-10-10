@@ -19,13 +19,13 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What is this?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo's Duck Hunt. Players compete to be
-                the <strong>last duck holder standing</strong> while hunting for <strong>Top Shot</strong> (most eliminations).
+                Punk HUNT is a PvP onchain NFT game inspired by Nintendo's Duck Hunt. Players compete to be
+                the last <a className="underline text-black" href="#duckmint">Duck</a> holder standing while hunting for <strong>Top Shot</strong> (most eliminations).
               </p><br />
               <p className="faq">Mint <a className="underline text-black" href="#duckmint">Ducks</a>, receive <a className="underline text-black" href="#zappmint">Zappers</a>.</p><br />
               <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to <a className="underline text-black" href="#burn">shoot ducks</a>.</p><br />
-              <p className="faq">Ded ducks get <strong>burned</strong>, and pepe appears.</p><br />
-              <p className="faq"><a className="underline text-black" href="#burn">Hunting SZN</a> ends when <strong>one Duck holder</strong> remains.</p>
+              <p className="faq">Ded ducks get burned, and pepe appears.</p><br />
+              <p className="faq"><a className="underline text-black" href="#burn">Hunting SZN</a> ends when one Duck holder remains.</p>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">So it's not a collectible?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Correct. This is an <strong>NFT game</strong>, not a static collectible. The NFTs are meant to be used. <a className="underline text-black" href="#duckmint">Ducks</a> and <a className="underline text-black" href="#zappmint">Zappers</a> are Open Editions designed to be burned during gameplay. When the game ends, only one <a className="underline text-black" href="#duckmint">Duck</a> holder remains standing.
+                Correct. This is an <strong>NFT game</strong>, not a static collectible. The NFTs are meant to be used. <a className="underline text-black" href="#duckmint">Ducks</a> and <a className="underline text-black" href="#zappmint">Zappers</a> are Open Editions designed to be burned during gameplay.<br /><br />When the game ends, only one <a className="underline text-black" href="#duckmint">Duck</a> holder remains standing.
               </p>
             </div>
           </div>
@@ -188,7 +188,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">I minted a Duck, now what?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Your call. <strong>Hodl and hope</strong>, or join the <a className="underline text-black" href="#burn">Hunt</a> and mint extra <a className="underline text-black" href="#zappmint">Zappers</a>. Eliminate <a className="underline text-black" href="#duckmint">Ducks</a> to climb the leaderboard and compete for Top Shot.
+                Your call. <strong>Hodl and hope</strong>, or join the <a className="underline text-black" href="#burn">Hunt</a> and mint extra <a className="underline text-black" href="#zappmint">Zappers</a>.<br /><br /> Eliminate <a className="underline text-black" href="#duckmint">Ducks</a> to climb the <a className="underline text-black" href="#stats">leaderboad</a> and compete for Top Shot.
               </p>
               <br />
               <p className="faq">
@@ -304,7 +304,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How much ETH is in the prize pool?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                The <a className="underline text-black" href="#duckmint">Duck</a> and <a className="underline text-black" href="#zappmint">Zapper</a> prize pool are listed under their corresponding mint pages, onchain, and on the leaderboard.
+                The <a className="underline text-black" href="#duckmint">Duck</a> and <a className="underline text-black" href="#zappmint">Zapper</a> prize pool are listed under their corresponding mint pages, onchain, and on the <a className="underline text-black" href="#stats">leaderboad</a>.
               </p>
             </div>
           </div>
