@@ -25,7 +25,7 @@ function Faq() {
               <p className="faq">Mint <a className="underline text-black" href="#duckmint">Ducks</a>, receive <a className="underline text-black" href="#zappmint">Zappers</a>.</p><br />
               <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to <a className="underline text-black" href="#burn">shoot ducks</a>.</p><br />
               <p className="faq">Ded ducks get burned, and pepe appears.</p><br />
-              <p className="faq"><a className="underline text-black" href="#burn">Hunting SZN</a> ends when one Duck holder remains.</p>
+              <p className="faq"><a className="underline text-black" href="#burn">Hunting SZN</a> ends when one <a className="underline text-black" href="#duckmint">Duck</a> holder remains.</p>
             </div>
           </div>
         </div>
