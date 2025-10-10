@@ -19,12 +19,13 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What is this?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo&apos;s Duck Hunt. Players compete to be
+                <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo's Duck Hunt. Players compete to be
                 the <strong>last duck holder standing</strong> while hunting for <strong>Top Shot</strong> (most eliminations).
               </p>
-              <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to zap Ducks.</p>
-              <p className="faq">Eliminated ducks get <strong>burned</strong>, and pepe appears.</p>
-              <p className="faq">The hunt ends when <strong>one Duck holder</strong> remains.</p>
+              <p className="faq">Mint <a className="underline text-black" href="#duckmint">Ducks</a>, receive Zappers.</p>
+              <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to <a className="underline text-black" href="#burn">shoot ducks</a>.</p>
+              <p className="faq">Ded ducks get <strong>burned</strong>, and pepe appears.</p>
+              <p className="faq"><a className="underline text-black" href="#burn">Hunting SZN</a> ends when <strong>one Duck holder</strong> remains.</p>
             </div>
           </div>
         </div>
@@ -37,7 +38,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">What blockchain is this on?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Base mainnet. All transactions cost real ETH. No testnets, no fake money.
+                <a className="underline text-black" href="https://base.org">Base Mainnnet</a>
               </p>
             </div>
           </div>
@@ -54,13 +55,13 @@ function Faq() {
                 &quot;PvP&quot; stands for &quot;Player versus Player.&quot; Punk HUNT is an elimination NFT game.
               </p>
               <p className="faq">
-                The objective: mint ducks and receive zappers, shoot Ducks by burning{' '}
+                The objective: mint ducks and receive <a className="underline text-black" href="#zappmint">Zappers</a>, <a className="underline text-black" href="#burn">shoot ducks</a> by burning{' '}
                 <a className="underline text-black" href="#zappmint">Zappers</a>.
-                The game ends when one Duck holder remains. The 3 Last Duck holders Standing and Top Shot (most hits) receive{' '}
+                The game ends when one <a className="underline text-black" href="#duckmint">Duck</a> holder remains. The Last 3 <a className="underline text-black" href="#duckmint">Duck</a> Holders Standing and Top Shot (most hits) receive{' '}
                 <strong>blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>.
               </p>
               <p className="faq">
-                It&apos;s like &quot;<a className="underline text-black" href="https://en.wikipedia.org/wiki/King_of_the_hill_(game)" target="_blank" rel="noopener noreferrer">king-of-the-hill</a>&quot; with a non-fungible twist.
+                It's like &quot;<a className="underline text-black" href="https://en.wikipedia.org/wiki/King_of_the_hill_(game)">king-of-the-hill</a>&quot; with a non-fungible twist.
               </p>
             </div>
           </div>
@@ -71,11 +72,132 @@ function Faq() {
       <div className="w-full px-2 sm:px-4 pt-4">
         <div className="flex flex-wrap justify-center">
           <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">So it&apos;s not a collectible?</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-3">So it's not a collectible?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Correct. This is an <strong>NFT game</strong>, not a static collectible. It's <strong>anti-collectible</strong>. Your NFT will
-              likely be burned. When the game completes, only one holder remains.
+                Correct. This is an <strong>NFT game</strong>, not a static collectible. The NFTs are meant to be used. <a className="underline text-black" href="#duckmint">Ducks</a> and <a className="underline text-black" href="#zappmint">Zappers</a> are Open Editions designed to be burned during gameplay. When the game ends, only one <a className="underline text-black" href="#duckmint">Duck</a> holder remains standing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Open Edition */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">What's an Open Edition? How long can I mint?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Open Edition means unlimited supply during the mint window.
+              </p>
+              <br />
+              <p className="faq">
+                <a className="underline text-black" href="#duckmint">Ducks</a> 5-day mint window (100 max per wallet)
+              </p>
+              <p className="faq">
+                <a className="underline text-black" href="#zappmint">Zappers</a> Available throughout the entire game, no mint limit.
+              </p>
+              <br />
+              <p className="faq">
+                <a className="underline text-black" href="#burn">Hunting SZN</a> begins on Day 3, so mint early if you want to survive!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* When shooting starts */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">When can I start shooting?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">When <a className="underline text-black" href="#burn">Hunting SZN</a> begins, as shown on the website, <a className="underline text-black" href="https://basescan.org/address/0x831d0CC6fb4bDa004D2d49342085e5299A9B782B">onchain</a>, and announced on <a className="underline text-black" href="https://x.com/cartyisme">Twitter</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Why shoot zappers */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">Why should I shoot Zappers?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Because passive holders are sitting <a className="underline text-black" href="#duckmint">Ducks</a>.
+              </p>
+              <br />
+              <p className="faq">
+                The math is simple: when you <a className="underline text-black" href="#burn">shoot ducks</a>, there's only a &gt;1% chance of hitting your own <a className="underline text-black" href="#duckmint">Duck</a>. That means 99%+ of your shots 
+                eliminate the competition while your <a className="underline text-black" href="#duckmint">Ducks</a> remain safe.
+              </p>
+              <br />
+              <p className="faq">
+                Active hunters control the game. Passive holders pray. Choose wisely.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Targeting */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">How are targets chosen?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                You don't pick. Each Zap fires at a random <a className="underline text-black" href="#duckmint">Duck</a> for fairness. Sometimes you miss, sometimes you hit. Be wary of friendly fire.
+                Your hit rate decreases as fewer <a className="underline text-black" href="#duckmint">Ducks</a> remain alive.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Zapper consumption */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">What happens to my Zappers when I shoot?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Zaps are burned. Whether you hit or miss. Each shot costs one <a className="underline text-black" href="#zappmint">Zapper</a> permanently.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Kamikaze */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">Can I shoot my own Ducks?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Yes, friendly fire is possible but, as mentioned above, rare.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Minted a Duck */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">I minted a Duck, now what?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Your call. <strong>Hodl and hope</strong>, or join the <a className="underline text-black" href="#burn">Hunt</a> and mint extra <a className="underline text-black" href="#zappmint">Zappers</a>. Eliminate
+                <a className="underline text-black" href="#duckmint">Ducks</a> to climb the leaderboard and compete for Top Shot.
+              </p>
+              <br />
+              <p className="faq">
+                Remember: Each <a className="underline text-black" href="#duckmint">Duck</a> mint includes one free <a className="underline text-black" href="#zappmint">Zapper</a> to get you started.
               </p>
             </div>
           </div>
@@ -86,10 +208,24 @@ function Faq() {
       <div className="w-full px-2 sm:px-4 pt-4">
         <div className="flex flex-wrap justify-center">
           <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">What happens when I get shot?</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-3">What happens when a Duck get shot?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Your Duck gets <strong>rekt</strong>. The NFT is burned and its image changes to show it&apos;s eliminated. No respawns, no second chances.
+                Your <a className="underline text-black" href="#duckmint">Duck</a> gets <strong>rekt</strong>. The NFT is burned and its image changes to show it's eliminated. No respawns, no second chances.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* See hits */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">When I hunt, can I see what I hit?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Yes. The UI shows your recent hits. You can also verify on BaseScan, at the linked tx, or watch activity unfold in the trollbox.
               </p>
             </div>
           </div>
@@ -103,7 +239,92 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How long does the game last?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Until one duck holder remains. Could be hours, days, or weeks depending on participation and elimination activity.
+                Until one <a className="underline text-black" href="#duckmint">Duck</a> holder remains. Could be hours, days, or weeks depending on participation and elimination activity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payouts */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">Do I get rewarded if I win?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Yes. Winners split up to 50% of all mint funds in blue-chip NFTs:
+              </p>
+              <br />
+              <p className="faq">
+                <strong><a className="underline text-black" href="#duckmint">Duck</a> PRIZE POOL (50% of Duck mint revenue):</strong>
+              </p>
+              <p className="faq">
+                - Last <a className="underline text-black" href="#duckmint">Duck</a> Standing: 50%
+              </p>
+              <p className="faq">
+                - 2nd Place: 30%
+              </p>
+              <p className="faq">
+                - 3rd Place: 20%
+              </p>
+              <br />
+              <p className="faq">
+                <strong>HUNTER PRIZE POOL (50% of <a className="underline text-black" href="#zappmint">Zapper</a> mint revenue):</strong>
+              </p>
+              <p className="faq">
+                - Top Shot (Most Kills): 100%
+              </p>
+              <br />
+              <p className="faq">
+                Prize quality scales with participation. Track your standing on the{' '}
+                <a className="underline text-black" href="#stats">leaderboard</a>. It updates in real-time as the carnage unfolds.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bluechip NFTs */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">What are blue-chip NFTs?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                Blue-chip NFTs are established collections with sustained demand and liquidity.
+              </p>
+              <br />
+              <p className="faq">
+                Prize quality scales with the total prize pool. More players = bigger pool = better prizes. Invite your friends!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Prize pool amount */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">How much ETH is in the prize pool?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                The <a className="underline text-black" href="#duckmint">Duck</a> and <a className="underline text-black" href="#zappmint">Zapper</a> prize pool are listed under their corresponding mint pages, onchain, and on the leaderboard.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Where paid */}
+      <div className="w-full px-2 sm:px-4 pt-4">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full max-w-4xl px-2">
+            <h2 className="text-lg sm:text-xl font-bold mb-3">Where do I get paid?</h2>
+            <div className="space-y-3 text-sm sm:text-base">
+              <p className="faq">
+                You'll be paid at the wallet address corresponding to the winners onchain, denoted at the Contract Address.
               </p>
             </div>
           </div>
@@ -117,7 +338,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Can I withdraw if I change my mind?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                No refunds. Once you mint, you&apos;re committed to the game.
+                No refunds. Once you mint, you're committed to the game.
               </p>
             </div>
           </div>
@@ -136,173 +357,6 @@ function Faq() {
         </div>
       </div>
 
-      {/* Minted a Duck */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">I minted a Duck, now what?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                Your call. <strong>Hodl and hope</strong>, or <strong>join the hunt</strong> by minting/burning Zappers. Eliminate
-                 Ducks to climb the leaderboard. Each Duck Mint comes with a free zapper.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mint limits */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">Mint limits?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq"><strong>Ducks:</strong> None. Mint as many as you want.</p>
-              <p className="faq"><strong>Zappers:</strong> No cap. Fire as many as you like.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* When shooting starts */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">When can I start shooting?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">When <strong>Hunting SZN</strong> begins, as shown on the website and contract. And announced on X.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Targeting */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">How are targets chosen?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                You don&apos;t pick. Each Zap fires at a <strong>random Duck</strong> for fairness. Sometimes you miss, sometimes you hit. Be weary of friendly fire.
-                Your hit rate decreases as fewer Ducks remain alive.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Zapper consumption */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">What happens to my Zappers when I shoot?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                Zaps are burned. Whether you hit or miss. Each shot costs one Zapper permanently.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Kamikaze */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">Can I shoot my own Ducks?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                Yes, but eliminating your own ducks doesn&apos;t increase your kill count.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* See hits */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">Can I see what I hit?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                Yes. The UI shows your recent hits; you can also verify on BaseScan, or watch activity unfold in the trollbox.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Ded check */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">How do I know if my Duck is eliminated?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                When it&apos;s burned. Your Duck&apos;s image and traits will flip to <strong>rekt</strong>, and the transaction shows the elimination.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Payouts */}
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">Do I get rewarded if I win?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                Yes. <strong>The Top Shot</strong> (most hits) and <strong>3 Last Duck holders Standing</strong> (final surviving Duck holders) each receive
-                <strong> blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>. Track standings and prize pool on the{' '} 
-                <a className="underline text-black" href="#stats"> leaderboard</a>.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">What do you mean by bluechip NFTs?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                Bluechip NFTs represent the liquid digital assets in the NFT market. Collections that have demonstrated sustained demand.
-              </p>
-<br />
-              <p className="faq">
-               NFT rewards are selected based on the total prize pool generated during gameplay.
-              </p>
-<br />
-              <p className="faq">
-               Prize quality scales dynamically with community participation and pool size
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
-
-
-
-      <div className="w-full px-2 sm:px-4 pt-4">
-        <div className="flex flex-wrap justify-center">
-          <div className="w-full max-w-4xl px-2">
-            <h2 className="text-lg sm:text-xl font-bold mb-3">Where do I get paid?</h2>
-            <div className="space-y-3 text-sm sm:text-base">
-              <p className="faq">
-                You&apos;ll be paid at the wallet address corresponding to the winners onchain, denoted @ the CA.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Roadmap */}
       <div className="w-full px-2 sm:px-4 pt-4">
         <div className="flex flex-wrap justify-center">
@@ -310,7 +364,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Roadmap?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                A memecoin!? Round 2!? Time will tell. Follow us on X to stay current.
+                A memecoin? Round 2? Time will tell. Follow us on X to stay current.
               </p>
               <div className="py-2" />
             </div>
