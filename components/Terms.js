@@ -61,7 +61,7 @@ function Terms() {
                 <p><strong>PLEASE READ THESE TERMS OF SERVICE CAREFULLY BEFORE USING THE PUNK HUNT NFT GAME APPLICATION. BY ACCESSING OR USING OUR SERVICE, YOU AGREE TO BE BOUND BY THESE TERMS.</strong></p>
 
                 <h3>1. ACCEPTANCE OF TERMS AND AGREEMENT FORMATION</h3>
-                <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and [COMPANY NAME] ("Company," "we," "us," or "our"), a California-based entity, governing your use of the Punk HUNT NFT game application, website, and related services (collectively, the "Service").</p>
+                <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and PunkHunt ("Company," "we," "us," or "our"), a California-based entity, governing your use of the Punk HUNT NFT game application, website, and related services (collectively, the "Service").</p>
 
                 <h4>1.1 Multiple Forms of Agreement</h4>
                 <p><strong>BY ANY OF THE FOLLOWING ACTIONS, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS:</strong></p>

@@ -99,6 +99,18 @@ function Ducks() {
 
   // Update countdown timer using cached mint end timestamp with fallback
   useEffect(() => {
+    // 🆕 Check if game hasn't started first
+    if (!cachedGameData.gameStarted) {
+      setTimeLeft('MINTING SOON!');
+      return;
+    }
+
+    // Check if game is over
+    if (cachedGameData.winner && cachedGameData.winner !== '0x0000000000000000000000000000000000000000') {
+      setTimeLeft('GAME OVER!');
+      return;
+    }
+
     // Use cached timestamp or fallback to 14 days from now
     const mintEndTimestamp = cachedGameData.ducksMintEndTimestamp || 
                             (Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60));
@@ -129,7 +141,7 @@ function Ducks() {
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [cachedGameData.ducksMintEndTimestamp]); // Will work even if undefined
+  }, [cachedGameData.ducksMintEndTimestamp, cachedGameData.winner, cachedGameData.gameStarted]); // 🆕 Added gameStarted to dependencies
 
   const handleMint = async () => {
     console.log('Mint button clicked', { isConnected, amount, address });
@@ -176,6 +188,11 @@ function Ducks() {
   };
 
   const getButtonText = () => {
+    // HIGHEST PRIORITY: Check if game hasn't started yet
+    if (!cachedGameData.gameStarted) {
+      return 'Loading ROM...';
+    }
+    
     if (isGameOver) return 'GAME OVER!';
     if (!isConnected) return 'CONNECT WALLET';
     if (timeLeft === 'HAPPY HUNTING!') return 'MINT CLOSED';
@@ -194,6 +211,11 @@ function Ducks() {
   };
 
   const isButtonDisabled = () => {
+    // HIGHEST PRIORITY: Disable if game hasn't started
+    if (!cachedGameData.gameStarted) {
+      return true;
+    }
+    
     return isGameOver ||
            timeLeft === 'HAPPY HUNTING!' ||
            isPending || 
@@ -290,9 +312,9 @@ function Ducks() {
                 {timeLeft && !isGameOver && (
                   <p className="mt-2 text-sm sm:text-base font-bold"
                      style={{ 
-                       color: timeLeft === 'HAPPY HUNTING!' ? '#ff650b' : '#f42a2a'
+                       color: timeLeft === 'HAPPY HUNTING!' || timeLeft === 'MINTING SOON!' ? '#ff650b' : '#f42a2a'
                      }}>
-                    {timeLeft === 'HAPPY HUNTING!' ? timeLeft : `Mint Ends in: ${timeLeft}`}
+                    {timeLeft === 'HAPPY HUNTING!' || timeLeft === 'MINTING SOON!' ? timeLeft : `Mint Ends in: ${timeLeft}`}
                   </p>
                 )}
                 {isGameOver && (

@@ -1,5 +1,6 @@
 // components/Splash.js
 import React from 'react';
+import { useCachedGameData } from './hooks/useCachedData';
 
 const logo = '/img/punkhunt.png';
 const etherscan = '/img/Pixel_Etherscan_Hunt.png';
@@ -7,6 +8,8 @@ const opensea = '/img/opensea.png';
 const twitter = '/img/x_alt.png';
 
 export default function Splash() {
+  const cachedGameData = useCachedGameData();
+  
   // Sound effect handlers
   const handleMenuClick = (soundKey, targetId) => {
     // Enable audio and play sound
@@ -25,6 +28,34 @@ export default function Splash() {
       }
     }, 100);
   };
+
+  // 🆕 Determine game status message and color
+  const getGameStatus = () => {
+    // Check if game is over (winner exists and not zero address)
+    const gameCompleted = cachedGameData.winner && 
+                         cachedGameData.winner !== '0x0000000000000000000000000000000000000000';
+    
+    if (gameCompleted) {
+      return {
+        message: 'Game Over!',
+        color: '#f42a2a' // Red
+      };
+    }
+    
+    if (cachedGameData.gameStarted) {
+      return {
+        message: 'Game Started - Happy Hunting!',
+        color: '#97E500' // Green
+      };
+    }
+    
+    return {
+      message: 'Game Starts 10/28/25 @ 9AM PDT',
+      color: '#aa32d2' // Purple
+    };
+  };
+
+  const gameStatus = getGameStatus();
 
   return (
     <section className="splash bg-black text-white flex flex-col justify-center" id="splash" data-sfx="splash">
@@ -47,6 +78,16 @@ export default function Splash() {
             <h2 className="pt-2 px-2 uppercase font-bold">
               An Onchain PvP NFT Elimination Game
             </h2>
+            {/* 🆕 Game Status Line */}
+            <p 
+              className="pt-2 px-2 font-bold"
+              style={{ 
+                color: gameStatus.color,
+                textShadow: '2px 2px 0 rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              {gameStatus.message}
+            </p>
           </div>
         </div>
       </div>
@@ -133,13 +174,13 @@ export default function Splash() {
 
             {/* Social Icons */}
             <div className="flex justify-center items-center space-x-4">
-              <a href="https://opensea.io/" target="_blank" rel="noreferrer" className="hover:opacity-75 transition-opacity">
+              <a href="https://opensea.io/item/base/0x068Addbbc8789C1F3Ba7e384B5614cF6c210c177/1" target="_blank" rel="noreferrer" className="hover:opacity-75 transition-opacity">
                 <img src={opensea} alt="OpenSea" className="h-8 mx-2 sm:h-8 w-auto" />
               </a>
               <a href="https://x.com/cartyisme" target="_blank" rel="noreferrer" className="hover:opacity-75 transition-opacity">
                 <img src={twitter} alt="X/Twitter" className="h-8 mx-2 sm:h-8 w-auto" />
               </a>
-              <a href="https://basescan.org" target="_blank" rel="noreferrer" className="hover:opacity-75 transition-opacity">
+              <a href="https://basescan.org/address/0x831d0CC6fb4bDa004D2d49342085e5299A9B782B#code" target="_blank" rel="noreferrer" className="hover:opacity-75 transition-opacity">
                 <img src={etherscan} alt="BaseScan" className="h-8 mx-2 sm:h-8 w-auto" />
               </a>
             </div>

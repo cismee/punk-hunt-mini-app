@@ -306,6 +306,11 @@ export default function Ded() {
   };
 
   const getButtonText = () => {
+    // HIGHEST PRIORITY: Check if game hasn't started yet
+    if (!cachedGameData.gameStarted) {
+      return 'LOADING ROM...';
+    }
+    
     if (isGameOver) return 'GAME OVER!';
     if (!isConnected) return 'CONNECT WALLET';
     
@@ -323,6 +328,11 @@ export default function Ded() {
   };
 
   const isButtonDisabled = () => {
+    // HIGHEST PRIORITY: Disable if game hasn't started
+    if (!cachedGameData.gameStarted) {
+      return true;
+    }
+    
     const liveDucks = cachedGameData.ducksMinted - cachedGameData.ducksRekt;
     return isGameOver ||
            liveDucks <= 1 ||
@@ -389,7 +399,7 @@ export default function Ded() {
                 onClick={() => closeNotification(notification.id)}
                 className="bg-transparent border-none text-white text-lg cursor-pointer p-0 leading-none flex-shrink-0"
               >
-                ✕
+                ×
               </button>
             </div>
           </div>
@@ -442,16 +452,17 @@ export default function Ded() {
                   <span className="text-black font-bold">TX FEE (50 MAX PER)</span><br />
                   Zappers: {cachedUserData.zapperBalance}
                 </div>
+                {/* Updated hunting season text - shows "GAME OVER!" in red when game ends */}
                 {!isGameOver && (
                   <h2 className="mt-2 text-base sm:text-lg font-bold"
                       style={{ 
                         color: cachedGameData.huntingSeason ? '#97e500' : '#f42a2a'
                       }}>
-                    {cachedGameData.huntingSeason ? "IT'S HUNTING SZN!" : "Hunting SZN Coming Soon"}
+                    {cachedGameData.huntingSeason ? "IT'S HUNTING SZN!" : "Hunting SZN Soon..."}
                   </h2>
                 )}
                 {isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#97e500' }}>
+                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#f42a2a' }}>
                     GAME OVER!
                   </p>
                 )}

@@ -109,6 +109,11 @@ export default function Zapp() {
   };
 
   const getButtonText = () => {
+    //  HIGHEST PRIORITY: Check if game hasn't started yet
+    if (!cachedGameData.gameStarted) {
+      return 'LOADING ROM...';
+    }
+    
     if (isGameOver) return 'GAME OVER!';
     if (!isConnected) return 'CONNECT WALLET';
     if (isPending) return 'CONFIRM IN WALLET...';
@@ -127,6 +132,11 @@ export default function Zapp() {
   };
 
   const isButtonDisabled = () => {
+    //  HIGHEST PRIORITY: Disable if game hasn't started
+    if (!cachedGameData.gameStarted) {
+      return true;
+    }
+    
     return isGameOver || isPending || isConfirming || !amount || parseInt(amount) <= 0;
   };
 
