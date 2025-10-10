@@ -252,7 +252,7 @@ function Faq() {
               </p>
               <br />
               <p className="faq">
-                <strong><a className="underline text-black" href="#duckmint">Duck</a> PRIZE POOL (50% of Duck mint revenue):</strong>
+                <strong><a className="underline text-black" href="#duckmint">Duck</a> PRIZE POOL (50% of <a className="underline text-black" href="#duckmint">Duck</a> mint revenue):</strong>
               </p>
               <p className="faq">
                 - Last <a className="underline text-black" href="#duckmint">Duck</a> Standing: 50%
@@ -358,7 +358,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">Roadmap?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                A memecoin? Round 2? Time will tell. Follow us on X to stay current.
+                A memecoin? Round 2? Time will tell. Follow <a className="underline text-black" href="https://cartyis.me">Cartyisme</a> on <a className="underline text-black" href="https://x.com/cartyisme">X</a> to stay current.
               </p>
               <div className="py-2" />
             </div>

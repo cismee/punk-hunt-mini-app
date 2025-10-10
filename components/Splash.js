@@ -80,7 +80,7 @@ export default function Splash() {
             </h2>
             {/* Game Status Line */}
             <p 
-              className="pt-2 px-2 font-bold"
+              className="pt-2 px-2"
               style={{ 
                 color: gameStatus.color,
                 textShadow: '2px 2px 0 rgba(0, 0, 0, 0.3)'

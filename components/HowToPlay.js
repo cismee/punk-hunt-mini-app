@@ -129,10 +129,7 @@ export default function HowToPlay() {
               <br />
               <p className="faq">
                 <b className="text-[#f42a2a]">STEP 3:</b> Hunting Szn? Burn Zappers to{' '}
-                <a href="#burn" className="text-[#3a3afc] underline">
-                  shoot ducks!
-                </a>{' '}
-                Be wary of friendly fire. It's RNG.
+                <a href="#burn" className="text-[#3a3afc] underline">shoot ducks</a>!
               </p>
               <br />
               <p className="faq">
