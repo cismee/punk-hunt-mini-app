@@ -78,7 +78,7 @@ export default function Splash() {
             <h2 className="pt-2 px-2 uppercase font-bold">
               An Onchain PvP NFT Elimination Game
             </h2>
-            {/* 🆕 Game Status Line */}
+            {/* Game Status Line */}
             <p 
               className="pt-2 px-2 font-bold"
               style={{ 
