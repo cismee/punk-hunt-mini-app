@@ -21,10 +21,10 @@ function Faq() {
               <p className="faq">
                 <strong>Punk HUNT</strong> is a PvP onchain NFT game inspired by Nintendo's Duck Hunt. Players compete to be
                 the <strong>last duck holder standing</strong> while hunting for <strong>Top Shot</strong> (most eliminations).
-              </p>
-              <p className="faq">Mint <a className="underline text-black" href="#duckmint">Ducks</a>, receive Zappers.</p>
-              <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to <a className="underline text-black" href="#burn">shoot ducks</a>.</p>
-              <p className="faq">Ded ducks get <strong>burned</strong>, and pepe appears.</p>
+              </p><br />
+              <p className="faq">Mint <a className="underline text-black" href="#duckmint">Ducks</a>, receive <a className="underline text-black" href="#zappmint">Zappers</a>.</p><br />
+              <p className="faq">Burn <a className="underline text-black" href="#zappmint">Zappers</a> to <a className="underline text-black" href="#burn">shoot ducks</a>.</p><br />
+              <p className="faq">Ded ducks get <strong>burned</strong>, and pepe appears.</p><br />
               <p className="faq"><a className="underline text-black" href="#burn">Hunting SZN</a> ends when <strong>one Duck holder</strong> remains.</p>
             </div>
           </div>
@@ -55,10 +55,8 @@ function Faq() {
                 &quot;PvP&quot; stands for &quot;Player versus Player.&quot; Punk HUNT is an elimination NFT game.
               </p>
               <p className="faq">
-                The objective: mint ducks and receive <a className="underline text-black" href="#zappmint">Zappers</a>, <a className="underline text-black" href="#burn">shoot ducks</a> by burning{' '}
-                <a className="underline text-black" href="#zappmint">Zappers</a>.
-                The game ends when one <a className="underline text-black" href="#duckmint">Duck</a> holder remains. The Last 3 <a className="underline text-black" href="#duckmint">Duck</a> Holders Standing and Top Shot (most hits) receive{' '}
-                <strong>blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>.
+                The objective: mint ducks and receive <a className="underline text-black" href="#zappmint">Zappers</a>, <a className="underline text-black" href="#burn">shoot ducks</a> by burning{' '}<a className="underline text-black" href="#zappmint">Zappers</a>.<br />
+                The game ends when one <a className="underline text-black" href="#duckmint">Duck</a> holder remains. <br />The Last 3 <a className="underline text-black" href="#duckmint">Duck</a> Holders Standing and Top Shot (most hits) receive{' '}<strong>blue-chip NFTs</strong> representing up to <strong>50% of the mint funds</strong>.
               </p>
               <p className="faq">
                 It's like &quot;<a className="underline text-black" href="https://en.wikipedia.org/wiki/King_of_the_hill_(game)">king-of-the-hill</a>&quot; with a non-fungible twist.
@@ -130,8 +128,7 @@ function Faq() {
               </p>
               <br />
               <p className="faq">
-                The math is simple: when you <a className="underline text-black" href="#burn">shoot ducks</a>, there's only a &gt;1% chance of hitting your own <a className="underline text-black" href="#duckmint">Duck</a>. That means 99%+ of your shots 
-                eliminate the competition while your <a className="underline text-black" href="#duckmint">Ducks</a> remain safe.
+                The math is simple: when you <a className="underline text-black" href="#burn">shoot ducks</a>, there's only a &gt;1% chance of hitting your own <a className="underline text-black" href="#duckmint">Duck</a>. That means 99%+ of your shots eliminate the competition while your <a className="underline text-black" href="#duckmint">Ducks</a> remain safe.
               </p>
               <br />
               <p className="faq">
@@ -149,8 +146,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">How are targets chosen?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                You don't pick. Each Zap fires at a random <a className="underline text-black" href="#duckmint">Duck</a> for fairness. Sometimes you miss, sometimes you hit. Be wary of friendly fire.
-                Your hit rate decreases as fewer <a className="underline text-black" href="#duckmint">Ducks</a> remain alive.
+                You don't pick. Each Zap fires at a random <a className="underline text-black" href="#duckmint">Duck</a> for fairness. Sometimes you miss, sometimes you hit. Be wary of friendly fire. Your hit rate decreases as fewer <a className="underline text-black" href="#duckmint">Ducks</a> remain alive.
               </p>
             </div>
           </div>
@@ -192,8 +188,7 @@ function Faq() {
             <h2 className="text-lg sm:text-xl font-bold mb-3">I minted a Duck, now what?</h2>
             <div className="space-y-3 text-sm sm:text-base">
               <p className="faq">
-                Your call. <strong>Hodl and hope</strong>, or join the <a className="underline text-black" href="#burn">Hunt</a> and mint extra <a className="underline text-black" href="#zappmint">Zappers</a>. Eliminate
-                <a className="underline text-black" href="#duckmint">Ducks</a> to climb the leaderboard and compete for Top Shot.
+                Your call. <strong>Hodl and hope</strong>, or join the <a className="underline text-black" href="#burn">Hunt</a> and mint extra <a className="underline text-black" href="#zappmint">Zappers</a>. Eliminate <a className="underline text-black" href="#duckmint">Ducks</a> to climb the leaderboard and compete for Top Shot.
               </p>
               <br />
               <p className="faq">
@@ -277,8 +272,7 @@ function Faq() {
               </p>
               <br />
               <p className="faq">
-                Prize quality scales with participation. Track your standing on the{' '}
-                <a className="underline text-black" href="#stats">leaderboard</a>. It updates in real-time as the carnage unfolds.
+                Prize quality scales with participation. Track your standing on the{' '}<a className="underline text-black" href="#stats">leaderboard</a>. It updates in real-time as the carnage unfolds.
               </p>
             </div>
           </div>
