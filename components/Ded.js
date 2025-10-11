@@ -454,15 +454,15 @@ export default function Ded() {
                 </div>
                 {/* Updated hunting season text - shows "GAME OVER!" in red when game ends */}
                 {!isGameOver && (
-                  <h2 className="mt-2 text-base sm:text-lg font-bold"
+                  <p className="mt-2 text-base sm:text-lg"
                       style={{ 
                         color: cachedGameData.huntingSeason ? '#97e500' : '#f42a2a'
                       }}>
                     {cachedGameData.huntingSeason ? "IT'S HUNTING SZN!" : "Hunting SZN Soon..."}
-                  </h2>
+                  </p>
                 )}
                 {isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#f42a2a' }}>
+                  <p className="mt-2 text-sm sm:text-base" style={{ color: '#f42a2a' }}>
                     GAME OVER!
                   </p>
                 )}
