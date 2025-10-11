@@ -306,7 +306,7 @@ function Ducks() {
               </button>
               
               <div className="p-2 space-y-1">
-                <p style={{ color: '#000', margin: 0 }} className=">
+                <p style={{ color: '#000', margin: 0 }} className="">
                   {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E PER [100 MAX]` : 'Loading price...'}
                 </p>
                 {timeLeft && !isGameOver && (
