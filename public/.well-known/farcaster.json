@@ -1,29 +1,53 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjIzNTc0MywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDRmM0Q2OWUxQ0I0NTliZjQ0ZEY3NzA2MTllMWU0YzI1ZGY3MjlFMzAifQ",
-    "payload": "eyJkb21haW4iOiJwdW5rLWh1bnQtbWluaS1hcHAudmVyY2VsLmFwcCJ9",
-    "signature": "MHg0OThhZTBlYmE5OWVlOGM1NTFkNGU3MTk3ZTVhOWRiYjBjNDRlYmFhYjRiY2ZlNDBlOTM3MjNlNmFkNmEyNjhhNzg3ZDMxYWMwOTk4NmYyNjU1NGJmOGExNjEwZTliY2Y3YjJhZGI5ZjkxMDRhY2U2ZjUxMTVkMjJjMzgyYWEyNjFj"
+    "header": "eyJmaWQiOjIzNTc0MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweGZlYzA2MjZiMDYyNWI0QWYyMkYwOTZjOWVGYTIzNTk3MDI4MEE0OGMifQ",
+    "payload": "eyJkb21haW4iOiJtaW5pLnB1bmtodW50LmdnIn0",
+    "signature": "8eo9FMGNmDDq6NZKl/pBx5m2ZRJrTibSeJsJLUNf2nhwwoCS2HYT1tny7nG8JCsDjwdz521IO3fuwWBg2nzelhs="
+  },
+    "baseBuilder": {
+    "allowedAddresses": ["0x807B479354813182aCEdb5051125f0a31DdB01CB"]
+  },
+   "miniapp": {
+    "version": "1",
+    "name": "Punk Hunt",
+    "homeUrl": "https://mini.punkhunt.gg",
+    "iconUrl": "https://mini.punkhunt.gg/icon.png",
+    "splashImageUrl": "https://mini.punkhunt.gg/splash.png",
+    "splashBackgroundColor": "#000000",
+    "subtitle": "A PVP NFT Elimination Game.",
+    "description": "Mint Ducks > Buy Zappers > Shoot Ducks > Last 3 Duck Holders Win > Top Shot Wins > BlueChip NFT Prizes",
+    "screenshotUrls": [
+      "https://mini.punkhunt.gg/screenshot1.png",
+      "https://mini.punkhunt.gg/screenshot2.png"
+    ],
+    "primaryCategory": "games",
+    "tags": ["nft", "duck hunt", "nes", "games", "onchain", "baseapp"],
+    "heroImageUrl": "https://mini.punkhunt.gg/hero.png",
+    "tagline": "Save instantly",
+    "ogTitle": "Punk Hunt",
+    "ogDescription": "An OnChain NFT Duck Hunt",
+    "ogImageUrl": "https://mini.punkhunt.gg/og-image.png",
+    "noindex": false
   },
   "frame": {
     "version": "1",
-    "name": "Punk Hunt [TEST]",
-    "iconUrl": "https://punk-hunt-mini-app.vercel.app/icon.png",
-    "homeUrl": "https://punk-hunt-mini-app.vercel.app",
-    "imageUrl": "https://punk-hunt-mini-app.vercel.app/preview.png",
-    "splashImageUrl": "https://punk-hunt-mini-app.vercel.app/splash.png",
-    "subtitle": "PVP NFT Elimination Game.",
-    "description": "Mint Ducks >>> Buy Zappers >>> Shoot Ducks >>> Last 3 Duck Holders Win >>> Top Shot Wins >>> BlueChip NFT Prizes",
-    "tagline": " OnChain NFT Duck Hunt",
-    "tags": ["nft", "duck hunt", "nes", "90s", "onchain", "baseapp"],
+    "name": "Punk Hunt",
+    "iconUrl": "https://mini.punkhunt.gg/icon.png",
+    "homeUrl": "https://mini.punkhunt.gg",
+    "imageUrl": "https://mini.punkhunt.gg/preview.png",
+    "splashImageUrl": "https://mini.punkhunt.gg/splash.png",
+    "subtitle": "A PVP NFT Elimination Game.",
+    "description": "Mint Ducks > Buy Zappers > Shoot Ducks > Last 3 Duck Holders Win > Top Shot Wins > BlueChip NFT Prizes",
+    "tagline": "An OnChain NFT Duck Hunt",
+    "tags": ["nft", "duck hunt", "nes", "games", "onchain", "baseapp"],
     "primaryCategory": "games",
     "splashBackgroundColor": "#000000",
     "screenshotUrls": [
-      "https://punk-hunt-mini-app.vercel.app/screenshot1.png",
-      "https://punk-hunt-mini-app.vercel.app/screenshot2.png"
+      "https://mini.punkhunt.gg/screenshot1.png",
+      "https://mini.punkhunt.gg/screenshot2.png"
     ],
-    "heroImageUrl": "https://punk-hunt-mini-app.vercel.app/hero.png",
-    "ogImageUrl": "https://punk-hunt-mini-app.vercel.app/og-image.png",
-    "noindex": true
+    "heroImageUrl": "https://mini.punkhunt.gg/hero.png",
+    "ogImageUrl": "https://mini.punkhunt.gg/og-image.png",
+    "noindex": false
   }
 }
-
