@@ -2,9 +2,9 @@ import { base } from 'wagmi/chains';
 
 // Base Mainnet Contract Addresses - UPDATED
 export const CONTRACTS = {
-  DUCK: '0x72eb385982f00BAD17bCA4b4470dAf10ac4E295D',
-  ZAPPER: '0x76A50FD2AB74D498De0fbB4f0aB20654c358bd8E',
-  MAIN: '0x14c647Ed6dbF1573f0D1CF32dBdf323dE81cbAc1'
+  DUCK: '0x068Addbbc8789C1F3Ba7e384B5614cF6c210c177',
+  ZAPPER: '0x6D6356EcF4c5EB4f1aC080eED9FdAd1F9F234b60',
+  MAIN: '0x831d0CC6fb4bDa004D2d49342085e5299A9B782B'
 };
 
 // Full ABI format for wagmi v2
