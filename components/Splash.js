@@ -75,7 +75,7 @@ export default function Splash() {
       <div className="w-full px-4">
         <div className="flex flex-wrap">
           <div className="w-full text-center">
-            <h2 className="pt-2 px-2 uppercase font-bold">
+            <h2 className="pt-2 px-2 uppercase">
               An Onchain PvP NFT Elimination Game
             </h2>
             {/* Game Status Line */}
@@ -101,7 +101,7 @@ export default function Splash() {
               <li className="flex items-center space-x-3 group">
                 <a 
                   href="#duckmint" 
-                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base font-bold"
+                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base"
                   onClick={(e) => {
                     e.preventDefault();
                     handleMenuClick('ducks', 'duckmint');
@@ -114,7 +114,7 @@ export default function Splash() {
               <li className="flex items-center space-x-3 group">
                 <a 
                   href="#zappmint" 
-                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base font-bold"
+                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base"
                   onClick={(e) => {
                     e.preventDefault();
                     handleMenuClick('zappmint', 'zappmint');
@@ -127,7 +127,7 @@ export default function Splash() {
               <li className="flex items-center space-x-3 group">
                 <a 
                   href="#burn" 
-                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base font-bold"
+                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base"
                   onClick={(e) => {
                     e.preventDefault();
                     handleMenuClick('burn', 'burn');
@@ -140,7 +140,7 @@ export default function Splash() {
               <li className="flex items-center space-x-3 group">
                 <a 
                   href="#stats" 
-                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base font-bold"
+                  className="text-[#ff650b] hover:text-[#ff650b] text-sm sm:text-base "
                   onClick={(e) => {
                     e.preventDefault();
                     handleMenuClick('stats', 'stats');
@@ -168,7 +168,7 @@ export default function Splash() {
                   handleMenuClick('faq', 'faq');
                 }}
               >
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold">Win Bluechip NFTs!</h1>
+                <h1 className="text-lg sm:text-xl lg:text-2xl">Win Bluechip NFTs!</h1>
               </a>
             </div>
 
@@ -185,7 +185,7 @@ export default function Splash() {
               </a>
             </div>
 
-            <h2 className="mt-3 mb-4 uppercase font-bold">©2025 ON BASE</h2>
+            <h2 className="mt-3 mb-4 uppercase">©2025 ON BASE</h2>
           </div>
         </div>
       </div>
