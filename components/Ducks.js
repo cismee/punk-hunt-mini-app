@@ -241,7 +241,7 @@ function Ducks() {
           >
             <div className="flex justify-between items-start">
               <div>
-                <div className="mb-2 font-bold text-sm">
+                <div className="mb-2 text-sm">
                   {notification.type === 'duck' 
                     ? `You minted ${notification.amount} ducks!`
                     : `You received ${notification.amount} free zappers!`
@@ -282,7 +282,7 @@ function Ducks() {
                 <img src={duck} style={{ height: '4em' }} className="w-auto mx-auto" alt="Duck animation" />
               </div>
               
-              <h1 className="text-lg sm:text-xl lg:text-2xl text-black font-bold">
+              <h1 className="text-lg sm:text-xl lg:text-2xl text-black">
                 Mint
                 <input
                   type="number"
@@ -298,7 +298,7 @@ function Ducks() {
               </h1>
               
               <button 
-                className="btn-nes bg-white text-black font-bold text-lg uppercase p-2 cursor-pointer touch-manipulation"
+                className="btn-nes bg-white text-black text-lg uppercase p-2 cursor-pointer touch-manipulation"
                 onClick={handleMint}
                 disabled={isButtonDisabled()}
               >
@@ -306,11 +306,11 @@ function Ducks() {
               </button>
               
               <div className="p-2 space-y-1">
-                <p style={{ color: '#000', margin: 0 }} className="font-bold">
+                <p style={{ color: '#000', margin: 0 }} className=">
                   {cachedGameData.duckPrice ? `${cachedGameData.duckPrice}E PER [100 MAX]` : 'Loading price...'}
                 </p>
                 {timeLeft && !isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold"
+                  <p className="mt-2 text-sm sm:text-base"
                      style={{ 
                        color: timeLeft === 'HAPPY HUNTING!' || timeLeft === 'MINTING SOON!' ? '#f42a2a' : '#f42a2a'
                      }}>
@@ -318,7 +318,7 @@ function Ducks() {
                   </p>
                 )}
                 {isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#ff650b' }}>
+                  <p className="mt-2 text-sm sm:text-base" style={{ color: '#ff650b' }}>
                     GAME OVER!
                   </p>
                 )}
@@ -330,7 +330,7 @@ function Ducks() {
                 </div>
               )}
 
-              <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
+              <h2 className="pb-2 text-black text-base sm:text-lg">
                 {cachedGameData.ducksMinted ?? '…'} Minted!
               </h2>
               
@@ -363,7 +363,7 @@ function Ducks() {
                 }}
                 className="block mt-2 mb-6"
               >
-                <h3 style={{ color: '#ff650b' }} className="text-sm sm:text-base font-bold">
+                <h3 style={{ color: '#ff650b' }} className="text-sm sm:text-base">
                   Last 3 duck holders win bluechip NFTs!
                 </h3>
               </a>

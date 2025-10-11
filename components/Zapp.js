@@ -155,7 +155,7 @@ export default function Zapp() {
           >
             <div className="flex justify-between items-start">
               <div>
-                <div className="mb-2 font-bold text-sm">
+                <div className="mb-2 text-sm">
                   You minted {notification.amount} zappers!
                 </div>
                 <a 
@@ -187,7 +187,7 @@ export default function Zapp() {
         <div className="w-full px-2 sm:px-4 pb-4">
           <div className="flex flex-wrap">
             <div className="w-full text-center">
-              <h1 className="p-2 text-black text-lg sm:text-xl lg:text-2xl font-bold">
+              <h1 className="p-2 text-black text-lg sm:text-xl lg:text-2xl">
                 Mint{' '}
                 <input
                   type="number"
@@ -211,11 +211,11 @@ export default function Zapp() {
               </button>
               
               <div className="p-2 space-y-1">
-                <p className="text-black text-base font-bold m-0">
+                <p className="text-black text-base m-0">
                   {cachedGameData.zapperPrice ? `${cachedGameData.zapperPrice}E PER` : 'Loading price...'}
                 </p>
                 {isGameOver && (
-                  <p className="mt-2 text-sm sm:text-base font-bold" style={{ color: '#aa32d2' }}>
+                  <p className="mt-2 text-sm sm:text-base" style={{ color: '#aa32d2' }}>
                     GAME OVER!
                   </p>
                 )}
@@ -227,7 +227,7 @@ export default function Zapp() {
                 </div>
               )}
 
-              <h2 className="pb-2 text-black text-base sm:text-lg font-bold">
+              <h2 className="pb-2 text-black text-base sm:text-lg">
                 {cachedGameData.zappersMinted ?? '…'} Minted!
               </h2>
 
@@ -255,7 +255,7 @@ export default function Zapp() {
                 }}
                 className="underline text-[#aa32d2] block mt-2  hover:text-[#97E500]"
               >
-                <h3 className="mx-2 text-[#aa32d2] hover:text-[#aa32d2] underline text-sm sm:text-base font-bold">
+                <h3 className="mx-2 text-[#aa32d2] hover:text-[#aa32d2] underline text-sm sm:text-base">
                   Aim carefully, you might miss!
                 </h3>
               </a>

@@ -383,7 +383,7 @@ export default function Ded() {
           >
             <div className="flex justify-between items-start">
               <div className="flex-1 mr-2">
-                <div className="mb-2 font-bold text-sm">
+                <div className="mb-2 text-sm">
                   {notification.message}
                 </div>
                 <a 
@@ -415,7 +415,7 @@ export default function Ded() {
         <div className="w-full px-2 sm:px-4 pt-4">
           <div className="flex flex-wrap">
             <div className="w-full text-center">
-              <h1 className="p-2 text-black text-lg sm:text-xl lg:text-2xl font-bold">
+              <h1 className="p-2 text-black text-lg sm:text-xl lg:text-2xl">
                 Shoot
 <input
   type="number"
@@ -449,7 +449,7 @@ export default function Ded() {
               
               <div className="p-2 space-y-1">
                 <div className="text-sm text-white">
-                  <span className="text-black font-bold">TX FEE (50 MAX PER)</span><br />
+                  <span className="text-black">TX FEE (50 MAX PER)</span><br />
                   Zappers: {cachedUserData.zapperBalance}
                 </div>
                 {/* Updated hunting season text - shows "GAME OVER!" in red when game ends */}
@@ -479,7 +479,7 @@ export default function Ded() {
                 <PixelProgress value={getProgressValue()} max={100} height={32} />
               </div>
 
-              <h2 className="mt-2 text-black text-base sm:text-lg font-bold">
+              <h2 className="mt-2 text-black text-base sm:text-lg">
                 {getDuckStatusText()}
               </h2>
               <h3 className="p-2 mx-2 text-black text-sm sm:text-base">
@@ -503,7 +503,7 @@ export default function Ded() {
                 }}
                 className="underline text-[#97e500] hover:text-[#97e500] block mt-2"
               >
-                <h3 className="mb-4 mx-2 text-[#97e500] hover:text-[#97e500] underline text-sm sm:text-base font-bold">
+                <h3 className="mb-4 mx-2 text-[#97e500] hover:text-[#97e500] underline text-sm sm:text-base">
                   Top Hunter Wins bluechip NFT! 
                 </h3>
               </a>

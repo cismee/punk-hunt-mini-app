@@ -133,7 +133,7 @@ function Stats() {
         <div className="w-full px-2 sm:px-4">
           <div className="flex flex-wrap justify-center">
             <div className="w-full text-center">
-              <h1 className="pt-4 text-xl sm:text-2xl lg:text-3xl font-bold">Loading game data...</h1>
+              <h1 className="pt-4 text-xl sm:text-2xl lg:text-3xl">Loading game data...</h1>
             </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ function Stats() {
       <div className="w-full px-2 sm:px-4">
         <div className="flex flex-wrap justify-center">
           <div className="w-full text-center">
-            <h1 className="pt-4 text-xl sm:text-2xl lg:text-3xl font-bold">leaderboard</h1>
+            <h1 className="pt-4 text-xl sm:text-2xl lg:text-3xl">leaderboard</h1>
           </div>
         </div>
       </div>
@@ -156,10 +156,10 @@ function Stats() {
         <div className="flex flex-wrap justify-center">
           <div className="w-full flex text-center">
             <div className="w-1/2 text-left">
-              <h2 className="text-[#3BC3FD] text-lg sm:text-xl font-bold">Hodlers</h2>
+              <h2 className="text-[#3BC3FD] text-lg sm:text-xl">Hodlers</h2>
             </div>
             <div className="w-1/2 text-right">
-              <h2 className="text-[#3BC3FD] text-lg sm:text-xl font-bold">Ducks</h2>
+              <h2 className="text-[#3BC3FD] text-lg sm:text-xl">Ducks</h2>
             </div>
           </div>
           <hr className="w-full h-1 bg-[#3BC3FD] border-0 my-2 opacity-100" />
@@ -246,10 +246,10 @@ function Stats() {
         <div className="flex flex-wrap justify-center">
           <div className="w-full flex text-center">
             <div className="w-1/2 text-left">
-              <h2 className="text-[#ea6126] text-lg sm:text-xl font-bold">Top Shots</h2>
+              <h2 className="text-[#ea6126] text-lg sm:text-xl">Top Shots</h2>
             </div>
             <div className="w-1/2 text-right">
-              <h2 className="text-[#ea6126] text-lg sm:text-xl font-bold">Hits</h2>
+              <h2 className="text-[#ea6126] text-lg sm:text-xl">Hits</h2>
             </div>
           </div>
           <hr className="w-full h-1 bg-[#ea6126] border-0 opacity-100 my-2" />
@@ -327,10 +327,10 @@ function Stats() {
         <div className="flex flex-wrap justify-center">
           <div className="w-full flex text-center">
             <div className="w-1/2 text-left">
-              <h2 className="text-[#97E500] text-lg sm:text-xl font-bold">Stats</h2>
+              <h2 className="text-[#97E500] text-lg sm:text-xl">Stats</h2>
             </div>
             <div className="w-1/2 text-right">
-              <h2 className="text-[#97E500] text-lg sm:text-xl font-bold">Count</h2>
+              <h2 className="text-[#97E500] text-lg sm:text-xl">Count</h2>
             </div>
           </div>
           <hr className="w-full h-1 bg-[#97E500] border-0 opacity-100 my-2" />
@@ -384,10 +384,10 @@ function Stats() {
         <div className="flex flex-wrap justify-center">
           <div className="w-full flex text-center">
             <div className="w-1/2 text-left">
-              <h2 className="text-[#aa32d2] text-lg sm:text-xl font-bold">Pool</h2>
+              <h2 className="text-[#aa32d2] text-lg sm:text-xl">Pool</h2>
             </div>
             <div className="w-1/2 text-right">
-              <h2 className="text-[#aa32d2] text-lg sm:text-xl font-bold">ETH</h2>
+              <h2 className="text-[#aa32d2] text-lg sm:text-xl">ETH</h2>
             </div>
           </div>
           <hr className="w-full h-1 bg-[#aa32d2] border-0 opacity-100 my-2" />
@@ -421,7 +421,7 @@ function Stats() {
       <div className="w-full px-2 sm:px-4 pt-2 pb-4">
         <div className="flex flex-wrap justify-center">
           <div className="w-full text-center">
-            <h2 className="text-base sm:text-lg font-bold">Contract:</h2>
+            <h2 className="text-base sm:text-lg">Contract:</h2>
             <a 
               className="underline transition-opacity" 
               href={`https://basescan.org/address/${CONTRACTS.MAIN}`}
